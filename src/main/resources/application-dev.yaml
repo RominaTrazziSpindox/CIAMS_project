@@ -54,7 +54,7 @@ spring:
   sql:
     init:
       # Forces execution of data.sql at every startup in order to load mock data into database
-      mode: always
+      mode: never
 
 
 # ============================================
@@ -69,6 +69,6 @@ logging:
   level:
     root: info                            # Default global log level
     org.springframework.web: error        # Suppress noisy web logs
-    org.hibernate: debug                  # General Hibernate logs (entity lifecycle, etc.)
+    org.hibernate: error                  # General Hibernate logs (entity lifecycle, etc.)
     org.hibernate.SQL: debug              # Logs the actual SQL statements executed
     org.hibernate.orm.jdbc.bind: trace    # Logs parameter bindings (shows query values)
