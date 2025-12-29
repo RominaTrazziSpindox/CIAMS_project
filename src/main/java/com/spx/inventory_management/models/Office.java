@@ -10,7 +10,6 @@ import lombok.*;
 @Getter
 @Setter
 @ToString
-
 public class Office {
 
     // Properties
@@ -20,7 +19,10 @@ public class Office {
     @Column(name="id_office", nullable = false)
     private Long id;
 
-    @Column(name="name", nullable = false, length = 100, unique = true)
+    @Column(nullable = false, length = 100, unique = true)
     private String name;
 
 }
+
+
+
