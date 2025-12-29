@@ -12,17 +12,16 @@ spring:
   application:
     name: inventory-management
 
-
-    # --------------------------------------------
-    # Active Spring profile
-    # --------------------------------------------
-    # Determines which configuration files are loaded:
-    # - application-dev.yml   → local development
-    # - application-prod.yml  → production
-    #
-    # NOTE:
-    # This value is often overridden via:
-    # - environment variables
-    # - JVM arguments (-Dspring.profiles.active=prod)
-    profiles:
-      active: dev
+  # --------------------------------------------
+  # Active Spring profile
+  # --------------------------------------------
+  # Determines which configuration files are loaded:
+  # - application-dev.yml   → local development
+  # - application-prod.yml  → production
+  #
+  # NOTE:
+  # This value is often overridden via:
+  # - environment variables
+  # - JVM arguments (-Dspring.profiles.active=prod)
+  profiles:
+    active: dev
