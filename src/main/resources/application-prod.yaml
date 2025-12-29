@@ -1,28 +1,79 @@
+# ============================================
+# SPRING BOOT - PRODUCTION CONFIGURATION (PROD)
+# ============================================
+# Environment: Production
+# Database: PostgreSQL (external / containerized)
+# Purpose:
+# - Secure configuration via environment variables
+# - Strict schema validation (no auto-DDL)
+# - Performance-oriented JPA settings
+# - Minimal logging for stability and clarity
+# ============================================
+
 spring:
   datasource:
+    # --------------------------------------------
+    # JDBC connection details
+    # Values are injected via environment variables
+    # to avoid hardcoding sensitive information.
+    # --------------------------------------------
     url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
+
+    # --------------------------------------------
+    # HikariCP connection pool configuration
+    # Tuned for production workloads:
+    # - higher pool size for concurrent requests
+    # - minimum idle connections to reduce latency
+    # --------------------------------------------
     hikari:
       maximum-pool-size: 20
       minimum-idle: 5
 
+  # --------------------------------------------
+  # JPA and Hibernate configuration
+  # --------------------------------------------
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+
     hibernate:
+      # Validates that the DB schema matches entity mappings.
+      # Fails fast on startup if inconsistencies are found.
+      # Safest option for production (no schema changes allowed).
       ddl-auto: validate
 
+    # Disables SQL logging to reduce I/O overhead
+    # and prevent leaking sensitive information.
     show-sql: false
+
+    # --------------------------------------------
+    # Open Session In View (OSIV)
+    # --------------------------------------------
+    # Closes the JPA session immediately after the service layer.
+    # - Prevents lazy loading outside transactions
+    # - Enforces proper data access boundaries
+    # - Reduces risk of connection leaks
     open-in-view: false
+
     properties:
       hibernate:
         jdbc:
+          # Forces Hibernate to store and read timestamps in UTC
+          # avoiding timezone-related bugs in distributed systems.
           time_zone: UTC
 
+
+# ============================================
+# LOGGING CONFIGURATION
+# ============================================
+# Production logging policy:
+# - Keep logs concise and actionable
+# - Avoid verbose framework and ORM logs
+# - Focus on errors only
+# ============================================
 logging:
   level:
-    root: "info"
-    org.springframework.web: "error"
-    org.hibernate: "error"
-
-
+    root: info                     # Global application log level
+    org.springframework.web: error # Log only web-layer errors
+    org.hibernate: error           # Suppress Hibernate internals

@@ -1,8 +1,28 @@
+# ============================================
+# SPRING BOOT - APPLICATION BOOTSTRAP CONFIG
+# ============================================
+# Application Name: inventory-management
+# Purpose:
+# - Defines the logical application identifier
+# - Controls which Spring profile is active at startup
+# - Acts as the entry point for environment-specific configs
+# ============================================
+
 spring:
   application:
     name: inventory-management
-  profiles:
-    active: dev
 
 
-
+    # --------------------------------------------
+    # Active Spring profile
+    # --------------------------------------------
+    # Determines which configuration files are loaded:
+    # - application-dev.yml   → local development
+    # - application-prod.yml  → production
+    #
+    # NOTE:
+    # This value is often overridden via:
+    # - environment variables
+    # - JVM arguments (-Dspring.profiles.active=prod)
+    profiles:
+      active: dev
