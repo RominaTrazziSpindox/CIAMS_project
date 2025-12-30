@@ -17,7 +17,7 @@ public class Office {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id_office", nullable = false)
-    private Long id;
+    private long id;
 
     @Column(nullable = false, length = 100, unique = true)
     private String name;
