@@ -18,24 +18,24 @@ public class OfficeService {
     // CRUD METHODS FROM JPA
 
     // Retrieve all the offices
-    public List<Office> officeServiceGetAll() {
+    public List<Office> getAllOffices() {
         return officeRepository.findAll();
     }
 
     // Retrieve an office by its id
-    public Office officeServiceGetById(long id) {
+    public Office getOfficeById(long id) {
         return officeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Office not found"));
     }
 
     // Insert a new office into the office list
     @Transactional
-    public Office officeServiceNewOffice(Office newOffice) {
+    public Office newOffice(Office newOffice) {
         return officeRepository.save(newOffice);
     }
 
     // Update an existing office into the office list
     @Transactional
-    public Office officeServiceExistingOffice(Office updatedOffice, long id) {
+    public Office updateExistingOffice(Office updatedOffice, long id) {
 
         // Find an existing office by its id, if it doesn't exist throw an error
         Office existingOffice = officeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Office not found"));
@@ -48,7 +48,7 @@ public class OfficeService {
 
     // Delete an office by its id
     @Transactional
-    public void officeServiceDelete(long id) {
+    public void deleteOfficeById(long id) {
         if (!officeRepository.existsById(id)) {
             throw new EntityNotFoundException("Office not found");
         }
