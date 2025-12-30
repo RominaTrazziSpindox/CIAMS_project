@@ -4,20 +4,22 @@ import com.spx.inventory_management.models.Office;
 import com.spx.inventory_management.repositories.OfficeRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@Slf4j
 public class OfficeService {
 
     @Autowired
     private OfficeRepository officeRepository;
 
-    // CRUD METHODS FROM JPA
+    // CRUD METHODS FROM SPRING DATA JPA
 
-    // Retrieve all the offices
+    // Retrieve all offices
     public List<Office> getAllOffices() {
         return officeRepository.findAll();
     }
@@ -27,20 +29,20 @@ public class OfficeService {
         return officeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Office not found"));
     }
 
-    // Insert a new office into the office list
+    // Insert a new office object into "offices" database table
     @Transactional
     public Office newOffice(Office newOffice) {
         return officeRepository.save(newOffice);
     }
 
-    // Update an existing office into the office list
+    // Update an existing office
     @Transactional
-    public Office updateExistingOffice(Office updatedOffice, long id) {
+    public Office updateExistingOffice(long id, Office updatedOffice) {
 
-        // Find an existing office by its id, if it doesn't exist throw an error
+        // Find the office by its id (return: Optional<Object>)
         Office existingOffice = officeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Office not found"));
 
-        // Set the new office name of the existing office (updating with the property of the parameter object)
+        // Set the new office name with the getter method
         existingOffice.setName(updatedOffice.getName());
 
         return officeRepository.save(existingOffice);
@@ -49,6 +51,8 @@ public class OfficeService {
     // Delete an office by its id
     @Transactional
     public void deleteOfficeById(long id) {
+
+        // Check if the office exists (return: boolean)
         if (!officeRepository.existsById(id)) {
             throw new EntityNotFoundException("Office not found");
         }
