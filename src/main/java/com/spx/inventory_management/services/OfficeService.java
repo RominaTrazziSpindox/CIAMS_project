@@ -10,6 +10,20 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Service layer for managing {@link Office} entities.
+ * <p>
+ * This class encapsulates the business logic related to "offices",
+ * mediating between the Controller (which uses DTOs) and the Repository (which interacts with the database).
+ * </p>
+ *
+ * <p>Responsibilities:</p>
+ * <ul>
+ *   <li>Orchestrate CRUD operations provided by {@link OfficeRepository}</li>
+ *   <li>Handle transactional boundaries for data consistency</li>
+ *   <li>Manage logging and exception handling</li>
+ * </ul>
+ */
 @Service
 @Slf4j
 public class OfficeService {
@@ -17,46 +31,105 @@ public class OfficeService {
     @Autowired
     private OfficeRepository officeRepository;
 
-    // CRUD METHODS FROM SPRING DATA JPA
+    // ==========================================================
+    // READ OPERATIONS
+    // ==========================================================
 
-    // Retrieve all offices
+    /**
+     * Retrieves all {@link Office} entities from the database.
+     *
+     * @return a list of all existing Office entities
+     */
     public List<Office> getAllOffices() {
         return officeRepository.findAll();
     }
 
-    // Retrieve an office by its id
+    /**
+     * Retrieves an {@link Office} entity by its ID.
+     *
+     * @param id the unique identifier of the office
+     * @return the matching Office entity
+     * @throws EntityNotFoundException if no entity with the given ID exists
+     */
     public Office getOfficeById(long id) {
-        return officeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Office not found"));
+        return officeRepository.findById(id).orElseThrow(() -> {
+                    log.error("Office not found. id={}", id);
+                    return new EntityNotFoundException("Office not found");
+        });
     }
 
-    // Insert a new office object into "offices" database table
+    // ==========================================================
+    // CREATE OPERATION
+    // ==========================================================
+
+    /**
+     * Persists a new {@link Office} entity in the database.
+     * <p>
+     * This method is transactional, ensuring rollback in case of runtime exceptions.
+     * </p>
+     *
+     * @param newOffice the new Office entity to be saved
+     * @return the saved Office entity (including its generated ID)
+     */
     @Transactional
-    public Office newOffice(Office newOffice) {
+    public Office createOffice(Office newOffice) {
+        log.info("Creating office. name='{}'", newOffice.getName());
         return officeRepository.save(newOffice);
     }
 
-    // Update an existing office
+    // ==========================================================
+    // UPDATE OPERATION
+    // ==========================================================
+
+    /**
+     * Updates an existing {@link Office} entity.
+     * <p>
+     * Finds the existing record, updates its mutable fields, and saves it back to the database.
+     * </p>
+     *
+     * @param id             the ID of the office to update
+     * @param updatedOffice  an Office object containing the new field values
+     * @return the updated Office entity
+     * @throws EntityNotFoundException if no entity with the given ID exists
+     */
     @Transactional
     public Office updateExistingOffice(long id, Office updatedOffice) {
 
-        // Find the office by its id (return: Optional<Object>)
-        Office existingOffice = officeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Office not found"));
+        // Retrieve the existing office or throw if not found.
+        Office existingOffice = officeRepository.findById(id).orElseThrow(() -> {
+                    log.error("Update failed. Office not found. id={}", id);
+                    return new EntityNotFoundException("Office not found");
+        });
 
-        // Set the new office name with the getter method
+        // Update only mutable fields (in this case: name).
         existingOffice.setName(updatedOffice.getName());
 
+        // Save and return the updated entity.
+        log.info("Updating office. id={}, newName='{}'", id, updatedOffice.getName());
         return officeRepository.save(existingOffice);
     }
 
-    // Delete an office by its id
+    // ==========================================================
+    // DELETE OPERATION
+    // ==========================================================
+
+    /**
+     * Deletes an {@link Office} entity by its ID.
+     *
+     * @param id the ID of the office to delete
+     * @throws EntityNotFoundException if no entity with the given ID exists
+     */
     @Transactional
     public void deleteOfficeById(long id) {
 
-        // Check if the office exists (return: boolean)
+        // Validate entity existence before deletion.
         if (!officeRepository.existsById(id)) {
+            log.error("Delete failed. Office not found. id={}", id);
             throw new EntityNotFoundException("Office not found");
         }
+
+        // Proceed with deletion.
+        log.info("Deleting office. id={}", id);
         officeRepository.deleteById(id);
     }
-
 }
