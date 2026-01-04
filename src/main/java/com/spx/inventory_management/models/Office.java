@@ -10,14 +10,15 @@ import lombok.*;
 @Getter
 @Setter
 @ToString
+
 public class Office {
 
     // Properties
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id_office", nullable = false)
     private long id;
+
 
     @Column(nullable = false, length = 100, unique = true)
     private String name;

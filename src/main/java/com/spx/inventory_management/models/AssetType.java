@@ -1,4 +1,37 @@
 package com.spx.inventory_management.models;
 
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.List;
+
+@Entity
+@Table(name = "asset_types")
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@ToString
 public class AssetType {
+
+    // Properties
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_asset_type", nullable = false)
+    private long id;
+
+
+    @Column(nullable = false, length = 100, unique = true)
+    private String assetTypeName;
+
+
+    @Column(nullable = true, length = 200)
+    private String assetTypeDescription;
+
+
+    // Relation with Asset table on database | List of Assets in Java
+    // It allows to have this method: assetType.getAssets()
+    @OneToMany(mappedBy = "assetType")
+    @ToString.Exclude
+    private List<Asset> assets;
 }
