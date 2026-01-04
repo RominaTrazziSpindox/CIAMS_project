@@ -13,11 +13,11 @@ import java.util.stream.Collectors;
 
 /**
  * REST Controller responsible for managing Office-related operations.
- * <p>
+ *
  * This controller exposes CRUD endpoints for the "offices" resource.
  * It uses DTOs to isolate API contracts from internal JPA entities.
  * The mapping between DTOs and entities is handled by MapStruct.
- * </p>
+ *
  */
 @RestController
 @RequestMapping("/offices")
