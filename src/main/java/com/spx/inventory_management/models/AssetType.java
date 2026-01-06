@@ -3,7 +3,8 @@ package com.spx.inventory_management.models;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "asset_types")
@@ -11,6 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode(of = "assetTypeName")
 @ToString
 public class AssetType {
 
@@ -29,9 +31,12 @@ public class AssetType {
     private String assetTypeDescription;
 
 
-    // Relation with Asset table on database | List of Assets in Java
+    // Relation with Asset table on database
     // It allows to have this method: assetType.getAssets()
-    @OneToMany(mappedBy = "assetType")
+    @OneToMany(mappedBy = "assetType") // Inverse side --> mappedBy
     @ToString.Exclude
-    private List<Asset> assets;
+    // HashSet: no duplicates, no fixed ordered of the items
+    private Set<Asset> assets = new HashSet<>();
 }
+
+
