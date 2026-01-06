@@ -12,17 +12,16 @@ import java.util.List;
 
 /**
  * Service layer for managing {@link Office} entities.
- * <p>
+ *
  * This class encapsulates the business logic related to "offices",
  * mediating between the Controller (which uses DTOs) and the Repository (which interacts with the database).
- * </p>
  *
- * <p>Responsibilities:</p>
- * <ul>
- *   <li>Orchestrate CRUD operations provided by {@link OfficeRepository}</li>
- *   <li>Handle transactional boundaries for data consistency</li>
- *   <li>Manage logging and exception handling</li>
- * </ul>
+ * Responsibilities:
+ *
+ * 1. Orchestrate CRUD operations provided by {@link OfficeRepository}</li>
+ * 2. Handle transactional boundaries for data consistency</li>
+ * 3. Manage logging and exception handling</li>
+ *
  */
 @Service
 @Slf4j
@@ -64,9 +63,8 @@ public class OfficeService {
 
     /**
      * Persists a new {@link Office} entity in the database.
-     * <p>
+     *
      * This method is transactional, ensuring rollback in case of runtime exceptions.
-     * </p>
      *
      * @param newOffice the new Office entity to be saved
      * @return the saved Office entity (including its generated ID)
@@ -83,9 +81,8 @@ public class OfficeService {
 
     /**
      * Updates an existing {@link Office} entity.
-     * <p>
+     *
      * Finds the existing record, updates its mutable fields, and saves it back to the database.
-     * </p>
      *
      * @param id             the ID of the office to update
      * @param updatedOffice  an Office object containing the new field values
