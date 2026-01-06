@@ -12,10 +12,10 @@ public interface OfficeMapper {
 
     // DTO → Entity
     @Mapping(target = "id", ignore = true) // because client doesn't send the ID
-    @Mapping(source = "officeName", target = "name")
+    @Mapping(target = "name", source = "officeName")
     Office toEntity(OfficeRequestDTO dto);
 
     // Entity → DTO
-    @Mapping(source = "name", target = "officeName")
+    @Mapping(target = "officeName", source = "name")
     OfficeResponseDTO toDTO(Office entity);
 }
