@@ -43,7 +43,7 @@ public class Asset {
     @JoinColumn(name = "id_office", nullable = false)
     private Office office;
 
-    // Relation with Software Licence table on database
+    // Relation with Software License table on database
     @ManyToMany(mappedBy = "installedAssets") // Inverse side (many)
     private Set<SoftwareLicense> softwareLicenses = new HashSet<>();
 
