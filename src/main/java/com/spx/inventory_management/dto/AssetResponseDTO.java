@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 public class AssetResponseDTO implements Serializable {
@@ -18,4 +19,7 @@ public class AssetResponseDTO implements Serializable {
     // From AssetType
     private String assetTypeName;
     private String assetTypeDescription;
+
+    // From SoftwareLicenses
+    private Set<SoftwareLicenseResponseDTO> softwareLicenses;
 }
