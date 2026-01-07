@@ -39,7 +39,7 @@ public class AssetTypeController {
      * @return the all asset type dto
      */
     @GetMapping("/all")
-    public List<AssetTypeResponseDTO> getAllAssetTypeDTO() {
+    public List<AssetTypeResponseDTO> getAllAssetType() {
 
         List <AssetTypeResponseDTO> assetTypeResponseDTOS = assetTypeService.getAllAssetTypes()
                 .stream()
@@ -56,7 +56,7 @@ public class AssetTypeController {
      * @return the asset type dto by id
      */
     @GetMapping("/{id}")
-    public AssetTypeResponseDTO getAssetTypeDTOById(@PathVariable long id) {
+    public AssetTypeResponseDTO getAssetTypeById(@PathVariable long id) {
 
         // Step 1: Service retrieves an Asset Type entity by its unique ID.
         AssetType retrievedAssetType = assetTypeService.getAssetTypeById(id);
