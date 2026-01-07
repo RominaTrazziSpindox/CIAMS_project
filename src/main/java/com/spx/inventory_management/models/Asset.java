@@ -3,6 +3,8 @@ package com.spx.inventory_management.models;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Entity
@@ -40,4 +42,9 @@ public class Asset {
     //Foreign key. An asset must have an office collocation.
     @JoinColumn(name = "id_office", nullable = false)
     private Office office;
+
+    // Relation with Software Licence table on database
+    @ManyToMany(mappedBy = "installedAssets") // Inverse side (many)
+    private Set<SoftwareLicense> softwareLicenses = new HashSet<>();
+
 }
