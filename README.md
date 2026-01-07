@@ -2,7 +2,197 @@
 Corporate IT Asset Management System project: a RESTful backend for managing physical offices, hardware assets, and software licenses, with a focus on traceability and compliance.
 
 This project aims to develop a robust and scalable RESTful backend that enables:
- * Cataloging physical company locations (Offices)
- * Standardizing hardware asset types
- * Tracking individual devices and their physical location
- * Managing software licenses installed on devices to ensure legal compliance
+* Cataloging physical company locations (Offices)
+* Standardizing hardware asset types
+* Tracking individual devices and their physical location
+* Managing software licenses installed on devices to ensure legal compliance
+
+---
+
+## 🏗️ Architecture Overview
+
+The application follows a **layered architecture**, with strict separation of concerns:
+
+
+Controller → Service → Repository → Database
+↓
+Mapper
+↓
+DTO
+
+### Layer Responsibilities
+
+- **Controller**
+    - Exposes REST endpoints
+    - Handles HTTP routing and request/response mapping
+    - Contains no business logic
+
+- **Service**
+    - Implements business rules and domain logic
+    - Performs validations and consistency checks
+    - Coordinates repositories and domain entities
+
+- **Repository**
+    - Handles data access using Spring Data JPA
+    - Contains no business logic
+
+- **Entity**
+    - Represents the persistent domain model
+    - Defines JPA mappings and relationships
+
+- **DTO (Request / Response)**
+    - Defines the API contract
+    - Prevents exposing JPA entities directly
+
+- **Mapper**
+    - Converts between Entities and DTOs
+    - Implemented using MapStruct
+
+---
+
+## 🧱 Domain Model
+
+### Core Entities
+
+#### Office
+Represents a physical company location.
+
+- `id`
+- `name` (unique)
+
+#### AssetType
+Defines a standardized hardware category.
+
+- `id`
+- `assetTypeName`
+- `assetTypeDescription`
+
+#### Asset
+Represents a physical device owned by the company.
+
+- `id`
+- `serialNumber` (unique)
+- `purchaseDate`
+- `office` (Many-to-One)
+- `assetType` (Many-to-One)
+- `softwareLicenses` (Many-to-Many)
+
+#### SoftwareLicense
+Represents a purchased software license.
+
+- `id`
+- `softwareName` (unique)
+- `expirationDate`
+- `maxInstallations` (nullable, null = unlimited)
+- `installedAssets` (Many-to-Many)
+
+---
+
+## 🔐 Software License Compliance Rules
+
+Software license management is a core feature of CIAMS.
+
+The system enforces the following rules at the **service layer**:
+
+- A license cannot be installed on the same asset more than once
+- A license cannot be installed if it is expired
+- A license cannot exceed its maximum number of allowed installations
+- Installation and uninstallation operations update both sides of the relationship
+- All compliance rules are enforced server-side
+
+---
+
+## 🔌 REST API Overview
+
+### Asset Management
+
+- `GET /assets/all`
+- `GET /assets/{id}`
+- `GET /assets/serial/{serialNumber}`
+- `POST /assets/insert`
+- `PUT /assets/update/{id}`
+- `PUT /assets/move/{assetId}?officeId={officeId}`
+- `DELETE /assets/{id}`
+
+---
+
+### Software License Management
+
+#### CRUD Operations
+
+- `GET /software-licenses/all`
+- `GET /software-licenses/{id}`
+- `POST /software-licenses/insert`
+- `PUT /software-licenses/update/{id}`
+- `DELETE /software-licenses/{id}`
+
+#### Compliance Operations
+
+- **Install software on an asset**
+
+- `POST /software-licenses/{licenseId}/install/{assetId}`
+
+- **Uninstall software from an asset**
+
+- `DELETE /software-licenses/{licenseId}/uninstall/{assetId}`
+
+- **Audit installed software on an asset**
+
+- `GET /software-licenses/asset/{assetId}`
+
+- **Retrieve licenses expiring in the next 30 days**
+
+- `GET /software-licenses/expiring-soon`
+
+
+---
+
+## 🧪 Validation & Error Handling
+
+- Request validation is handled using Jakarta Bean Validation (`@Valid`)
+- Business rule violations are enforced in the service layer
+- Errors are centralized using `@RestControllerAdvice`
+- The API returns meaningful HTTP status codes and error messages
+
+---
+
+## 🛠️ Tech Stack
+
+- **Java**
+- **Spring Boot**
+- **Spring Data JPA / Hibernate**
+- **MapStruct**
+- **Lombok**
+- **Jakarta Validation**
+- **PostgreSQL / MySQL** (configurable)
+- **Maven**
+
+---
+
+## 🚀 Getting Started
+
+1. Clone the repository
+2. Configure the database in `application.yml`
+3. Run the application
+4. Test endpoints using Postman or similar tools
+
+---
+
+## 📌 Design Principles
+
+- No business logic in controllers
+- No domain logic in repositories
+- Clear separation between API and persistence models
+- Explicit, readable code over hidden magic
+- Domain rules enforced centrally
+
+---
+
+## 📄 License
+
+This project is intended for educational and professional demonstration purposes.
+
+
+---
+
+## Author - Romina Trazzi
