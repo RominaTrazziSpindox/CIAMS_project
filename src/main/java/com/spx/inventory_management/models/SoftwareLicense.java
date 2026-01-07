@@ -24,7 +24,7 @@ public class SoftwareLicense {
     private String softwareName;
 
     @Column(name = "max_installations")
-    private int maxInstallations;
+    private Integer maxInstallations;
 
     @Column(name="expiration_date", nullable = false)
     private LocalDate expirationDate;
