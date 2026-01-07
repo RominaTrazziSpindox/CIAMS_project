@@ -149,6 +149,8 @@ public class SoftwareLicenseController {
      * @param assetId   the asset id
      * @return the updated software license response dto
      */
+
+    // /software-licenses/1/uninstall/2
     @PostMapping("/{licenseId}/install/{assetId}")
     public SoftwareLicenseResponseDTO installSoftware(@PathVariable long licenseId, @PathVariable long assetId) {
 

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -29,6 +30,16 @@ public class SoftwareLicense {
     @Column(name="expiration_date", nullable = false)
     private LocalDate expirationDate;
 
+    // Methods
+    public void addAsset(Asset asset) {
+        this.installedAssets.add(asset);
+        asset.getSoftwareLicenses().add(this);
+    }
+
+    public void removeAsset(Asset asset) {
+        this.installedAssets.remove(asset);
+        asset.getSoftwareLicenses().remove(this);
+    }
 
     // Relation with Asset table on database
     @ManyToMany
@@ -37,5 +48,5 @@ public class SoftwareLicense {
             joinColumns = @JoinColumn(name = "license_id"),
             inverseJoinColumns = @JoinColumn(name = "asset_id")
     )
-    private Set<Asset> installedAssets;
+    private Set<Asset> installedAssets = new HashSet<>();
 }

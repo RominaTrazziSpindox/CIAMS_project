@@ -143,7 +143,7 @@ public class SoftwareLicenseService {
         }
 
         // Add the license to the asset
-        softwareLicense.getInstalledAssets().add(asset);
+        softwareLicense.addAsset(asset);
 
         log.info("The Software License has been installed. licenseId={}, assetId={}", licenseId, assetId);
 
@@ -172,7 +172,7 @@ public class SoftwareLicenseService {
         }
 
         // Remove the license to the asset
-        softwareLicense.getInstalledAssets().remove(asset);
+        softwareLicense.removeAsset(asset);
 
         log.info("Uninstalled Software License. licenseId={}, assetId={}", licenseId, assetId);
 
