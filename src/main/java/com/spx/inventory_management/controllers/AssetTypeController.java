@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * The mapping between DTOs and entities is handled by MapStruct.
  */
 @RestController
-@RequestMapping("/asset_types")
+@RequestMapping("/asset-types")
 public class AssetTypeController {
 
     @Autowired
@@ -30,7 +30,7 @@ public class AssetTypeController {
     public AssetTypeMapper mapper;
 
     // ==========================================================
-    // CRUD METHODS - Service Layer Integration
+    // CRUD METHODS
     // ==========================================================
 
     /**
