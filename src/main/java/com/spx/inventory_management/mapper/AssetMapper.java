@@ -20,5 +20,5 @@ public interface AssetMapper {
     @Mapping(source = "office.name", target = "officeName")
     @Mapping(source = "assetType.assetTypeName", target = "assetTypeName")
     @Mapping(source = "assetType.assetTypeDescription", target = "assetTypeDescription")
-    AssetResponseDTO toResponseDTO(Asset asset);
+    AssetResponseDTO toDTO(Asset asset);
 }
