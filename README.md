@@ -15,8 +15,10 @@ The application follows a **layered architecture**, with strict separation of co
 
 
 Controller → Service → Repository → Database
+
 ↓
 Mapper
+
 ↓
 DTO
 
@@ -85,6 +87,16 @@ Represents a purchased software license.
 - `expirationDate`
 - `maxInstallations` (nullable, null = unlimited)
 - `installedAssets` (Many-to-Many)
+
+---
+
+## 📌 Design Principles
+
+- No business logic in controllers
+- No domain logic in repositories
+- Clear separation between API and persistence models
+- Explicit, readable code over hidden magic
+- Domain rules enforced centrally
 
 ---
 
@@ -158,13 +170,13 @@ The system enforces the following rules at the **service layer**:
 
 ## 🛠️ Tech Stack
 
-- **Java**
-- **Spring Boot**
+- **Java 17**
+- **Spring Boot 3.8**
 - **Spring Data JPA / Hibernate**
 - **MapStruct**
 - **Lombok**
 - **Jakarta Validation**
-- **PostgreSQL / MySQL** (configurable)
+- **PostgreSQL** (configurable)
 - **Maven**
 
 ---
@@ -178,15 +190,81 @@ The system enforces the following rules at the **service layer**:
 
 ---
 
-## 📌 Design Principles
+## ⚙️ Setup & Run
 
-- No business logic in controllers
-- No domain logic in repositories
-- Clear separation between API and persistence models
-- Explicit, readable code over hidden magic
-- Domain rules enforced centrally
+*Prerequisites* 
 
----
+Make sure the following tools are installed on your system:
+
+- **Java 17 (or compatible LTS version)**
+- **Maven 3.8+**
+
+- A relational database:
+
+  - **PostgreSQL (recommended) or MySQL**
+  - **An API testing tool (Postman, Insomnia, etc.)**
+
+*Database Configuration*
+
+Create a database for the application (example with PostgreSQL):
+
+```sql
+CREATE DATABASE ciams;
+```
+
+Update the database configuration in src/main/resources/application.yml (or application.properties):
+
+```yaml
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ciams
+    username: your_db_username
+    password: your_db_password
+
+jpa:
+  hibernate:
+    ddl-auto: update
+  show-sql: true
+  properties:
+    hibernate:
+      format_sql: true
+```
+
+*Build the Project*
+
+From the project root directory, run:
+
+```bash
+mvn clean install
+```
+
+This will:
+
+- compile the project
+- run validations
+- generate MapStruct mappers
+- package the application
+
+*Run the Application*
+
+Option 1: Using Maven: 
+
+```bash
+mvn spring-boot:run
+```
+
+Option 2: Using the JAR: 
+
+```bash
+java -jar target/ciams-*.jar
+```
+
+*Application Startup*
+
+Once started, the application will be available at: http://localhost:8080
+
+Example endpoint: http://localhost:8080/offices/all
+
 
 ## 📄 License
 
@@ -195,4 +273,4 @@ This project is intended for educational and professional demonstration purposes
 
 ---
 
-## Author - Romina Trazzi
+## 👤 Author - Romina Trazzi
