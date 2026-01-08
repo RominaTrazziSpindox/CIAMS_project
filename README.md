@@ -50,6 +50,17 @@ DTO
     - Converts between Entities and DTOs
     - Implemented using MapStruct
 
+- **Exception**
+  - Centralizes application-wide error handling
+  - Maps exceptions to appropriate HTTP status codes
+  - Ensures a consistent JSON error response format across the API
+  - Keeps controllers and services free from error-handling logic
+
+- **Security**
+  - Handles authentication and authorization concerns
+  - Enforces access control rules before requests reach controllers
+  - Manages security-related error responses (401 Unauthorized, 403 Forbidden)
+  - Decouples access control logic from business logic
 ---
 
 ## 🧱 Domain Model
@@ -165,8 +176,41 @@ The system enforces the following rules at the **service layer**:
 - Business rule violations are enforced in the service layer
 - Errors are centralized using `@RestControllerAdvice`
 - The API returns meaningful HTTP status codes and error messages
+- Error responses follow a unified JSON structure
+- Each error response includes a human-readable action hint to guide API consumers
+- Error handling is fully decoupled from controllers and services (with class `GlobalExceptionHandler`)
 
 ---
+
+## 🔐 Security & Access Control
+
+The application is secured using **Spring Security** with **HTTP Basic Authentication**, designed to protect write operations while keeping read operations publicly accessible.
+
+### Authentication
+
+- Basic Authentication is enabled
+- Credentials are required for all write operations
+- Authentication is handled at the security filter level (before controllers)
+
+### Authorization Rules
+
+- **DELETE operations** require the `ADMIN` role
+- **POST / PUT operations** require authentication
+- **GET operations** are publicly accessible
+
+Authorization is enforced using method and path-based rules, ensuring clear and predictable access control.
+
+### Security Error Handling
+
+Security-related errors are handled separately from application errors:
+
+- **401 Unauthorized**
+  - Triggered when authentication credentials are missing or invalid
+  - Returned before reaching controllers
+- **403 Forbidden**
+  - Triggered when an authenticated user lacks sufficient permissions
+
+Both errors return a structured JSON response using the same error DTO format as the rest of the application, ensuring consistency across all API responses.
 
 ## 🛠️ Tech Stack
 
@@ -178,6 +222,7 @@ The system enforces the following rules at the **service layer**:
 - **Jakarta Validation**
 - **PostgreSQL** (configurable)
 - **Maven**
+- **Spring Security**
 
 ---
 
