@@ -2,7 +2,7 @@ package com.spx.inventory_management.controllers;
 
 import com.spx.inventory_management.dto.OfficeRequestDTO;
 import com.spx.inventory_management.dto.OfficeResponseDTO;
-import com.spx.inventory_management.mapper.OfficeMapper;
+import com.spx.inventory_management.mappers.OfficeMapper;
 import com.spx.inventory_management.models.Office;
 import com.spx.inventory_management.services.OfficeService;
 import org.springframework.beans.factory.annotation.Autowired;

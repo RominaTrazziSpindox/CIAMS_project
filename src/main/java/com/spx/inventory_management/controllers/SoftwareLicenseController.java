@@ -2,7 +2,7 @@ package com.spx.inventory_management.controllers;
 
 import com.spx.inventory_management.dto.SoftwareLicenseRequestDTO;
 import com.spx.inventory_management.dto.SoftwareLicenseResponseDTO;
-import com.spx.inventory_management.mapper.SoftwareLicenseMapper;
+import com.spx.inventory_management.mappers.SoftwareLicenseMapper;
 import com.spx.inventory_management.models.SoftwareLicense;
 import com.spx.inventory_management.services.SoftwareLicenseService;
 import jakarta.validation.Valid;
