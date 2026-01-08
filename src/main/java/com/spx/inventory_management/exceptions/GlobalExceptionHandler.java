@@ -72,23 +72,23 @@ public class GlobalExceptionHandler {
 
 
     // ==========================================================
-    // 401 - UNAUTHORIZED
+    // 401 - UNAUTHORIZED || NO WITH SPRING SECURITY
     // ==========================================================
 
-    @ExceptionHandler(AuthenticationException.class)
+    /* @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ApiErrorResponseDTO> handleUnauthorized(AuthenticationException ex, WebRequest request) {
         return buildError(HttpStatus.UNAUTHORIZED,"Unauthorized","Missing or invalid authentication credentials",request);
-    }
+    } */
 
 
     // ==========================================================
-    // 403 - FORBIDDEN
+    // 403 - FORBIDDEN || NO WITH SPRING SECURITY
     // ==========================================================
 
-    @ExceptionHandler(AccessDeniedException.class)
+   /* @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ApiErrorResponseDTO> handleForbidden(AccessDeniedException ex, WebRequest request) {
         return buildError(HttpStatus.FORBIDDEN,"Forbidden","Access denied - insufficient permissions",request);
-    }
+    } */
 
 
     // ==========================================================

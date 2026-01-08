@@ -8,6 +8,15 @@
 # ============================================
 
 spring:
+  # --------------------------------------------
+  # Spring Security custom admin e password in dev profile
+  # --------------------------------------------
+  security:
+    user:
+      name: admin
+      password: admin
+      roles: ADMIN
+
   datasource:
     # --------------------------------------------
     # JDBC connection details for PostgreSQL
@@ -19,6 +28,8 @@ spring:
     hikari:
       maximum-pool-size: 10
       minimum-idle: 2
+
+
 
   # --------------------------------------------
   # JPA and Hibernate setup
