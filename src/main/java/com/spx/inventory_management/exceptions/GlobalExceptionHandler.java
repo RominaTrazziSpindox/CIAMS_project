@@ -9,10 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
-
-import javax.naming.AuthenticationException;
 import javax.naming.ServiceUnavailableException;
-import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 
 @RestControllerAdvice
@@ -25,13 +22,14 @@ public class GlobalExceptionHandler {
 
     private ResponseEntity<ApiErrorResponseDTO> buildError(HttpStatus status, String errorTitle, String message, WebRequest request) {
 
-        // Initialising a new ApiErrorResponseDTO object. It contains the body part of a ResponseEntity object.
+        // Initializing a new ApiErrorResponseDTO object. It contains the body part of a ResponseEntity object.
         ApiErrorResponseDTO error = new ApiErrorResponseDTO(
                 status.value(),
                 errorTitle,
                 message,
+                "Check request data and try again", // Implementation of action property
                 // Uri path
-                request.getDescription(false),
+                request.getDescription(true),
                 LocalDateTime.now()
         );
 
@@ -69,26 +67,6 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.BAD_REQUEST,"Bad Request", message, request);
 
     }
-
-
-    // ==========================================================
-    // 401 - UNAUTHORIZED || NO WITH SPRING SECURITY
-    // ==========================================================
-
-    /* @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ApiErrorResponseDTO> handleUnauthorized(AuthenticationException ex, WebRequest request) {
-        return buildError(HttpStatus.UNAUTHORIZED,"Unauthorized","Missing or invalid authentication credentials",request);
-    } */
-
-
-    // ==========================================================
-    // 403 - FORBIDDEN || NO WITH SPRING SECURITY
-    // ==========================================================
-
-   /* @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ApiErrorResponseDTO> handleForbidden(AccessDeniedException ex, WebRequest request) {
-        return buildError(HttpStatus.FORBIDDEN,"Forbidden","Access denied - insufficient permissions",request);
-    } */
 
 
     // ==========================================================
