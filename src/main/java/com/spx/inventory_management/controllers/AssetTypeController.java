@@ -2,7 +2,7 @@ package com.spx.inventory_management.controllers;
 
 import com.spx.inventory_management.dto.AssetTypeRequestDTO;
 import com.spx.inventory_management.dto.AssetTypeResponseDTO;
-import com.spx.inventory_management.mapper.AssetTypeMapper;
+import com.spx.inventory_management.mappers.AssetTypeMapper;
 import com.spx.inventory_management.models.AssetType;
 import com.spx.inventory_management.services.AssetTypeService;
 import org.springframework.beans.factory.annotation.Autowired;

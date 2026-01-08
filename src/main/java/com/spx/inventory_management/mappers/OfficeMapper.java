@@ -1,4 +1,4 @@
-package com.spx.inventory_management.mapper;
+package com.spx.inventory_management.mappers;
 
 import com.spx.inventory_management.dto.OfficeRequestDTO;
 import com.spx.inventory_management.dto.OfficeResponseDTO;

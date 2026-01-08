@@ -2,7 +2,7 @@ package com.spx.inventory_management.controllers;
 
 import com.spx.inventory_management.dto.AssetRequestDTO;
 import com.spx.inventory_management.dto.AssetResponseDTO;
-import com.spx.inventory_management.mapper.AssetMapper;
+import com.spx.inventory_management.mappers.AssetMapper;
 import com.spx.inventory_management.models.Asset;
 import com.spx.inventory_management.services.AssetService;
 import jakarta.validation.Valid;
