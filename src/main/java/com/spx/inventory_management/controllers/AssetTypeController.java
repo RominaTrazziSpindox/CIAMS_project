@@ -5,6 +5,7 @@ import com.spx.inventory_management.dto.AssetTypeResponseDTO;
 import com.spx.inventory_management.mappers.AssetTypeMapper;
 import com.spx.inventory_management.models.AssetType;
 import com.spx.inventory_management.services.AssetTypeService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -74,7 +75,7 @@ public class AssetTypeController {
      * @return the asset type response dto
      */
     @PostMapping("/insert")
-    public AssetTypeResponseDTO createAssetType(@RequestBody AssetTypeRequestDTO newAssetTypeDTO) {
+    public AssetTypeResponseDTO createAssetType(@Valid @RequestBody AssetTypeRequestDTO newAssetTypeDTO) {
 
         // Step 1: Convert incoming DTO to an Entity for persistence.
         AssetType newAssetType = mapper.toEntity(newAssetTypeDTO);
@@ -96,7 +97,7 @@ public class AssetTypeController {
      * @return the asset type response dto
      */
     @PutMapping("/update/{id}")
-    public AssetTypeResponseDTO updateAssetType(@PathVariable long id, @RequestBody AssetTypeRequestDTO updatedAssetTypeDTO) {
+    public AssetTypeResponseDTO updateAssetType(@Valid @PathVariable long id, @RequestBody AssetTypeRequestDTO updatedAssetTypeDTO) {
 
         // Step 1: Convert incoming DTO into an Entity containing updated values.
         AssetType updatedData = mapper.toEntity(updatedAssetTypeDTO);
