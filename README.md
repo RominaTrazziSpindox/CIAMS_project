@@ -215,7 +215,7 @@ Both errors return a structured JSON response using the same error DTO format as
 ## 🛠️ Tech Stack
 
 - **Java 17**
-- **Spring Boot 3.8**
+- **Spring Boot 3.5**
 - **Spring Data JPA / Hibernate**
 - **MapStruct**
 - **Lombok**
