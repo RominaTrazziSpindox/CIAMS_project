@@ -5,6 +5,7 @@ import com.spx.inventory_management.dto.OfficeResponseDTO;
 import com.spx.inventory_management.mappers.OfficeMapper;
 import com.spx.inventory_management.models.Office;
 import com.spx.inventory_management.services.OfficeService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -94,7 +95,7 @@ public class OfficeController {
      *
      */
     @PostMapping("/insert")
-    public OfficeResponseDTO createOffice(@RequestBody OfficeRequestDTO newOfficeDTO) {
+    public OfficeResponseDTO createOffice(@Valid @RequestBody OfficeRequestDTO newOfficeDTO) {
 
         // Step 1: Convert incoming DTO to an Entity for persistence.
         Office newOffice = mapper.toEntity(newOfficeDTO);
@@ -126,7 +127,7 @@ public class OfficeController {
      *
      */
     @PutMapping("/update/{id}")
-    public OfficeResponseDTO updateOffice(@PathVariable long id, @RequestBody OfficeRequestDTO updatedOfficeDTO) {
+    public OfficeResponseDTO updateOffice(@Valid @PathVariable long id, @RequestBody OfficeRequestDTO updatedOfficeDTO ) {
 
         // Step 1: Convert incoming DTO into an entity containing updated values.
         Office updatedData = mapper.toEntity(updatedOfficeDTO);
