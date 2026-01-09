@@ -7,4 +7,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AssetTypeRepository extends JpaRepository<AssetType, Long> {
 
+    // DA FARE
+    boolean existsByAssetTypeName(String assetTypeName);
+
 }
