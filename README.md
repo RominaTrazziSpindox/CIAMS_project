@@ -61,6 +61,12 @@ DTO
   - Enforces access control rules before requests reach controllers
   - Manages security-related error responses (401 Unauthorized, 403 Forbidden)
   - Decouples access control logic from business logic
+
+- **Utils**
+  - Provides shared utility logic used across the application
+  - Centralizes text normalization and input sanitization
+  - Ensures consistent and human-friendly data persistence (e.g. lowercase keys, trimmed values)
+
 ---
 
 ## 🧱 Domain Model
@@ -106,8 +112,9 @@ Represents a purchased software license.
 - No business logic in controllers
 - No domain logic in repositories
 - Clear separation between API and persistence models
-- Explicit, readable code over hidden magic
 - Domain rules enforced centrally
+- Controlled caching applied only to stable, read-heavy operations
+- Human-friendly data handling through centralized normalization and validation
 
 ---
 
@@ -135,6 +142,7 @@ The system enforces the following rules at the **service layer**:
 - `POST /assets/insert`
 - `PUT /assets/update/{id}`
 - `PUT /assets/move/{assetId}?officeId={officeId}`
+- `PUT /assets/move-name/{assetId}?officeName={officeName}`
 - `DELETE /assets/{id}`
 
 ---
@@ -173,6 +181,7 @@ The system enforces the following rules at the **service layer**:
 ## 🧪 Validation & Error Handling
 
 - Request validation is handled using Jakarta Bean Validation (`@Valid`)
+- Input data is validated and normalized before business rule enforcement
 - Business rule violations are enforced in the service layer
 - Errors are centralized using `@RestControllerAdvice`
 - The API returns meaningful HTTP status codes and error messages
@@ -191,6 +200,7 @@ The application is secured using **Spring Security** with **HTTP Basic Authentic
 - Basic Authentication is enabled
 - Credentials are required for all write operations
 - Authentication is handled at the security filter level (before controllers)
+- Authentication credentials are externalized using environment variables and loaded at runtime, avoiding hard-coded secrets in the codebase.
 
 ### Authorization Rules
 
@@ -220,16 +230,17 @@ Both errors return a structured JSON response using the same error DTO format as
 - **MapStruct**
 - **Lombok**
 - **Jakarta Validation**
-- **PostgreSQL** (configurable)
+- **PostgreSQL** 
 - **Maven**
 - **Spring Security**
+- **Spring Cache**
 
 ---
 
 ## 🚀 Getting Started
 
 1. Clone the repository
-2. Configure the database in `application.yml`
+2. Configure environment variables for database and security credentials 
 3. Run the application
 4. Test endpoints using Postman or similar tools
 
@@ -254,26 +265,40 @@ Make sure the following tools are installed on your system:
 Create a database for the application (example with PostgreSQL):
 
 ```sql
-CREATE DATABASE ciams;
+CREATE DATABASE inventory_db;
 ```
 
-Update the database configuration in src/main/resources/application.yml (or application.properties):
+Configure database connection using environment variables loaded from a `.env` file:
+
+```properties
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=inventory_db
+DB_USER=your_db_username
+DB_PASSWORD=your_db_password
+```
+
+The `.env` file is automatically loaded at startup and must not be committed to version control.
+
+In application.yaml (or application.properties) use placeholders:
 
 ```yaml
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/ciams
-    username: your_db_username
-    password: your_db_password
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
 
-jpa:
-  hibernate:
-    ddl-auto: update
-  show-sql: true
-  properties:
+  jpa:
     hibernate:
-      format_sql: true
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
 ```
+
+Security credentials (Basic Authentication) are also configured via environment variables.
 
 *Build the Project*
 
