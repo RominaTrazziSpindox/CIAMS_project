@@ -6,7 +6,7 @@ import com.spx.inventory_management.models.Asset;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = SoftwareLicenseMapper.class)
 public interface AssetMapper {
 
     // DTO -> Entity
