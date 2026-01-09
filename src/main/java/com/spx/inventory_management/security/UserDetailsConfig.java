@@ -1,5 +1,6 @@
 package com.spx.inventory_management.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.userdetails.User;
@@ -11,6 +12,18 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 @Configuration
 public class UserDetailsConfig {
+
+    @Value("${DB_ADMIN_USERNAME}")
+    private String adminUsername;
+
+    @Value("${DB_ADMIN_PASSWORD}")
+    private String adminPassword;
+
+    @Value("${DB_USER_USERNAME}")
+    private String userUsername;
+
+    @Value("${DB_USER_PASSWORD}")
+    private String userPassword;
 
     /**
      * BCrypt library to hash users' passwords
@@ -26,13 +39,15 @@ public class UserDetailsConfig {
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
 
-        UserDetails admin = User.withUsername("admin")
-                .password(passwordEncoder.encode("admin"))
+        UserDetails admin = User
+                .withUsername(adminUsername)
+                .password(passwordEncoder.encode(adminPassword))
                 .roles("ADMIN")
                 .build();
 
-        UserDetails user = User.withUsername("user")
-                .password(passwordEncoder.encode("user"))
+        UserDetails user = User
+                .withUsername(userUsername)
+                .password(passwordEncoder.encode(userPassword))
                 .roles("USER")
                 .build();
 
