@@ -167,17 +167,17 @@ public class AssetController {
     /**
      * Move asset to office by name asset response dto.
      *
-     * @param name       the name
+     * @param assetId       the name
      * @param officeName the office name
      * @return the asset response dto
      */
 
     // http://localhost:8080/assets/move-name/1?officeName=Rome HQ
-    @PutMapping("/move-name/{name}")
+    @PutMapping("/move-name/{assetId}")
     public AssetResponseDTO moveAssetToOfficeByName(@PathVariable long assetId, @RequestParam String officeName) {
 
         // Step 1: Delegate to service layer to move the asset from its current office to the target office identified by name.
-        Asset movedAsset = assetService.moveAssetToOfficeByName(name, officeName);
+        Asset movedAsset = assetService.moveAssetToOfficeByName(assetId, officeName);
 
         // Step 2: Convert the updated entity into a response DTO.
         AssetResponseDTO assetResponseDTO = mapper.toDTO(movedAsset);
