@@ -7,10 +7,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 
@@ -22,6 +18,8 @@ public class SecurityConfig {
 
     @Autowired
     private CustomAccessDeniedHandler accessDeniedHandler;
+
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -55,22 +53,6 @@ public class SecurityConfig {
             .httpBasic(Customizer.withDefaults());
 
         return http.build();
-    }
-
-    // Type of users saved in RAM memory
-    @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails admin = User.withUsername("admin")
-                .password("{noop}admin")
-                .roles("ADMIN")
-                .build();
-
-        UserDetails user = User.withUsername("user")
-                .password("{noop}user")
-                .roles("USER")
-                .build();
-
-        return new InMemoryUserDetailsManager(admin, user);
     }
 }
 
