@@ -6,7 +6,10 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import com.spx.inventory_management.utils.TextNormalizer;
 
 import java.util.List;
 
@@ -26,6 +29,7 @@ public class AssetTypeService {
      *
      * @return the all asset types
      */
+    @Cacheable("asset_types")
     public List<AssetType> getAllAssetTypes() {
         return assetTypeRepository.findAll();
     }
@@ -36,6 +40,7 @@ public class AssetTypeService {
      * @param id the id
      * @return the asset type by id
      */
+    @Cacheable(value = "asset_types", key = "#id")
     public AssetType getAssetTypeById(long id) {
         return assetTypeRepository.findById(id).orElseThrow(() -> {
             log.error("AssetType not found. id={}", id);
@@ -55,7 +60,18 @@ public class AssetTypeService {
      * @return the asset type
      */
     @Transactional
+    @CacheEvict(value = "asset_types", allEntries = true)
     public AssetType createAssetType(AssetType newAssetType) {
+
+        // Cleaning incoming assetType name data using utility function
+        String newAssetTypeName = TextNormalizer.normalizeKey(newAssetType.getAssetTypeName());
+        newAssetType.setAssetTypeName(newAssetTypeName);
+
+        // Check if the office name already exists
+        if (assetTypeRepository.existsByAssetTypeName(newAssetTypeName)) {
+            throw new IllegalArgumentException("Asset type already exists: " + newAssetTypeName);
+        }
+
         log.info("Creating a new Asset Type. name:'{}' and description:'{}'", newAssetType.getAssetTypeName(), newAssetType.getAssetTypeDescription());
         return assetTypeRepository.save(newAssetType);
     }
@@ -72,13 +88,20 @@ public class AssetTypeService {
      * @return the asset type
      */
     @Transactional
+    @CacheEvict(value = "asset_types", allEntries = true)
     public AssetType updateExistingAssetType(long id, AssetType updatedAssetType) {
+
+        // Cleaning incoming assetType name data
+        String newAssetTypeName = TextNormalizer.normalizeKey(updatedAssetType.getAssetTypeName());
 
         // Retrieve the existing office or throw if not found.
         AssetType existingAssetType = assetTypeRepository.findById(id).orElseThrow(() -> {
             log.error("Update failed. Asset Type not found. id={}", id);
             return new EntityNotFoundException("Asset Type not found");
         });
+
+        // Get the current AssetType name
+        String currentOfficeName = existingAssetType.getAssetTypeName();
 
         // Update only mutable fields (in this case: name and description).
         existingAssetType.setAssetTypeName(updatedAssetType.getAssetTypeName());
@@ -102,6 +125,7 @@ public class AssetTypeService {
      * @param id the id
      */
     @Transactional
+    @CacheEvict(value = "asset_types", allEntries = true)
     public void deleteAssetTypeById(long id) {
 
         // Validate entity existence before deletion.
