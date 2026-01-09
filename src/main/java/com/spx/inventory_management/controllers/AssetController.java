@@ -174,7 +174,7 @@ public class AssetController {
 
     // http://localhost:8080/assets/move-name/1?officeName=Rome HQ
     @PutMapping("/move-name/{name}")
-    public AssetResponseDTO moveAssetToOfficeByName(@PathVariable long name, @RequestParam String officeName) {
+    public AssetResponseDTO moveAssetToOfficeByName(@PathVariable long assetId, @RequestParam String officeName) {
 
         // Step 1: Delegate to service layer to move the asset from its current office to the target office identified by name.
         Asset movedAsset = assetService.moveAssetToOfficeByName(name, officeName);
