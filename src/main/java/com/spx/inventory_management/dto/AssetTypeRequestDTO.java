@@ -15,6 +15,6 @@ public class AssetTypeRequestDTO implements Serializable {
     @Size(max = 100, message = "Asset Type name must not exceed 100 characters")
     private String assetTypeName;
 
-    @Size(max = 200, message = "Asset Type description must not exceed 100 characters")
+    @Size(max = 200, message = "Asset Type description must not exceed 200 characters")
     private String assetTypeDescription;
 }
