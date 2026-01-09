@@ -150,7 +150,8 @@ public class AssetController {
      * @param officeId the office id
      * @return the asset response dto
      */
-// http://localhost:8080/assets/move/1?officeId=2
+
+    // http://localhost:8080/assets/move/1?officeId=2
     @PutMapping("/move/{assetId}")
     public AssetResponseDTO moveAssetToOffice(@PathVariable long assetId, @RequestParam long officeId) {
 
@@ -170,7 +171,8 @@ public class AssetController {
      * @param officeName the office name
      * @return the asset response dto
      */
-// http://localhost:8080/assets/move-name/1?officeName=Rome HQ
+
+    // http://localhost:8080/assets/move-name/1?officeName=Rome HQ
     @PutMapping("/move-name/{name}")
     public AssetResponseDTO moveAssetToOfficeByName(@PathVariable long name, @RequestParam String officeName) {
 
