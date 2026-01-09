@@ -16,8 +16,7 @@ public interface SoftwareLicenseMapper {
 
 
     void updateEntityFromDto(
-            SoftwareLicenseRequestDTO dto,
-            @MappingTarget SoftwareLicense entity
+            SoftwareLicenseRequestDTO dto, @MappingTarget SoftwareLicense entity
     );
 
 }
