@@ -20,7 +20,8 @@ public class GlobalExceptionHandler {
     // BUILDER METHOD
     // ==========================================================
 
-    private ResponseEntity<ApiErrorResponseDTO> buildError(HttpStatus status, String errorTitle, String message, WebRequest request) {
+    private ResponseEntity<ApiErrorResponseDTO> buildError(
+            HttpStatus status, String errorTitle, String message, WebRequest request) {
 
         // Initializing a new ApiErrorResponseDTO object. It contains the body part of a ResponseEntity object.
         ApiErrorResponseDTO error = new ApiErrorResponseDTO(
@@ -105,7 +106,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponseDTO> handleGeneric(Exception ex, WebRequest request) {
-        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error","An unexpected error occurred", request);
+        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error",ex.getMessage(), request);
     }
 
 
