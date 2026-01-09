@@ -10,7 +10,6 @@ import java.util.Set;
 @Table(name = "offices")
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(of = "name")
 @Getter
 @Setter
 @ToString
