@@ -2,29 +2,28 @@ package com.spx.inventory_management.controllers;
 
 import com.spx.inventory_management.dto.SoftwareLicenseRequestDTO;
 import com.spx.inventory_management.dto.SoftwareLicenseResponseDTO;
-import com.spx.inventory_management.mappers.SoftwareLicenseMapper;
-import com.spx.inventory_management.models.SoftwareLicense;
+
 import com.spx.inventory_management.services.SoftwareLicenseService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/software-licenses")
 public class SoftwareLicenseController {
 
+
     @Autowired
     SoftwareLicenseService softwareLicenseService;
 
-    @Autowired
-    SoftwareLicenseMapper mapper;
+
 
     // ==========================================================
-    // CRUD METHODS
+    // CRUD METHODS - From Service Layer
     // ==========================================================
 
     // ==========================================================
@@ -32,64 +31,63 @@ public class SoftwareLicenseController {
     // ==========================================================
 
     /**
-     * Gets all software licenses.
+     * Get all software licenses response entity.
      *
-     * @return the list of software licenses
+     * @return the response entity
      */
     @GetMapping("/all")
-    public List<SoftwareLicenseResponseDTO> getAllSoftwareLicenses() {
+    public ResponseEntity<List<SoftwareLicenseResponseDTO>>getAllSoftwareLicenses() {
 
-        List<SoftwareLicenseResponseDTO> responseDTOS =
-                softwareLicenseService.getAllSoftwareLicenses()
-                        .stream()
-                        .map(mapper::toDto)
-                        .collect(Collectors.toList());
+        // Step 1: Service try to retrieve an Asset list.
+        List<SoftwareLicenseResponseDTO> licenses = softwareLicenseService.getAllSoftwareLicenses();
 
-        return responseDTOS;
+        // If the list is empty add a header with message
+        if (licenses.isEmpty()) {
+            return ResponseEntity.ok().header("X-Info-Message","No software licenses have been found in the database").body(licenses);
+
+        }
+
+        // Step 2: return a 200 HTTP Status code
+        return ResponseEntity.ok(licenses);
     }
 
     /**
-     * Gets software license by id.
+     * Gets software license by name.
      *
-     * @param id the license id
-     * @return the software license
+     * @param softwareLicenseName the software license name
+     * @return the software license by name
      */
-    @GetMapping("/{id}")
-    public SoftwareLicenseResponseDTO getSoftwareLicenseById(@PathVariable long id) {
+    @GetMapping("/{softwareName}")
+    public ResponseEntity<SoftwareLicenseResponseDTO>
+    getSoftwareLicenseByName(@PathVariable String softwareLicenseName) {
 
-        // Step 1: Service retrieves the Software License entity by its ID.
-        SoftwareLicense retrievedSoftwareLicense = softwareLicenseService.getSoftwareLicenseById(id);
+        // Step 1: Service try to retrieve a Software license entity by its unique name.
+        SoftwareLicenseResponseDTO license = softwareLicenseService.getSoftwareLicenseByName(softwareLicenseName);
 
-        // Step 2: Mapper converts the entity into a Response DTO.
-        SoftwareLicenseResponseDTO responseDTO = mapper.toDto(retrievedSoftwareLicense);
-
-        return responseDTO;
+        // Step 2: return a 200 HTTP Status code
+        return ResponseEntity.ok(license);
     }
+
+
 
     // ==========================================================
     // CREATE
     // ==========================================================
 
     /**
-     * Create software license.
+     * Create software license response entity.
      *
-     * @param dto the request dto
-     * @return the software license response dto
+     * @param newSoftwareLicense the new software license
+     * @return the response entity
      */
     @PostMapping("/insert")
-    public SoftwareLicenseResponseDTO createSoftwareLicense(@RequestBody @Valid SoftwareLicenseRequestDTO dto
-    ) {
+    public ResponseEntity<SoftwareLicenseResponseDTO> createSoftwareLicense(@Valid @RequestBody SoftwareLicenseRequestDTO newSoftwareLicense) {
 
-        // Step 1: Convert incoming Request DTO to an Entity.
-        SoftwareLicense newLicense = mapper.toEntity(dto);
+        // Step 1: Persist the entity via service layer.
+        SoftwareLicenseResponseDTO created = softwareLicenseService.createSoftwareLicense(newSoftwareLicense);
 
-        // Step 2: Delegate creation logic to the service layer.
-        SoftwareLicense savedSoftwareLicense = softwareLicenseService.createSoftwareLicense(newLicense);
-
-        // Step 3: Convert the persisted entity into a Response DTO.
-        SoftwareLicenseResponseDTO responseDTO = mapper.toDto(savedSoftwareLicense);
-
-        return responseDTO;
+        // Step 2: return a 201 HTTP Status code
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     // ==========================================================
@@ -97,25 +95,20 @@ public class SoftwareLicenseController {
     // ==========================================================
 
     /**
-     * Update existing software license.
+     * Update software license response entity.
      *
-     * @param id  the license id
-     * @param dto the request dto
-     * @return the software license response dto
+     * @param softwareName       the software name
+     * @param newSoftwareLicense the new software license
+     * @return the response entity
      */
-    @PutMapping("/update/{id}")
-    public SoftwareLicenseResponseDTO updateSoftwareLicense(@PathVariable long id, @RequestBody @Valid SoftwareLicenseRequestDTO dto) {
+    @PutMapping("/update/{softwareName}")
+    public ResponseEntity<SoftwareLicenseResponseDTO> updateSoftwareLicense(@PathVariable String softwareName, @Valid @RequestBody SoftwareLicenseRequestDTO newSoftwareLicense) {
 
-        // Step 1: Convert incoming DTO into an Entity containing updated values.
-        SoftwareLicense updatedData = mapper.toEntity(dto);
+        // Step 1: Delegate to service layer validation, update fields, and persist changes.
+        SoftwareLicenseResponseDTO updated = softwareLicenseService.updateSoftwareLicense(softwareName, newSoftwareLicense);
 
-        // Step 2: Delegate update logic to the service layer.
-        SoftwareLicense updatedSoftwareLicense = softwareLicenseService.updateExistingSoftwareLicense(id, updatedData);
-
-        // Step 3: Convert the updated entity into a Response DTO.
-        SoftwareLicenseResponseDTO responseDTO = mapper.toDto(updatedSoftwareLicense);
-
-        return responseDTO;
+        // Step 2: return a 200 HTTP Status code
+        return ResponseEntity.ok(updated);
     }
 
     // ==========================================================
@@ -123,15 +116,20 @@ public class SoftwareLicenseController {
     // ==========================================================
 
     /**
-     * Delete software license by id.
+     * Delete software license response entity.
      *
-     * @param id the license id
+     * @param softwareName the software name
+     * @return the response entity
      */
-    @DeleteMapping("/{id}")
-    public void deleteSoftwareLicenseById(@PathVariable long id) {
+    @DeleteMapping("/{softwareName}")
+    public ResponseEntity<Void>
+    deleteSoftwareLicense(@PathVariable String softwareName) {
 
-        // Delegate deletion logic to the service layer.
-        softwareLicenseService.deleteSoftwareLicenseById(id);
+        // Step 1: Delegate to service layer for deletion logic.
+        softwareLicenseService.deleteSoftwareLicenseByName(softwareName);
+
+        // Step 2: return a 204 HTTP Status code
+        return ResponseEntity.noContent().build();
     }
 
     // ==========================================================
@@ -143,82 +141,81 @@ public class SoftwareLicenseController {
     // ==========================================================
 
     /**
-     * Install a software license on a specific asset.
+     * Install software license on asset response entity.
      *
-     * @param licenseId the license id
-     * @param assetId   the asset id
-     * @return the updated software license response dto
+     * @param softwareName the software name
+     * @param serialNumber the serial number
+     * @return the response entity
      */
-
-    // /software-licenses/1/uninstall/2
-    @PostMapping("/{licenseId}/install/{assetId}")
-    public SoftwareLicenseResponseDTO installSoftware(@PathVariable long licenseId, @PathVariable long assetId) {
+    @PostMapping("/{softwareName}/install/{serialNumber}")
+    public ResponseEntity<SoftwareLicenseResponseDTO> installSoftwareLicenseOnAsset(@PathVariable String softwareName, @PathVariable String serialNumber) {
 
         // Step 1: Delegate installation logic to the service layer.
-        SoftwareLicense updatedSoftwareLicense = softwareLicenseService.installationSoftware(licenseId, assetId);
+        SoftwareLicenseResponseDTO installedSoftwareLicense = softwareLicenseService.installSoftwareLicenseOnAsset(softwareName, serialNumber);
 
-        // Step 2: Convert updated entity into a Response DTO.
-        SoftwareLicenseResponseDTO responseDTO = mapper.toDto(updatedSoftwareLicense);
-
-        return responseDTO;
+        // Step 2: return a 200 HTTP Status code
+        return ResponseEntity.ok(installedSoftwareLicense);
     }
 
     /**
-     * Uninstall a software license from a specific asset.
+     * Uninstall software license from asset response entity.
      *
-     * @param licenseId the license id
-     * @param assetId   the asset id
-     * @return the updated software license response dto
+     * @param softwareName the software name
+     * @param serialNumber the serial number
+     * @return the response entity
      */
-    @DeleteMapping("/{licenseId}/uninstall/{assetId}")
-    public SoftwareLicenseResponseDTO uninstallSoftware(@PathVariable long licenseId, @PathVariable long assetId) {
+    @DeleteMapping("/{softwareName}/uninstall/{serialNumber}")
+    public ResponseEntity<SoftwareLicenseResponseDTO> uninstallSoftwareLicenseFromAsset(@PathVariable String softwareName,@PathVariable String serialNumber) {
 
         // Step 1: Delegate uninstallation logic to the service layer.
-        SoftwareLicense updatedLicense = softwareLicenseService.uninstallSoftware(licenseId, assetId);
+        SoftwareLicenseResponseDTO updated = softwareLicenseService.uninstallSoftwareLicenseFromAsset(softwareName, serialNumber);
 
-        // Step 2: Convert updated entity into a Response DTO.
-        SoftwareLicenseResponseDTO responseDTO = mapper.toDto(updatedLicense);
+        // Step 2: return a 204 HTTP Status code
+        return ResponseEntity.noContent().build();
 
-        return responseDTO;
     }
 
+    /**
+     * Gets installed software license by asset.
+     *
+     * @param serialNumber the serial number
+     * @return the installed software license by asset
+     */
     // ==========================================================
     // AUDIT & QUERY
     // ==========================================================
+    @GetMapping("/asset/{serialNumber}")
+    public ResponseEntity<List<SoftwareLicenseResponseDTO>> getInstalledSoftwareLicenseByAsset(@PathVariable String serialNumber) {
 
-    /**
-     * Retrieve all software licenses installed on a specific asset.
-     *
-     * @param assetId the asset id
-     * @return the set of installed software licenses
-     */
-    @GetMapping("/asset/{assetId}")
-    public Set<SoftwareLicenseResponseDTO> getInstalledSoftwareByAsset(@PathVariable long assetId) {
+        // Step 1: Service try to retrieve all the software licence owned by a specific asset (through its serial number)
+        List<SoftwareLicenseResponseDTO>  installedLicensesOnAsset = softwareLicenseService.getInstalledSoftwareLicenseByAsset(serialNumber);
 
-        Set<SoftwareLicenseResponseDTO> responseDTOS = softwareLicenseService.getInstalledSoftwareByAsset(assetId)
-                .stream()
-                .map(mapper::toDto)
-                .collect(Collectors.toSet());
+        // If the list is empty add a header with message
+        if (installedLicensesOnAsset.isEmpty()) {
+            return ResponseEntity.ok().header("X-Info-Message","No software licenses installed on this asset").body(installedLicensesOnAsset);
+        }
 
-        return responseDTOS;
+        // Step 2: return a 200 HTTP Status code
+        return ResponseEntity.ok(installedLicensesOnAsset);
     }
 
     /**
-     * Retrieve software licenses expiring in the next 30 days.
+     * Gets software licenses expiring soon.
      *
-     * @return the list of expiring software licenses
+     * @return the software licenses expiring soon
      */
     @GetMapping("/expiring-soon")
-    public List<SoftwareLicenseResponseDTO> getLicensesExpiringSoon() {
+    public ResponseEntity<List<SoftwareLicenseResponseDTO>> getSoftwareLicensesExpiringSoon() {
 
-        List<SoftwareLicenseResponseDTO> responseDTOS = softwareLicenseService.getLicensesExpiringSoon()
-                .stream()
-                .map(mapper::toDto)
-                .collect(Collectors.toList());
+        // Step 1: Service try to retrieve a software licence list based on their expired dates.
+        List<SoftwareLicenseResponseDTO> licenses = softwareLicenseService.getSoftwareLicensesExpiringSoon();
 
-        return responseDTOS;
+        // If the list is empty add a header with message
+        if (licenses.isEmpty()) {
+            return ResponseEntity.ok().header( "X-Info-Message","No software licenses expiring soon").body(licenses);
+        }
+
+        // Step 2: return a 200 HTTP Status code
+        return ResponseEntity.ok(licenses);
     }
 }
-
-
-

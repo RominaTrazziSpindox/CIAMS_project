@@ -12,12 +12,7 @@ public interface SoftwareLicenseMapper {
     SoftwareLicense toEntity(SoftwareLicenseRequestDTO dto);
 
     // Entity → Response
-    SoftwareLicenseResponseDTO toDto(SoftwareLicense entity);
-
-
-    void updateEntityFromDto(
-            SoftwareLicenseRequestDTO dto, @MappingTarget SoftwareLicense entity
-    );
+    SoftwareLicenseResponseDTO toDTO(SoftwareLicense entity);
 
 }
 
