@@ -34,6 +34,11 @@ public class OfficeService {
     // READ OPERATIONS
     // ==========================================================
 
+    /**
+     * Gets all offices.
+     *
+     * @return the all offices
+     */
     @Cacheable("offices")
     public List<OfficeResponseDTO> getAllOffices() {
 
@@ -46,7 +51,14 @@ public class OfficeService {
     }
 
 
-    // ATTENTION: Cache use a not normalized value
+    /**
+     * Gets office by name.
+     *
+     * @param name the name
+     * @return the office by name
+     *
+     * ATTENTION: Cache use a not normalized value
+     */
     @Cacheable(value = "offices", key = "#name")
     public OfficeResponseDTO getOfficeByName(String name) {
 
@@ -68,6 +80,12 @@ public class OfficeService {
     // CREATE OPERATION
     // ==========================================================
 
+    /**
+     * Create office office response dto.
+     *
+     * @param newOfficeDTO the new office dto
+     * @return the office response dto
+     */
     @Transactional
     public OfficeResponseDTO createOffice(OfficeRequestDTO newOfficeDTO) {
 
@@ -96,6 +114,13 @@ public class OfficeService {
     // UPDATE OPERATION
     // ==========================================================
 
+    /**
+     * Update existing office by name office response dto.
+     *
+     * @param currentName  the current name
+     * @param newOfficeDTO the new office dto
+     * @return the office response dto
+     */
     @Transactional
     public OfficeResponseDTO updateExistingOfficeByName(String currentName, OfficeRequestDTO newOfficeDTO) {
 
@@ -136,6 +161,11 @@ public class OfficeService {
     // DELETE OPERATION
     // ==========================================================
 
+    /**
+     * Delete office by name.
+     *
+     * @param officeName the office name
+     */
     @Transactional
     public void deleteOfficeByName(String officeName) {
 

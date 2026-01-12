@@ -13,9 +13,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * The type Office controller.
+ */
 @RestController
 @RequestMapping("/offices")
 public class OfficeController {
+
 
     @Autowired
     public OfficeService officeService;
@@ -28,6 +32,11 @@ public class OfficeController {
     // READ OPERATIONS
     // ==========================================================
 
+    /**
+     * Gets all offices.
+     *
+     * @return the all offices
+     */
     @GetMapping("/all")
     public ResponseEntity<List<OfficeResponseDTO>> getAllOffices() {
 
@@ -45,6 +54,12 @@ public class OfficeController {
     }
 
 
+    /**
+     * Gets office by name.
+     *
+     * @param name the name
+     * @return the office by name
+     */
     @GetMapping("/{name}")
     public ResponseEntity<OfficeResponseDTO> getOfficeByName(@PathVariable String name) {
 
@@ -60,6 +75,12 @@ public class OfficeController {
     // CREATE OPERATION
     // ==========================================================
 
+    /**
+     * Create office response entity.
+     *
+     * @param newOfficeDTO the new office dto
+     * @return the response entity
+     */
     @PostMapping("/insert")
     public ResponseEntity<OfficeResponseDTO> createOffice(@Valid @RequestBody OfficeRequestDTO newOfficeDTO) {
 
@@ -74,6 +95,13 @@ public class OfficeController {
     // UPDATE OPERATION
     // ==========================================================
 
+    /**
+     * Update office by name response entity.
+     *
+     * @param name             the name
+     * @param updatedOfficeDTO the updated office dto
+     * @return the response entity
+     */
     @PutMapping("/update/{name}")
     public ResponseEntity<OfficeResponseDTO> updateOfficeByName(@PathVariable String name, @Valid @RequestBody OfficeRequestDTO updatedOfficeDTO ) {
 
@@ -89,6 +117,12 @@ public class OfficeController {
     // DELETE OPERATION
     // ==========================================================
 
+    /**
+     * Delete office by id response entity.
+     *
+     * @param name the name
+     * @return the response entity
+     */
     @DeleteMapping("/{name}")
     public ResponseEntity<Void> deleteOfficeById(@PathVariable String name) {
 
