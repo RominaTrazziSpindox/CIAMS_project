@@ -42,7 +42,7 @@ public class AssetTypeService {
                 .toList();
     }
 
-    @Cacheable(value = "asset_types", key = "#name")
+    @Cacheable(value = "asset_types", key = "#assetTypeName")
     public AssetTypeResponseDTO getAssetTypeByName(String assetTypeName) {
 
         // Step 1: Normalized the incoming asset type name
