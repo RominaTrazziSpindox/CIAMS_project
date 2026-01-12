@@ -52,7 +52,7 @@ public class AssetTypeService {
         AssetType assetType = assetTypeRepository
                 .findByAssetTypeNameIgnoreCase(normalizedName)
                 .orElseThrow(() -> {
-                    log.error("AssetType not found. name: {}", normalizedName);
+                    log.error("AssetType not found. Name: {}", normalizedName);
                     return new EntityNotFoundException("Asset type not found");
                 });
 
@@ -83,7 +83,7 @@ public class AssetTypeService {
 
         log.info("AssetType created. name: {}", saved.getAssetTypeName());
 
-        // Step 5: Entity -> DTO
+        // Step 5. Convert Entity -> DTO
         return assetTypeMapper.toDTO(saved);
     }
 
@@ -102,7 +102,7 @@ public class AssetTypeService {
 
         // Step 3: Retrieve the existing asset type or throw if not found.
         AssetType existingAssetType = assetTypeRepository.findByAssetTypeNameIgnoreCase(normalizedCurrentName).orElseThrow(() -> {
-            log.error("Update failed. AssetType not found. name: {}", normalizedCurrentName);
+            log.error("Update failed. AssetType not found. Name: {}", normalizedCurrentName);
             return new EntityNotFoundException("Asset type not found");
         });
 
