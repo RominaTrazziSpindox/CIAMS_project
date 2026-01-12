@@ -1,5 +1,6 @@
 package com.spx.inventory_management.mappers;
 
+import com.spx.inventory_management.dto.AssetDetailedResponseDTO;
 import com.spx.inventory_management.dto.AssetRequestDTO;
 import com.spx.inventory_management.dto.AssetResponseDTO;
 import com.spx.inventory_management.models.Asset;
@@ -9,16 +10,27 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring", uses = SoftwareLicenseMapper.class)
 public interface AssetMapper {
 
-    // DTO -> Entity
+    // ==========================================================
+    // DTO -> Entity (solo campi semplici)
+    // ==========================================================
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "office", ignore = true)
     @Mapping(target = "assetType", ignore = true)
+    @Mapping(target = "softwareLicenses", ignore = true)
     Asset toEntity(AssetRequestDTO dto);
 
+    // ==========================================================
+    // Entity -> DTO (BASE)
+    // ==========================================================
 
-    // Entity -> DTO
     @Mapping(source = "office.name", target = "officeName")
     @Mapping(source = "assetType.assetTypeName", target = "assetTypeName")
-    @Mapping(source = "assetType.assetTypeDescription", target = "assetTypeDescription")
     AssetResponseDTO toDTO(Asset asset);
+
+    // ==========================================================
+    // Entity -> DTO (DETAILED)
+    // ==========================================================
+
+    AssetDetailedResponseDTO toDetailedDTO(Asset asset);
 }
