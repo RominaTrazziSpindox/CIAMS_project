@@ -91,8 +91,8 @@ public class AssetService {
 
         // Step 2: Retrieve asset (with relations already available via JPA)
         Asset asset = assetRepository.findBySerialNumberIgnoreCase(normalizedSerialNumber).orElseThrow(() -> {
-                log.error("Asset not found. This serial number doesn't exists: {}", normalizedSerialNumber);
-                return new EntityNotFoundException("Asset not found" + normalizedSerialNumber);
+            log.error("Asset not found. This serial number doesn't exists: {}", normalizedSerialNumber);
+            return new EntityNotFoundException("Asset not found" + normalizedSerialNumber);
         });
 
         // Step 3: Mapper converts the entity into a DTO for response.

@@ -12,7 +12,7 @@ import com.spx.inventory_management.dto.AssetTypeRequestDTO;
  * - assetTypeName: normalized as a key (trimmed, single spaces, lowercase)
  * - assetTypeDescription: normalized as plain text (trimmed, single spaces)
  */
-public final class AssetTypeRequestNormalizer {
+public class AssetTypeRequestNormalizer {
 
     // Constructor
     private AssetTypeRequestNormalizer() {

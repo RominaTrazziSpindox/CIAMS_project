@@ -11,7 +11,7 @@ import com.spx.inventory_management.dto.AssetRequestDTO;
  * - assetTypeName: normalized as a key
  * - purchaseDate: untouched
  */
-public final class AssetRequestNormalizer {
+public class AssetRequestNormalizer {
 
     // Constructor
     private AssetRequestNormalizer() {
