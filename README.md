@@ -1,11 +1,16 @@
 # CIAMS_project
-Corporate IT Asset Management System project: a RESTful backend for managing physical offices, hardware assets, and software licenses, with a focus on traceability and compliance.
+CIAMS is a RESTful backend application designed to manage corporate IT assets, physical offices, and software licenses, with a strong focus on traceability, consistency, and compliance.
 
-This project aims to develop a robust and scalable RESTful backend that enables:
+The system supports the full lifecycle of hardware devices and software licenses, enabling organizations to maintain a clear and auditable inventory of their IT resources.
+
+CIAMS aims to provide a robust and scalable backend that allows:
+
 * Cataloging physical company locations (Offices)
-* Standardizing hardware asset types
-* Tracking individual devices and their physical location
-* Managing software licenses installed on devices to ensure legal compliance
+* Standardizing hardware categories (Asset Types)
+* Tracking individual devices (Assets) and their physical location
+* Managing software licenses installed on devices
+* Enforcing software compliance rules server-side
+* Offering both lightweight list views and detailed asset inspections
 
 ---
 
@@ -16,52 +21,52 @@ The application follows a **layered architecture**, with strict separation of co
 
 Controller → Service → Repository → Database
 
-↓
-Mapper
-
-↓
-DTO
+                ↓
+                Mapper
+                
+                ↓
+                DTO
 
 ### Layer Responsibilities
 
 - **Controller**
     - Exposes REST endpoints
-    - Handles HTTP routing and request/response mapping
-    - Contains no business logic
+    - Performs input validation (@Valid)
 
 - **Service**
     - Implements business rules and domain logic
-    - Performs validations and consistency checks
     - Coordinates repositories and domain entities
+    - Performs validations and consistency checks
+    - Handles HTTP routing and request/response mapping
+    - Orchestrates complex operations (e.g. moving assets, installing licenses)
 
 - **Repository**
     - Handles data access using Spring Data JPA
-    - Contains no business logic
+    - Provides query methods based on domain concepts
 
 - **Entity**
     - Represents the persistent domain model
     - Defines JPA mappings and relationships
+    - Mirrors the logical database schema
 
 - **DTO (Request / Response)**
     - Defines the API contract
     - Prevents exposing JPA entities directly
+    - Uses human-friendly keys (names, serial numbers) instead of internal IDs
 
 - **Mapper**
     - Converts between Entities and DTOs
     - Implemented using MapStruct
 
 - **Exception**
-  - Centralizes application-wide error handling
+  - Centralized via `@RestControllerAdvice`
   - Maps exceptions to appropriate HTTP status codes
   - Ensures a consistent JSON error response format across the API
-  - Keeps controllers and services free from error-handling logic
 
 - **Security**
-  - Handles authentication and authorization concerns
-  - Enforces access control rules before requests reach controllers
+  - Implemented with Spring Security
   - Manages security-related error responses (401 Unauthorized, 403 Forbidden)
-  - Decouples access control logic from business logic
-
+ 
 - **Utils**
   - Provides shared utility logic used across the application
   - Centralizes text normalization and input sanitization
@@ -77,20 +82,20 @@ DTO
 Represents a physical company location.
 
 - `id`
-- `name` (unique)
+- `name` (unique, domain key)
 
 #### AssetType
 Defines a standardized hardware category.
 
 - `id`
-- `assetTypeName`
-- `assetTypeDescription`
+- `assetTypeName` (unique, domain key)
+- `assetTypeDescription` (optional)
 
 #### Asset
 Represents a physical device owned by the company.
 
 - `id`
-- `serialNumber` (unique)
+- `serialNumber` (unique, domain key)
 - `purchaseDate`
 - `office` (Many-to-One)
 - `assetType` (Many-to-One)
@@ -100,7 +105,7 @@ Represents a physical device owned by the company.
 Represents a purchased software license.
 
 - `id`
-- `softwareName` (unique)
+- `softwareName` (unique, domain key)
 - `expirationDate`
 - `maxInstallations` (nullable, null = unlimited)
 - `installedAssets` (Many-to-Many)
@@ -115,6 +120,7 @@ Represents a purchased software license.
 - Domain rules enforced centrally
 - Controlled caching applied only to stable, read-heavy operations
 - Human-friendly data handling through centralized normalization and validation
+- Explicit separation between list views and detailed views
 
 ---
 
@@ -134,47 +140,69 @@ The system enforces the following rules at the **service layer**:
 
 ## 🔌 REST API Overview
 
+### Office Management
+
+- `GET /offices/all`
+- `GET /offices/{officeName}`
+- `POST /offices/insert`
+- `PUT /offices/{officeName}`
+- `DELETE /offices/{officeName}`
+
+### Asset Type Management
+
+- `GET /asset-types/all`
+- `GET /asset-types/{assetTypeName}`
+- `PUT /asset-types/{assetTypeName}`
+- `POST /asset-types/insert`
+- `DELETE /asset-types/{assetTypeName}`
+
 ### Asset Management
 
+#### Base Views
+
 - `GET /assets/all`
-- `GET /assets/{id}`
-- `GET /assets/serial/{serialNumber}`
+- `GET /assets/{serialNumber}`
+- `GET /assets/office/{officeName}`
+- `GET /assets/type/{assetTypeName}`
+
+#### Detailed View
+
+- `GET /assets/{serialNumber}/details`
+
+#### Write Operations
+
 - `POST /assets/insert`
-- `PUT /assets/update/{id}`
-- `PUT /assets/move/{assetId}?officeId={officeId}`
-- `PUT /assets/move-name/{assetId}?officeName={officeName}`
-- `DELETE /assets/{id}`
+- `PUT /assets/update/{serialNumber}`
 
----
+##### Move asset to another office
 
-### Software License Management
+- `PUT /assets/{serialNumber}/move?officeName={officeName}`
+- `DELETE /assets/{serialNumber}`
+
+
+### Software Licence Management
 
 #### CRUD Operations
 
 - `GET /software-licenses/all`
-- `GET /software-licenses/{id}`
+- `GET /software-licenses/{softwareName}`
 - `POST /software-licenses/insert`
-- `PUT /software-licenses/update/{id}`
-- `DELETE /software-licenses/{id}`
+- `PUT /software-licenses/update/{softwareName}`
+- `DELETE /software-licenses/{softwareName}`
 
 #### Compliance Operations
 
-- **Install software on an asset**
+Install license on an asset
+- `POST /software-licenses/{softwareName}/install/{serialNumber}`
 
-- `POST /software-licenses/{licenseId}/install/{assetId}`
+Uninstall license from an asset
+- `DELETE /software-licenses/{softwareName}/uninstall/{serialNumber}`
 
-- **Uninstall software from an asset**
+Audit licenses installed on an asset
+- `GET /software-licenses/asset/{serialNumber}`
 
-- `DELETE /software-licenses/{licenseId}/uninstall/{assetId}`
-
-- **Audit installed software on an asset**
-
-- `GET /software-licenses/asset/{assetId}`
-
-- **Retrieve licenses expiring in the next 30 days**
-
+Retrieve licenses expiring soon
 - `GET /software-licenses/expiring-soon`
-
 
 ---
 
@@ -184,16 +212,15 @@ The system enforces the following rules at the **service layer**:
 - Input data is validated and normalized before business rule enforcement
 - Business rule violations are enforced in the service layer
 - Errors are centralized using `@RestControllerAdvice`
-- The API returns meaningful HTTP status codes and error messages
+- Meaningful HTTP status codes and error messages
 - Error responses follow a unified JSON structure
 - Each error response includes a human-readable action hint to guide API consumers
-- Error handling is fully decoupled from controllers and services (with class `GlobalExceptionHandler`)
 
 ---
 
 ## 🔐 Security & Access Control
 
-The application is secured using **Spring Security** with **HTTP Basic Authentication**, designed to protect write operations while keeping read operations publicly accessible.
+The application is secured using **Spring Security** with **HTTP Basic Authentication**.
 
 ### Authentication
 
@@ -335,6 +362,58 @@ Once started, the application will be available at: http://localhost:8080
 
 Example endpoint: http://localhost:8080/offices/all
 
+---
+
+### 🔮 Future Improvements
+
+While CIAMS already provides a complete and consistent backend for IT asset and software license management, several enhancements could further improve scalability, usability, and maintainability.
+
+1. Pagination & Sorting for List Endpoints: 
+Currently, list endpoints return full collections.
+A future improvement would introduce:
+
+- Pagination (Pageable)
+
+Sorting by key fields (e.g. asset type, purchase date, expiration date).
+This would improve performance and usability when dealing with large datasets.
+
+2. Advanced Search & Filtering
+
+Read operations could be extended with more advanced filtering capabilities, such as:
+
+- Assets filtered by purchase date range
+- Assets grouped by office or asset type 
+- Licenses nearing expiration within a configurable time window
+
+These features would enable more powerful reporting and auditing use cases.
+
+3. Advanced Search & Filtering
+
+Read operations could be extended with more advanced filtering capabilities, such as:
+
+- Assets filtered by purchase date range
+- Assets grouped by office or asset type
+- Licenses nearing expiration within a configurable time window
+
+These features would enable more powerful reporting and auditing use cases.
+
+4. API Documentation (OpenAPI / Swagger)
+
+The API could be documented using OpenAPI specifications and Swagger UI to:
+
+- Provide interactive API documentation
+- Improve discoverability for API consumers
+- Simplify integration with external systems
+
+5. Frontend & Visualization Layer
+
+Although CIAMS is currently backend-focused, a future extension could include:
+
+- A web-based frontend
+- Dashboards for asset distribution and license compliance
+- Visual tools for auditing and reporting
+
+This would improve usability for non-technical users.
 
 ## 📄 License
 
