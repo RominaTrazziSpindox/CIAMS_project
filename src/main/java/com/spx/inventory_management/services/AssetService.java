@@ -224,7 +224,7 @@ public class AssetService {
         });
 
         // Step 2: Retrieve the target office by name
-        Office updatedOffice = officeRepository.findByName(updatedOfficeName).orElseThrow(() -> {
+        Office updatedOffice = officeRepository.findByNameIgnoreCase(updatedOfficeName).orElseThrow(() -> {
             log.error("Move failed. Office not found. name={}", updatedOfficeName);
             return new EntityNotFoundException("Office not found with name=" + updatedOfficeName);
         });
@@ -251,11 +251,6 @@ public class AssetService {
     // DELETE OPERATIONS
     // ==========================================================
 
-    /**
-     * Delete asset by id.
-     *
-     * @param id the id
-     */
     @Transactional
     public void deleteAssetById(long id) {
 
