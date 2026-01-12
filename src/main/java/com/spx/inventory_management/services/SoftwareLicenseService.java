@@ -1,9 +1,16 @@
 package com.spx.inventory_management.services;
 
+import com.spx.inventory_management.dto.OfficeRequestDTO;
+import com.spx.inventory_management.dto.SoftwareLicenseRequestDTO;
+import com.spx.inventory_management.dto.SoftwareLicenseResponseDTO;
+import com.spx.inventory_management.mappers.SoftwareLicenseMapper;
 import com.spx.inventory_management.models.Asset;
 import com.spx.inventory_management.models.SoftwareLicense;
 import com.spx.inventory_management.repositories.AssetRepository;
 import com.spx.inventory_management.repositories.SoftwareLicenseRepository;
+import com.spx.inventory_management.utils.OfficeRequestNormalizer;
+import com.spx.inventory_management.utils.SoftwareLicenseRequestNormalizer;
+import com.spx.inventory_management.utils.TextNormalizer;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -24,182 +31,306 @@ public class SoftwareLicenseService {
     @Autowired
     private AssetRepository assetRepository;
 
+    @Autowired
+    private SoftwareLicenseMapper softwareLicenseMapper;
+
+    // ==========================================================
+    // CRUD METHODS - From Repository Layer
+    // ==========================================================
+
+
     // ==========================================================
     // READ OPERATIONS
     // ==========================================================
 
-    public List<SoftwareLicense> getAllSoftwareLicenses() {
-        return softwareLicenseRepository.findAll();
+    /**
+     * Gets all software licenses.
+     *
+     * @return the all software licenses
+     */
+    public List<SoftwareLicenseResponseDTO> getAllSoftwareLicenses() {
+        return softwareLicenseRepository.findAll()
+                .stream()
+                .map(softwareLicenseMapper::toDTO)
+                .toList();
     }
 
-    public SoftwareLicense getSoftwareLicenseById(long id) {
-        return softwareLicenseRepository.findById(id).orElseThrow(() -> {
-            log.error("SoftwareLicense not found. id={}", id);
-            return new EntityNotFoundException("Software License not found");
+    /**
+     * Gets software license by name.
+     *
+     * @param softwareName the software name
+     * @return the software license by name
+     */
+    public SoftwareLicenseResponseDTO getSoftwareLicenseByName(String softwareName) {
+
+        // Step 1: Normalized the incoming software name license
+        String normalizedSoftwareName = TextNormalizer.normalizeKey(softwareName);
+
+        // Step 2: Repository try to retrieve a SoftwareLicence entity by its unique name from the database.
+        SoftwareLicense license = softwareLicenseRepository.findBySoftwareNameIgnoreCase(normalizedSoftwareName).orElseThrow(() -> {
+            log.error("Asset not found. This software name doesn't exists: {}", normalizedSoftwareName);
+            return new EntityNotFoundException("Software Licence not found" + normalizedSoftwareName);
         });
+
+        // Step 3: Mapper converts the entity into a DTO for response.
+        return softwareLicenseMapper.toDTO(license);
     }
 
+
+    /**
+     * Create software license response dto.
+     *
+     * @param requestDTO the request dto
+     * @return the software license response dto
+     */
     // ==========================================================
     // CREATE OPERATION
     // ==========================================================
     @Transactional
-    public SoftwareLicense createSoftwareLicense(SoftwareLicense newSoftwareLicense) {
+    public SoftwareLicenseResponseDTO createSoftwareLicense(SoftwareLicenseRequestDTO requestDTO) {
 
-        if (softwareLicenseRepository.existsBySoftwareName(newSoftwareLicense.getSoftwareName())) {
-            log.error("Create failed. Software License already exists. name={}", newSoftwareLicense.getSoftwareName());
-            throw new IllegalArgumentException("Software License already exists");
+        // Step 1: Normalize all the input field incoming from SoftwareLicenceRequestDTO
+        SoftwareLicenseRequestDTO normalized = SoftwareLicenseRequestNormalizer.normalize(requestDTO);
+
+        // Step 2: Check if the software license name already exists
+        if (softwareLicenseRepository.existsBySoftwareNameIgnoreCase(normalized.getSoftwareName())) {
+            throw new IllegalArgumentException("Software license already exists: " + normalized.getSoftwareName());
         }
 
-        log.info("Creating Software License. name:'{}', maxInstallations:{}, expirationDate:{}",
-                newSoftwareLicense.getSoftwareName(),
-                newSoftwareLicense.getMaxInstallations(),
-                newSoftwareLicense.getExpirationDate()
-        );
+        // Step 3. Convert DTO -> Entity (Database added an id automatically)
+        SoftwareLicense newSoftwareLicenceEntity = softwareLicenseMapper.toEntity(normalized);
 
-        return softwareLicenseRepository.save(newSoftwareLicense);
+        // Step 4. Save the entity into the database
+        SoftwareLicense savedSoftwareLicense = softwareLicenseRepository.save(newSoftwareLicenceEntity);
+
+
+        log.info("Software license created: {}", savedSoftwareLicense.getSoftwareName());
+
+        // Step 5. Convert Entity -> DTO
+        return softwareLicenseMapper.toDTO(savedSoftwareLicense);
     }
-
     // ==========================================================
     // UPDATE OPERATION
     // ==========================================================
 
+    /**
+     * Update software license response dto.
+     *
+     * @param softwareName          the software name
+     * @param newSoftwareLicenseDTO the new software license dto
+     * @return the software license response dto
+     */
     @Transactional
-    public SoftwareLicense updateExistingSoftwareLicense(long id, SoftwareLicense updatedSoftwareLicense) {
+    public SoftwareLicenseResponseDTO updateSoftwareLicense(String softwareName, SoftwareLicenseRequestDTO newSoftwareLicenseDTO) {
 
-        SoftwareLicense existingSoftwareLicense = softwareLicenseRepository.findById(id).orElseThrow(() -> {
-            log.error("Update failed. Software License not found. id={}", id);
-            return new EntityNotFoundException("Software License not found");
-        });
+        // Step 1: Normalize the current software license name
+        String normalizedCurrentName = TextNormalizer.normalizeKey(softwareName);
 
-        // Update only mutable fields (in this case: name, expiration date and number of maximum license).
-        existingSoftwareLicense.setSoftwareName(updatedSoftwareLicense.getSoftwareName());
-        existingSoftwareLicense.setMaxInstallations(updatedSoftwareLicense.getMaxInstallations());
-        existingSoftwareLicense.setExpirationDate(updatedSoftwareLicense.getExpirationDate());
+        // Step 2: Normalize incoming new software license data
+        SoftwareLicenseRequestDTO normalizedUpdated = SoftwareLicenseRequestNormalizer.normalize(newSoftwareLicenseDTO);
 
-        log.info(
-                "Updating Software License. id:{}, name:'{}', maxInstallations:{}, expirationDate:{}",
-                id,
-                updatedSoftwareLicense.getSoftwareName(),
-                updatedSoftwareLicense.getMaxInstallations(),
-                updatedSoftwareLicense.getExpirationDate()
-        );
+        // Step 3: Retrieve the existing software license or throw if not found.
+        SoftwareLicense existingSoftwareLicense = softwareLicenseRepository.findBySoftwareNameIgnoreCase(normalizedCurrentName).orElseThrow(() ->
+                new EntityNotFoundException("Software license not found"));
 
-        return softwareLicenseRepository.save(existingSoftwareLicense);
+        // Step 4: Extract the new software license name
+        String newSoftwareLicenseName = normalizedUpdated.getSoftwareName();
+
+        // Step 5: If the newSoftwareLicenseName IS NOT EQUAL to the currentSoftwareLicenseName AND if the newSoftwareLicenseName already exists into the database...
+        if (!normalizedCurrentName.equalsIgnoreCase(newSoftwareLicenseName) && softwareLicenseRepository.existsBySoftwareNameIgnoreCase(newSoftwareLicenseName)) {
+            throw new IllegalArgumentException("Software license already exists: " + newSoftwareLicenseName);
+        }
+
+        // Step 6: Update only mutable fields (in this case: office name).
+        existingSoftwareLicense.setSoftwareName(newSoftwareLicenseName);
+        existingSoftwareLicense.setExpirationDate(normalizedUpdated.getExpirationDate());
+        existingSoftwareLicense.setMaxInstallations(normalizedUpdated.getMaxInstallations());
+
+        // Step 7: Save the new updated Software license into the database
+        SoftwareLicense saved = softwareLicenseRepository.save(existingSoftwareLicense);
+
+        log.info("Software license updated. OldName: {}, NewName: {}", normalizedCurrentName, newSoftwareLicenseName);
+
+        // Step 8: Convert Entity -> DTO
+        return softwareLicenseMapper.toDTO(saved);
     }
+
 
     // ==========================================================
     // DELETE OPERATION
     // ==========================================================
 
+    /**
+     * Delete software license by name.
+     *
+     * @param softwareName the software name
+     */
     @Transactional
-    public void deleteSoftwareLicenseById(long id) {
+    public void deleteSoftwareLicenseByName(String softwareName) {
 
-        // Validate entity existence before deletion.
-        if (!softwareLicenseRepository.existsById(id)) {
-            log.error("Delete failed. Software License not found. id={}", id);
-            throw new EntityNotFoundException("Software License not found");
+        // Step 1: Normalize the software license name
+        String normalizedName = TextNormalizer.normalizeKey(softwareName);
+
+        // Step 2: Validate entity existence before deletion.
+        if (!softwareLicenseRepository.existsBySoftwareNameIgnoreCase(normalizedName)) {
+            throw new EntityNotFoundException("Software license not found");
         }
 
-        // Proceed with deletion.
-        log.info("Deleting Software License. id={}", id);
-        softwareLicenseRepository.deleteById(id);
+        // Step 3: Proceed with deletion.
+        softwareLicenseRepository.deleteBySoftwareNameIgnoreCase(normalizedName);
+
+
+        log.info("Software license deleted: {}", normalizedName);
+
     }
 
     // ==========================================================
     // SOFTWARE INSTALLATION & COMPLIANCE
     // ==========================================================
 
+    /**
+     * Install software on asset software license response dto.
+     *
+     * @param softwareName the software name
+     * @param serialNumber the serial number
+     * @return the software license response dto
+     */
     @Transactional
-    public SoftwareLicense installationSoftware(long licenseId, long assetId) {
+    public SoftwareLicenseResponseDTO installSoftwareLicenseOnAsset(String softwareName, String serialNumber) {
 
-        // Check if the asset exists
-        Asset asset = assetRepository.findById(assetId).orElseThrow(() -> {
-            log.error("Installation failed. Asset not found. id={}", assetId);
+        // Step 1: Normalize inputs
+        String normalizedSoftwareName = TextNormalizer.normalizeKey(softwareName);
+        String normalizedSerialNumber = TextNormalizer.normalizeKey(serialNumber);
+
+        // Step 2:  Check if the asset exists
+        Asset asset = assetRepository.findBySerialNumberIgnoreCase(normalizedSerialNumber).orElseThrow(() -> {
+            log.error("Installation failed. Asset not found. serial={}", normalizedSerialNumber);
             return new EntityNotFoundException("Asset not found");
         });
 
-        // Check if the software license exists
-        SoftwareLicense softwareLicense = softwareLicenseRepository.findById(licenseId).orElseThrow(() -> {
-            log.error("Installation failed. Software License not found. id={}", licenseId);
-            return new EntityNotFoundException("Software License not found");
+        // Step 3: Check if the software license exists
+        SoftwareLicense softwareLicense = softwareLicenseRepository.findBySoftwareNameIgnoreCase(normalizedSoftwareName).orElseThrow(() -> {
+            log.error("Installation failed. Software license not found. Software license name: {}", normalizedSoftwareName);
+            return new EntityNotFoundException("Software license not found");
         });
 
-        // Check if the software license is not expired
-        if (softwareLicense.getExpirationDate().isBefore(LocalDate.now())) {
-            log.error("Installation failed. Software License expired. id={}", licenseId);
-            throw new IllegalStateException("Software License is expired");
+        // Step 4: Check if the software license is not expired
+        if (softwareLicense.getExpirationDate() != null && softwareLicense.getExpirationDate().isBefore(LocalDate.now())) {
+            log.error("Installation failed. Software license is expired. Software license name: {}", normalizedSoftwareName);
+            throw new IllegalStateException("Software license is expired");
         }
 
-        // Check if the software has already this license installed (= same licenseId)
+        // Step 5: Check if already installed on an asset
         if (softwareLicense.getInstalledAssets().contains(asset)) {
-            log.error("Installation failed. License already installed. licenseId={}, assetId={}", licenseId, assetId);
-            throw new IllegalStateException("Software already installed on this asset");
+            log.error("Installation failed. License already installed. Software license name: {}, Asset serial number: {}", normalizedSoftwareName, normalizedSerialNumber);
+            throw new IllegalStateException("This software license is already installed on this asset");
         }
 
-        // Check the number of installation
+        // Step 6: Check the number of maximum installations
         if (softwareLicense.getMaxInstallations() != null && softwareLicense.getInstalledAssets().size() >= softwareLicense.getMaxInstallations()) {
-            log.error("Installation failed. Number of maximum installations reached. licenseId={}", licenseId);
-            throw new IllegalStateException("Maximum number of installations reached!");
+            log.error("Installation failed. Max installations reached. Software: {}", normalizedSoftwareName);
+            throw new IllegalStateException("Maximum number of installations reached");
         }
 
-        // Add the license to the asset
+        // Step 8: Add the license to the asset (= installation)
         softwareLicense.addAsset(asset);
 
-        log.info("The Software License has been installed. licenseId={}, assetId={}", licenseId, assetId);
+        // Step 9: Save the entity into the database
+        SoftwareLicense savedSoftwareLicense = softwareLicenseRepository.save(softwareLicense);
 
-        return softwareLicenseRepository.save(softwareLicense);
+        log.info("Software successfully installed. Software license name:{}, Asset serial number:{}", normalizedSoftwareName, normalizedSerialNumber);
+
+        // Step 10: Convert Entity -> DTO
+        return softwareLicenseMapper.toDTO(savedSoftwareLicense);
     }
 
+    /**
+     * Uninstall software from asset software license response dto.
+     *
+     * @param softwareName the software name
+     * @param serialNumber the serial number
+     * @return the software license response dto
+     */
     @Transactional
-    public SoftwareLicense uninstallSoftware(long licenseId, long assetId) {
+    public SoftwareLicenseResponseDTO uninstallSoftwareLicenseFromAsset(String softwareName, String serialNumber) {
 
-        // Check if the asset exists
-        Asset asset = assetRepository.findById(assetId).orElseThrow(() -> {
-            log.error("Uninstallation failed. Asset not found. id={}", assetId);
+        // Step 1: Normalize inputs
+        String normalizedSoftwareName = TextNormalizer.normalizeKey(softwareName);
+        String normalizedSerialNumber = TextNormalizer.normalizeKey(serialNumber);
+
+        // Step 2:  Check if the asset exists
+        Asset asset = assetRepository.findBySerialNumberIgnoreCase(normalizedSerialNumber).orElseThrow(() -> {
+            log.error("Installation failed. Asset not found. serial={}", normalizedSerialNumber);
             return new EntityNotFoundException("Asset not found");
         });
 
-        // Check if the software license exists
-        SoftwareLicense softwareLicense = softwareLicenseRepository.findById(licenseId).orElseThrow(() -> {
-            log.error("Uninstallation failed. Software License not found. id={}", licenseId);
-            return new EntityNotFoundException("Software License not found");
+        // Step 3: Check if the software license exists
+        SoftwareLicense softwareLicense = softwareLicenseRepository.findBySoftwareNameIgnoreCase(normalizedSoftwareName).orElseThrow(() -> {
+            log.error("Installation failed. Software license not found. Software license name: {}", normalizedSoftwareName);
+            return new EntityNotFoundException("Software license not found");
         });
 
-        // Check if the asset contains the specific software license
+        // Step 4: Check if already installed on an asset
         if (!softwareLicense.getInstalledAssets().contains(asset)) {
-            log.error("Uninstallatopm failed. Software not installed. licenseId={}, assetId={}",licenseId, assetId);
-            throw new IllegalStateException("This Software license is not installed on this asset");
+            log.error("Uninstallation failed. Software not installed. Software license name: {}, Asset serial number: {}", normalizedSoftwareName, normalizedSerialNumber);
+            throw new IllegalStateException("This software license is not installed on this asset");
         }
 
-        // Remove the license to the asset
+        // Step 5: Remove the license to the asset (= installation)
         softwareLicense.removeAsset(asset);
 
-        log.info("Uninstalled Software License. licenseId={}, assetId={}", licenseId, assetId);
+        // Step 6: Save the entity into the database
+        SoftwareLicense savedSoftwareLicense = softwareLicenseRepository.save(softwareLicense);
 
-        return softwareLicenseRepository.save(softwareLicense);
+        log.info("Software uninstalled. Software license name:{}, Asset serial number:{}", normalizedSoftwareName, normalizedSerialNumber);
+
+        // Step 7: Convert Entity -> DTO
+        return softwareLicenseMapper.toDTO(savedSoftwareLicense);
+
     }
 
+
+    /**
+     * Gets installed software by asset.
+     *
+     * @param serialNumber the serial number
+     * @return the installed software by asset
+     */
     // Retrieve all the licenses owned by an asset
-    public Set<SoftwareLicense> getInstalledSoftwareByAsset(long assetId) {
+    public List<SoftwareLicenseResponseDTO> getInstalledSoftwareLicenseByAsset(String serialNumber) {
 
-        Asset asset = assetRepository.findById(assetId).orElseThrow(() -> {
-            log.error("Audit failed. Asset not found. id={}", assetId);
-            return new EntityNotFoundException("Asset not found");
-        });
+        // Step 1: Normalize the incoming asset serial number
+        String normalizedSerialNumber = TextNormalizer.normalizeKey(serialNumber);
 
-        log.info("Audit software for Asset. assetId={}", assetId);
+        log.info("Audit software for asset. Asset serial number: {}", normalizedSerialNumber);
 
-        return asset.getSoftwareLicenses();
+        return softwareLicenseRepository
+                .findByInstalledAssets_SerialNumberIgnoreCase(normalizedSerialNumber)
+                .stream()
+                .map(softwareLicenseMapper::toDTO)
+                .toList();
+
+
     }
 
-    // Retrieve a list of the licenses that will be expired into 30 days
-    public List<SoftwareLicense> getLicensesExpiringSoon() {
+    /**
+     * Gets licenses expiring soon.
+     *
+     * @return the licenses expiring soon
+     */
+    // Retrieve all the licenses that will expire in 30 days
+    public List<SoftwareLicenseResponseDTO> getSoftwareLicensesExpiringSoon() {
 
-        LocalDate now = LocalDate.now();
-        LocalDate limit = now.plusDays(30);
+        LocalDate today = LocalDate.now();
+        LocalDate limit = today.plusDays(30);
 
-        log.info("Fetching software licenses expiring between {} and {}", now, limit);
+        log.info("Fetching software licenses expiring between {} and {}", today, limit);
 
-        return softwareLicenseRepository.findByExpirationDateBetween(now, limit);
+        return softwareLicenseRepository
+                .findByExpirationDateBefore(limit)
+                .stream()
+                .map(softwareLicenseMapper::toDTO)
+                .toList();
     }
 }
+

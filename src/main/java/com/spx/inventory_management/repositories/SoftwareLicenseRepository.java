@@ -6,11 +6,30 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SoftwareLicenseRepository extends JpaRepository<SoftwareLicense, Long> {
 
-    boolean existsBySoftwareName(String softwareName);
+    // ==========================================================
+    // BASIC READ OPERATIONS
+    // ==========================================================
 
-    List<SoftwareLicense> findByExpirationDateBetween(LocalDate start, LocalDate end);
+    Optional<SoftwareLicense> findBySoftwareNameIgnoreCase(String softwareName);
+
+    boolean existsBySoftwareNameIgnoreCase(String softwareName);
+
+    void deleteBySoftwareNameIgnoreCase(String softwareName);
+
+    // ==========================================================
+    // COMPLIANCE & AUDIT QUERIES
+    // ==========================================================
+
+    // Licenses installed on a specific asset (by serial number)
+    List<SoftwareLicense> findByInstalledAssets_SerialNumberIgnoreCase(
+            String serialNumber
+    );
+
+    // Licenses expiring before a given date
+    List<SoftwareLicense> findByExpirationDateBefore(LocalDate date);
 }
