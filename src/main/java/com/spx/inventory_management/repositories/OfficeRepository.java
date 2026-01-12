@@ -9,8 +9,9 @@ import java.util.Optional;
 @Repository
 public interface OfficeRepository extends JpaRepository<Office, Long> {
 
-    Optional<Office> findByName(String name);
+    Optional<Office> findByNameIgnoreCase(String name);
 
-    boolean existsByName(String name);
+    boolean existsByNameIgnoreCase(String name);
 
+    void deleteByNameIgnoreCase(String name);
 }
