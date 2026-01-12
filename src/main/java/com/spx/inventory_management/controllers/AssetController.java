@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
 @RestController
 @RequestMapping("/assets")
 public class AssetController {
@@ -22,13 +21,18 @@ public class AssetController {
 
 
     // ==========================================================
-    // CRUD METHODS - Service Layer
+    // CRUD METHODS - From Service Layer
     // ==========================================================
 
     // ==========================================================
     // READ
     // ==========================================================
 
+    /**
+     * Gets all assets.
+     *
+     * @return the all assets
+     */
     @GetMapping("/all")
     public ResponseEntity<List<AssetResponseDTO>> getAllAssets() {
 
@@ -45,6 +49,12 @@ public class AssetController {
         return ResponseEntity.ok(assets);
     }
 
+    /**
+     * Get assets by office response entity.
+     *
+     * @param officeName the office name
+     * @return the response entity
+     */
     @GetMapping("/{officeName}")
     public ResponseEntity<List<AssetResponseDTO>> getAssetsByOffice(@PathVariable String officeName){
 
@@ -61,6 +71,12 @@ public class AssetController {
         return ResponseEntity.ok(assets);
     }
 
+    /**
+     * Gets assets by asset type.
+     *
+     * @param assetTypeName the asset type name
+     * @return the assets by asset type
+     */
     @GetMapping("/{assetTypeName}")
     public ResponseEntity<List<AssetResponseDTO>> getAssetsByAssetType(@PathVariable String assetTypeName) {
 
@@ -73,6 +89,12 @@ public class AssetController {
         return ResponseEntity.ok(assets);
     }
 
+    /**
+     * Gets asset by serial number.
+     *
+     * @param serialNumber the serial number
+     * @return the asset by serial number
+     */
     @GetMapping("/{serialNumber}")
     public ResponseEntity<AssetResponseDTO> getAssetBySerialNumber(@PathVariable String serialNumber) {
 
@@ -84,7 +106,14 @@ public class AssetController {
     }
 
 
-    // URL: GET /assets/SN-001/details
+    /**
+     * Gets asset details.
+     *
+     * @param serialNumber the serial number
+     * @return the asset details
+     *
+     * URL: GET /assets/SN-001/details
+     */
     @GetMapping("/{serialNumber}/details")
     public ResponseEntity<AssetDetailedResponseDTO> getAssetDetails(@PathVariable String serialNumber) {
 
@@ -101,6 +130,12 @@ public class AssetController {
     // CREATE OPERATIONS
     // ==========================================================
 
+    /**
+     * Create asset response entity.
+     *
+     * @param assetRequestDTO the asset request dto
+     * @return the response entity
+     */
     @PostMapping("/insert")
     public ResponseEntity<AssetResponseDTO> createAsset(@Valid @RequestBody AssetRequestDTO assetRequestDTO) {
 
@@ -116,6 +151,13 @@ public class AssetController {
     // UPDATE OPERATIONS
     // ==========================================================
 
+    /**
+     * Update asset response entity.
+     *
+     * @param serialNumber    the serial number
+     * @param updatedAssetDTO the updated asset dto
+     * @return the response entity
+     */
     @PutMapping("/update/{serialNumber}")
     public ResponseEntity<AssetResponseDTO> updateAsset(@PathVariable String serialNumber, @Valid @RequestBody AssetRequestDTO updatedAssetDTO) {
 
@@ -131,7 +173,15 @@ public class AssetController {
     // MOVE (office)
     // ==========================================================
 
-    // URL: PUT /assets/SN-001/move?officeName=Rome HQ
+    /**
+     * Move asset to office response entity.
+     *
+     * @param serialNumber  the serial number
+     * @param newOfficeName the new office name
+     * @return the response entity
+     *
+     * URL: PUT /assets/SN-001/move?officeName=Rome HQ
+     */
     @PutMapping("/{serialNumber}/move")
     public ResponseEntity<AssetResponseDTO> moveAssetToOffice(@PathVariable String serialNumber, @RequestParam String newOfficeName) {
 
@@ -146,6 +196,12 @@ public class AssetController {
     // DELETE
     // ==========================================================
 
+    /**
+     * Delete asset response entity.
+     *
+     * @param serialNumber the serial number
+     * @return the response entity
+     */
     @DeleteMapping("/{serialNumber}")
     public ResponseEntity<Void> deleteAsset(@PathVariable String serialNumber) {
 

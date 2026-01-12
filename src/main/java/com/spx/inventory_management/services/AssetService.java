@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-
 @Service
 @Slf4j
 public class AssetService {
@@ -45,11 +44,22 @@ public class AssetService {
     // READ OPERATIONS
     // ==========================================================
 
+    /**
+     * Gets all assets.
+     *
+     * @return the all assets
+     */
     public List<AssetResponseDTO> getAllAssets() {
 
         return assetRepository.findAll().stream().map(assetMapper::toDTO).toList();
     }
 
+    /**
+     * Gets assets by office.
+     *
+     * @param officeName the office name
+     * @return the assets by office
+     */
     public List<AssetResponseDTO> getAssetsByOffice(String officeName) {
 
         String normalizedOffice = TextNormalizer.normalizeKey(officeName);
@@ -58,6 +68,12 @@ public class AssetService {
 
     }
 
+    /**
+     * Gets assets by asset type.
+     *
+     * @param assetTypeName the asset type name
+     * @return the assets by asset type
+     */
     public List<AssetResponseDTO> getAssetsByAssetType(String assetTypeName) {
 
         // Step 1: Normalized the incoming asset serial number
@@ -69,6 +85,12 @@ public class AssetService {
                 .toList();
     }
 
+    /**
+     * Gets asset by serial number.
+     *
+     * @param assetSerialNumber the asset serial number
+     * @return the asset by serial number
+     */
     public AssetResponseDTO getAssetBySerialNumber(String assetSerialNumber) {
 
         // Step 1: Normalized the incoming asset serial number
@@ -84,6 +106,12 @@ public class AssetService {
         return assetMapper.toDTO(asset);
     }
 
+    /**
+     * Gets asset details by serial number.
+     *
+     * @param serialNumber the serial number
+     * @return the asset details by serial number
+     */
     public AssetDetailedResponseDTO getAssetDetailsBySerialNumber(String serialNumber) {
 
         // Step 1: Normalized the incoming asset serial number
@@ -103,6 +131,12 @@ public class AssetService {
     // CREATE OPERATION
     // ==========================================================
 
+    /**
+     * Create asset asset response dto.
+     *
+     * @param newAssetRequestDTO the new asset request dto
+     * @return the asset response dto
+     */
     @Transactional
     public AssetResponseDTO createAsset(AssetRequestDTO newAssetRequestDTO) {
 
@@ -145,6 +179,13 @@ public class AssetService {
     // UPDATE OPERATIONS
     // ==========================================================
 
+    /**
+     * Update asset by serial number asset response dto.
+     *
+     * @param currentSerialNumber the current serial number
+     * @param newAssetDTO         the new asset dto
+     * @return the asset response dto
+     */
     @Transactional
     public AssetResponseDTO updateAssetBySerialNumber(String currentSerialNumber, AssetRequestDTO newAssetDTO) {
 
@@ -192,6 +233,13 @@ public class AssetService {
     }
 
 
+    /**
+     * Move asset to office by name asset response dto.
+     *
+     * @param serialNumber      the serial number
+     * @param updatedOfficeName the updated office name
+     * @return the asset response dto
+     */
     @Transactional
     public AssetResponseDTO moveAssetToOfficeByName( String serialNumber,String updatedOfficeName) {
 
@@ -231,6 +279,11 @@ public class AssetService {
     // DELETE OPERATION
     // ==========================================================
 
+    /**
+     * Delete asset by serial number.
+     *
+     * @param serialNumber the serial number
+     */
     @Transactional
     public void deleteAssetBySerialNumber(String serialNumber) {
 
