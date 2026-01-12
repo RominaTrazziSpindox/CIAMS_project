@@ -1,11 +1,15 @@
 package com.spx.inventory_management.services;
 
+import com.spx.inventory_management.dto.*;
+import com.spx.inventory_management.mappers.AssetMapper;
 import com.spx.inventory_management.models.Asset;
 import com.spx.inventory_management.models.AssetType;
 import com.spx.inventory_management.models.Office;
 import com.spx.inventory_management.repositories.AssetRepository;
 import com.spx.inventory_management.repositories.AssetTypeRepository;
 import com.spx.inventory_management.repositories.OfficeRepository;
+import com.spx.inventory_management.utils.AssetRequestNormalizer;
+import com.spx.inventory_management.utils.TextNormalizer;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -13,11 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
-/**
- * The type Asset service.
- */
+
 @Service
 @Slf4j
 public class AssetService {
@@ -31,99 +32,112 @@ public class AssetService {
     @Autowired
     private OfficeRepository officeRepository;
 
+    @Autowired
+    private AssetMapper assetMapper;
+
+
+    // ==========================================================
+    // CRUD METHODS - From Repository Layer
+    // ==========================================================
+
+
     // ==========================================================
     // READ OPERATIONS
     // ==========================================================
 
-    /**
-     * Gets all assets.
-     *
-     * @return the all assets
-     */
-    public List<Asset> getAllAssets() {
-        return assetRepository.findAll();
+    public List<AssetResponseDTO> getAllAssets() {
+
+        return assetRepository.findAll().stream().map(assetMapper::toDTO).toList();
     }
 
-    /**
-     * Gets asset by id.
-     *
-     * @param id the id
-     * @return the asset by id
-     */
-    public Asset getAssetById(long id) {
-        return assetRepository.findById(id).orElseThrow(() -> {
-            log.error("Asset not found. id={}", id);
-            return new EntityNotFoundException("Asset not found");
+    public List<AssetResponseDTO> getAssetsByOffice(String officeName) {
+
+        String normalizedOffice = TextNormalizer.normalizeKey(officeName);
+
+        return assetRepository.findByOffice_NameIgnoreCase(normalizedOffice).stream().map(assetMapper::toDTO).toList();
+
+    }
+
+    public List<AssetResponseDTO> getAssetsByAssetType(String assetTypeName) {
+
+        // Step 1: Normalized the incoming asset serial number
+        String normalizedTypeName = TextNormalizer.normalizeKey(assetTypeName);
+
+        return assetRepository.findByAssetType_AssetTypeNameIgnoreCase(normalizedTypeName)
+                .stream()
+                .map(assetMapper::toDTO)
+                .toList();
+    }
+
+    public AssetResponseDTO getAssetBySerialNumber(String assetSerialNumber) {
+
+        // Step 1: Normalized the incoming asset serial number
+        String normalizedSerialNumber = TextNormalizer.normalizeKey(assetSerialNumber);
+
+        // Step 2: Repository try to retrieve an Asset entity by its unique serial number from the database.
+        Asset asset = assetRepository.findBySerialNumberIgnoreCase(normalizedSerialNumber).orElseThrow(() -> {
+            log.error("Asset not found. This serial number doesn't exists: {}", normalizedSerialNumber);
+            return new EntityNotFoundException("Asset not found: " + normalizedSerialNumber);
         });
+
+        // Step 3: Mapper converts the entity into a DTO for response.
+        return assetMapper.toDTO(asset);
     }
 
-    /**
-     * Gets asset by serial number.
-     *
-     * @param serialNumber the serial number
-     * @return the asset by serial number
-     */
-    public Asset getAssetBySerialNumber(String serialNumber) {
+    public AssetDetailedResponseDTO getAssetDetailsBySerialNumber(String serialNumber) {
 
-        // Find the Asset by serial number
-        Optional<Asset> optionalAsset = assetRepository.findBySerialNumber(serialNumber);
+        // Step 1: Normalized the incoming asset serial number
+        String normalizedSerialNumber = TextNormalizer.normalizeKey(serialNumber);
 
-        // If the Asset doesn't exist
-        if (optionalAsset.isEmpty()) {
-            log.error("Asset not found. This serial number doesn't exists={}", serialNumber);
-            throw new EntityNotFoundException("Asset not found with serial number: " + serialNumber);
-        }
+        // Step 2: Retrieve asset (with relations already available via JPA)
+        Asset asset = assetRepository.findBySerialNumberIgnoreCase(normalizedSerialNumber).orElseThrow(() -> {
+                log.error("Asset not found. This serial number doesn't exists: {}", normalizedSerialNumber);
+                return new EntityNotFoundException("Asset not found" + normalizedSerialNumber);
+        });
 
-        // If the Asset exists
-        return optionalAsset.get();
+        // Step 3: Mapper converts the entity into a DTO for response.
+        return assetMapper.toDetailedDTO(asset);
     }
-
 
     // ==========================================================
     // CREATE OPERATION
     // ==========================================================
 
-    /**
-     * Create asset asset.
-     *
-     * @param asset       the asset
-     * @param assetTypeId the asset type id
-     * @param officeId    the office id
-     * @return the asset
-     */
     @Transactional
-    public Asset createAsset(Asset asset, Long assetTypeId, Long officeId) {
+    public AssetResponseDTO createAsset(AssetRequestDTO newAssetRequestDTO) {
 
-        log.debug("Creating asset with serialNumber={}", asset.getSerialNumber());
+        // Step 1: Normalize all the input field incoming from assetRequestDTO
+        AssetRequestDTO normalizedDTO = AssetRequestNormalizer.normalize(newAssetRequestDTO);
 
-        // 1. Check serial number uniqueness
-        if (assetRepository.existsBySerialNumber(asset.getSerialNumber())) {
-            throw new IllegalArgumentException(
-                    "Asset with serial number already exists: " + asset.getSerialNumber()
-            );
+        log.debug("Creating asset with serialNumber: {}", normalizedDTO.getSerialNumber());
+
+        // Step 2: Check if the asset serial number already exists
+        if (assetRepository.existsBySerialNumberIgnoreCase(normalizedDTO.getSerialNumber())) {
+            throw new IllegalArgumentException("Asset with serial number already exists: " + normalizedDTO.getSerialNumber());
         }
 
-        // 2. Check if AssetType exists
-        AssetType assetType = assetTypeRepository.findById(assetTypeId).orElseThrow(() ->
-                new EntityNotFoundException("AssetType not found with id=" + assetTypeId)
-        );
+        // Step 3: Check if the office exists by its name
+        Office office = officeRepository.findByNameIgnoreCase(normalizedDTO.getOfficeName()).orElseThrow(() ->
+                new EntityNotFoundException("Office not found"));
 
-        // 3. Check if the Office exists
-        Office office = officeRepository.findById(officeId).orElseThrow(() ->
-                new EntityNotFoundException("Office not found with id=" + officeId)
-        );
+        // Step 4: Check if the asset type exists by its name
+        AssetType assetType = assetTypeRepository.findByAssetTypeNameIgnoreCase(normalizedDTO.getAssetTypeName()).orElseThrow(()
+                -> new EntityNotFoundException("Asset type not found"));
 
+        // Step 5. Convert DTO -> Entity (Database added an id automatically)
+        Asset newAsset = assetMapper.toEntity(normalizedDTO);
 
-        // 4. Set the foreign keys
-        asset.setAssetType(assetType);
-        asset.setOffice(office);
+        // Step 6: Set the new Asset foreign keys
+        newAsset.setOffice(office);
+        newAsset.setAssetType(assetType);
 
-        // 5. Persist
-        Asset savedAsset = assetRepository.save(asset);
+        // Step 7. Save the entity into the database
+        Asset savedAsset = assetRepository.save(newAsset);
 
-        log.info("Asset created successfully. id={}", savedAsset.getId());
+        log.info("Asset created succeffully. Serial number: {}", savedAsset.getSerialNumber());
 
-        return savedAsset;
+        // Step 8. Convert Entity -> DTO
+        return assetMapper.toDTO(savedAsset);
     }
 
 
@@ -131,159 +145,149 @@ public class AssetService {
     // UPDATE OPERATIONS
     // ==========================================================
 
-    /**
-     * Update existing asset asset.
-     *
-     * @param id           the id
-     * @param updatedAsset the updated asset
-     * @return the asset
-     */
     @Transactional
-    public Asset updateExistingAsset(long id, Asset updatedAsset) {
+    public AssetResponseDTO updateAssetBySerialNumber(String currentSerialNumber, AssetRequestDTO newAssetDTO) {
 
-        // Retrieve the existing office or throw an exception if not found.
-        Asset existingAsset = assetRepository.findById(id).orElseThrow(() -> {
-            log.error("Update failed. Asset not found. id={}", id);
-            return new EntityNotFoundException("Asset not found");
+        // Step 1: Normalize the current serial number
+        String normalizedCurrentSerialNumber = TextNormalizer.normalizeKey(currentSerialNumber);
+
+        // Step 2: Normalize incoming new asset type data
+        AssetRequestDTO normalizedDTO = AssetRequestNormalizer.normalize(newAssetDTO);
+
+        // Step 3: Retrieve the existing asset or throw if not found.
+        Asset existingAsset = assetRepository.findBySerialNumberIgnoreCase(normalizedCurrentSerialNumber).orElseThrow(() -> {
+                log.error("Update failed. Asset not found. Serial number: {}", normalizedCurrentSerialNumber);
+                return new EntityNotFoundException("Asset not found");
         });
 
-        // Update the date of purchase field
-        existingAsset.setPurchaseDate(updatedAsset.getPurchaseDate());
 
-        // Update the serial number (checking unique constraint)
-        if (!existingAsset.getSerialNumber().equals(updatedAsset.getSerialNumber())) {
+        // Step 4: Extract the new asset serial number
+        String newSerialNumber = normalizedDTO.getSerialNumber();
 
-            if (assetRepository.existsBySerialNumber(updatedAsset.getSerialNumber())) {
-                throw new IllegalArgumentException( "Asset with serial number already exists: " + updatedAsset.getSerialNumber());
-            }
-
-            // Update the serial number field
-            existingAsset.setSerialNumber(updatedAsset.getSerialNumber());
+        // Step 5: If the newSerialNumber IS NOT EQUAL to the currentSerialNumber AND if the newSerialNumber already exists into the database...
+        if (!normalizedCurrentSerialNumber.equalsIgnoreCase(newSerialNumber) && assetRepository.existsBySerialNumberIgnoreCase(newSerialNumber)) {
+            throw new IllegalArgumentException( "Asset with serial number already exists: " + newSerialNumber);
         }
 
-        // Save and return the updated entity.
-        log.info("Asset updated successfully. id={}", id);
-        return assetRepository.save(existingAsset);
-    }
+        // Step 6: Check if there is no office
+        Office office = officeRepository.findByNameIgnoreCase(normalizedDTO.getOfficeName()).orElseThrow(() ->
+                new EntityNotFoundException("Office not found"));
 
-    /**
-     * Move asset to office by id asset.
-     *
-     * @param assetId         the asset id
-     * @param updatedOfficeId the updated office id
-     * @return the asset
-     */
+        // Step 7: Check if there is no asset type
+        AssetType assetType = assetTypeRepository.findByAssetTypeNameIgnoreCase(normalizedDTO.getAssetTypeName()).orElseThrow(() ->
+                new EntityNotFoundException("Asset type not found"));
 
-    // SQL: UPDATE assets SET id_office = ? WHERE id_asset = ?
-    @Transactional
-    public Asset moveAssetToOfficeById(long assetId, long updatedOfficeId) {
+        // Step 8: Set the foreign keys and update the mutable field (in this case: asset serial number, asset type and asset purchase date)
+        existingAsset.setSerialNumber(newSerialNumber);
+        existingAsset.setOffice(office); existingAsset.setAssetType(assetType);
+        existingAsset.setPurchaseDate(normalizedDTO.getPurchaseDate());
 
-        // Try to retrieve an asset by its id
-        Asset retrievedAsset = assetRepository.findById(assetId).orElseThrow(() -> {
-            log.error("Move failed. Asset not found. id={}", assetId);
-            return new EntityNotFoundException("Asset not found");
-        });
+        // Step 9: Save the new updated Asset into the database
+        Asset updatedAsset = assetRepository.save(existingAsset);
 
-        // Try to retrieve the target office by its id
-        Office updatedOffice = officeRepository.findById(updatedOfficeId).orElseThrow(() -> {
-            log.error("Move failed. Office not found. id={}", updatedOfficeId);
-            return new EntityNotFoundException("Office not found");
-        });
+        log.info( "Asset updated. OldSerial={}, NewSerial={}", normalizedCurrentSerialNumber, newSerialNumber);
 
-        // Check if the asset is already assigned to the target office
-        if (retrievedAsset.getOffice().getId() == updatedOfficeId) {
-            throw new IllegalArgumentException("Asset is already assigned to office id=" + updatedOfficeId);
-        }
-
-        // Update the office allocation
-        retrievedAsset.setOffice(updatedOffice);
-
-        // Persist the update
-        Asset savedAsset = assetRepository.save(retrievedAsset);
-
-        log.info("Asset {} moved to office {}", assetId, updatedOfficeId);
-
-        return savedAsset;
+        // Step 10: Convert Entity -> DTO
+        return assetMapper.toDTO(updatedAsset);
     }
 
 
-    /**
-     * Move asset to office by name asset.
-     *
-     * @param assetId           the asset id
-     * @param updatedOfficeName the updated office name
-     * @return the asset
-     */
     @Transactional
-    public Asset moveAssetToOfficeByName(long assetId, String updatedOfficeName) {
+    public AssetResponseDTO moveAssetToOfficeByName( String serialNumber,String updatedOfficeName) {
 
-        // Step 1: Retrieve the asset
-        Asset asset = assetRepository.findById(assetId).orElseThrow(() -> {
-            log.error("Move failed. Asset not found. id={}", assetId);
-            return new EntityNotFoundException("Asset not found");
-        });
+        // Step 1: Normalize the current serial number
+        String normalizedSerial = TextNormalizer.normalizeKey(serialNumber);
 
-        // Step 2: Retrieve the target office by name
-        Office updatedOffice = officeRepository.findByNameIgnoreCase(updatedOfficeName).orElseThrow(() -> {
-            log.error("Move failed. Office not found. name={}", updatedOfficeName);
-            return new EntityNotFoundException("Office not found with name=" + updatedOfficeName);
-        });
+        // Step 2: Normalize incoming new asset type data
+        String normalizedOfficeName = TextNormalizer.normalizeKey(updatedOfficeName);
 
-        // Step 3: Check if the asset is already in the target office
-        Office currentOffice = asset.getOffice();
-        if (currentOffice.getId() == updatedOffice.getId()) {
-            throw new IllegalArgumentException("Asset is already assigned to office '" + updatedOfficeName + "'");
+        // Step 3: Retrieve the existing asset by serial number
+        Asset asset = assetRepository.findBySerialNumberIgnoreCase(normalizedSerial).orElseThrow(() ->
+                new EntityNotFoundException("Asset not found"));
+
+        // Step 4: Retrieve the target office by its name
+        Office targetOffice = officeRepository.findByNameIgnoreCase(normalizedOfficeName).orElseThrow(() ->
+                new EntityNotFoundException("Office not found"));
+
+        // Step 5: Check if asset is already in that office
+        if (asset.getOffice() != null && asset.getOffice().getName().equalsIgnoreCase(normalizedOfficeName)) {
+            throw new IllegalArgumentException("Asset is already assigned to office '" + normalizedOfficeName + "'");
         }
 
-        // Step 4: Move the asset into the new office (setting the new field property name)
-        asset.setOffice(updatedOffice);
+        // Step 6: Move asset by setting the new office
+        asset.setOffice(targetOffice);
 
-        // Step 5: Persist and return
-        Asset savedAsset = assetRepository.save(asset);
+        // Step 7: Save the new office data into the database
+        Asset savedOffice = assetRepository.save(asset);
 
-        log.info("Asset {} moved from office '{}' to office '{}'", assetId, currentOffice.getName(), updatedOffice.getName());
+        log.info("Asset moved. Serial: {}, NewOffice: {}", normalizedSerial, normalizedOfficeName);
 
-        return savedAsset;
+
+        // Step 8: Entity -> DTO
+        return assetMapper.toDTO(savedOffice);
     }
-
 
     // ==========================================================
-    // DELETE OPERATIONS
+    // DELETE OPERATION
     // ==========================================================
 
-    @Transactional
-    public void deleteAssetById(long id) {
-
-        // Validate entity existence before deletion.
-        if (!assetRepository.existsById(id)) {
-            log.error("Delete failed. Asset not found. id={}", id);
-            throw new EntityNotFoundException("Asset not found");
-        }
-
-        // Proceed with deletion.
-        log.info("Deleting asset. id={}", id);
-        assetRepository.deleteById(id);
-    }
-
-    /**
-     * Delete asset by serial number.
-     *
-     * @param serialNumber the serial number
-     */
     @Transactional
     public void deleteAssetBySerialNumber(String serialNumber) {
 
-        // Validate entity existence before deletion.
-        if (!assetRepository.existsBySerialNumber(serialNumber)) {
-            log.error("Delete failed. Asset not found. Serial number={}", serialNumber);
+        // Step 1: Normalize the serial number input field incoming from assetRequestDTO
+        String normalizedSerialNumber = TextNormalizer.normalizeKey(serialNumber);
+
+        // Step 2: Validate entity existence before deletion.
+        if (!assetRepository.existsBySerialNumberIgnoreCase(normalizedSerialNumber)) {
+            log.error("Delete failed. Asset not found. Serial number: {}", normalizedSerialNumber);
             throw new EntityNotFoundException("Asset not found");
         }
 
-        // Proceed with deletion.
-        log.info("Deleting asset. Serial number={}", serialNumber);
-        assetRepository.deleteBySerialNumber(serialNumber);
+        assetRepository.deleteBySerialNumberIgnoreCase(normalizedSerialNumber);
 
+        log.info("Asset deleted. Serial: {}", normalizedSerialNumber);
     }
-
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

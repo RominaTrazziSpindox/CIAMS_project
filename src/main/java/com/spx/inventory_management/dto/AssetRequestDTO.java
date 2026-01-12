@@ -19,8 +19,8 @@ public class AssetRequestDTO implements Serializable {
     private LocalDate purchaseDate;
 
     @NotNull(message = "Asset Type ID is required")
-    private Long assetTypeId;
+    private String assetTypeName;
 
     @NotNull(message = "Office ID is required")
-    private Long officeId;
+    private String officeName;
 }

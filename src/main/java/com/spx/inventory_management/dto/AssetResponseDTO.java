@@ -13,13 +13,6 @@ public class AssetResponseDTO implements Serializable {
     private String serialNumber;
     private LocalDate purchaseDate;
 
-    // From Office
     private String officeName;
-
-    // From AssetType
     private String assetTypeName;
-    private String assetTypeDescription;
-
-    // From SoftwareLicenses
-    private Set<SoftwareLicenseResponseDTO> softwareLicenses;
 }

@@ -12,11 +12,11 @@ public interface AssetRepository extends JpaRepository <Asset, Long> {
     // Lookup by domain key
     // ==========================================================
 
-    boolean existsBySerialNumber(String serialNumber);
+    boolean existsBySerialNumberIgnoreCase(String serialNumber);
 
-    Optional<Asset> findBySerialNumber(String serialNumber);
+    Optional<Asset> findBySerialNumberIgnoreCase(String serialNumber);
 
-    void deleteBySerialNumber(String serialNumber);
+    void deleteBySerialNumberIgnoreCase(String serialNumber);
 
     // ==========================================================
     // Relations-based queries
@@ -26,4 +26,4 @@ public interface AssetRepository extends JpaRepository <Asset, Long> {
 
     List<Asset> findByAssetType_AssetTypeNameIgnoreCase(String assetTypeName);
 }
-}
+
