@@ -73,7 +73,7 @@ public class AssetTypeController {
     // UPDATE OPERATION
     // ==========================================================
 
-    @PutMapping("/{name}")
+    @PutMapping("/update/{name}")
     public ResponseEntity<AssetTypeResponseDTO> updateAssetTypeByName(@PathVariable String name, @Valid @RequestBody AssetTypeRequestDTO assetTypeRequestDTO) {
 
         // Step 1: Delegate to service layer validation, update fields, and persist changes.
