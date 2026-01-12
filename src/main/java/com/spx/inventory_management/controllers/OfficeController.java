@@ -11,9 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * The type Office controller.
- */
 @RestController
 @RequestMapping("/offices")
 public class OfficeController {

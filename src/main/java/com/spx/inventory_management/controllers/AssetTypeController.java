@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 
-
 @RestController
 @RequestMapping("/asset-types")
 public class AssetTypeController {
@@ -30,6 +29,11 @@ public class AssetTypeController {
     // READ OPERATIONS
     // ==========================================================
 
+    /**
+     * Gets all asset types.
+     *
+     * @return the all asset types
+     */
     @GetMapping("/all")
     public ResponseEntity<List<AssetTypeResponseDTO>> getAllAssetTypes() {
 
@@ -45,6 +49,12 @@ public class AssetTypeController {
         return ResponseEntity.ok(assetTypes);
     }
 
+    /**
+     * Gets asset type by name.
+     *
+     * @param name the name
+     * @return the asset type by name
+     */
     @GetMapping("/{name}")
     public ResponseEntity<AssetTypeResponseDTO> getAssetTypeByName(@PathVariable String name) {
 
@@ -59,6 +69,12 @@ public class AssetTypeController {
     // CREATE OPERATION
     // ==========================================================
 
+    /**
+     * Create asset type response entity.
+     *
+     * @param assetTypeRequestDTO the asset type request dto
+     * @return the response entity
+     */
     @PostMapping("/insert")
     public ResponseEntity<AssetTypeResponseDTO> createAssetType(@Valid @RequestBody AssetTypeRequestDTO assetTypeRequestDTO) {
 
@@ -73,6 +89,13 @@ public class AssetTypeController {
     // UPDATE OPERATION
     // ==========================================================
 
+    /**
+     * Update asset type by name response entity.
+     *
+     * @param name                the name
+     * @param assetTypeRequestDTO the asset type request dto
+     * @return the response entity
+     */
     @PutMapping("/update/{name}")
     public ResponseEntity<AssetTypeResponseDTO> updateAssetTypeByName(@PathVariable String name, @Valid @RequestBody AssetTypeRequestDTO assetTypeRequestDTO) {
 
@@ -87,6 +110,12 @@ public class AssetTypeController {
     // DELETE OPERATION
     // ==========================================================
 
+    /**
+     * Delete asset type by name response entity.
+     *
+     * @param name the name
+     * @return the response entity
+     */
     @DeleteMapping("/{name}")
     public ResponseEntity<Void> deleteAssetTypeByName(@PathVariable String name) {
 

@@ -15,6 +15,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
+
 @Service
 @Slf4j
 public class AssetTypeService {
@@ -33,6 +34,11 @@ public class AssetTypeService {
     // READ OPERATIONS
     // ==========================================================
 
+    /**
+     * Gets all asset types.
+     *
+     * @return the all asset types
+     */
     @Cacheable("asset_types")
     public List<AssetTypeResponseDTO> getAllAssetTypes() {
 
@@ -42,6 +48,12 @@ public class AssetTypeService {
                 .toList();
     }
 
+    /**
+     * Gets asset type by name.
+     *
+     * @param assetTypeName the asset type name
+     * @return the asset type by name
+     */
     @Cacheable(value = "asset_types", key = "#assetTypeName")
     public AssetTypeResponseDTO getAssetTypeByName(String assetTypeName) {
 
@@ -64,6 +76,12 @@ public class AssetTypeService {
     // CREATE OPERATION
     // ==========================================================
 
+    /**
+     * Create asset type asset type response dto.
+     *
+     * @param newAssetTypeRequestDTO the new asset type request dto
+     * @return the asset type response dto
+     */
     @Transactional
     public AssetTypeResponseDTO createAssetType(AssetTypeRequestDTO newAssetTypeRequestDTO) {
 
@@ -91,6 +109,13 @@ public class AssetTypeService {
     // UPDATE OPERATION
     // ==========================================================
 
+    /**
+     * Update asset type by name asset type response dto.
+     *
+     * @param currentName     the current name
+     * @param newAssetTypeDTO the new asset type dto
+     * @return the asset type response dto
+     */
     @Transactional
     public AssetTypeResponseDTO updateAssetTypeByName(String currentName, AssetTypeRequestDTO newAssetTypeDTO) {
 
@@ -132,6 +157,11 @@ public class AssetTypeService {
     // DELETE OPERATION
     // ==========================================================
 
+    /**
+     * Delete asset type by name.
+     *
+     * @param assetTypeName the asset type name
+     */
     @Transactional
     public void deleteAssetTypeByName(String assetTypeName) {
 
