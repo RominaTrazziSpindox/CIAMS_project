@@ -2,8 +2,6 @@ package com.spx.inventory_management.controllers;
 
 import com.spx.inventory_management.dto.OfficeRequestDTO;
 import com.spx.inventory_management.dto.OfficeResponseDTO;
-import com.spx.inventory_management.mappers.OfficeMapper;
-import com.spx.inventory_management.models.Office;
 import com.spx.inventory_management.services.OfficeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +42,7 @@ public class OfficeController {
         // Step 1: Service try to retrieve an Office list.
         List<OfficeResponseDTO> officesRetrieved = officeService.getAllOffices();
 
-        // If the list is empty...
+        // If the list is empty add a header with message
         if (officesRetrieved.isEmpty()) {
             return ResponseEntity.ok().header("X-Info-Message", "No offices found in the database").body(officesRetrieved);
         }

@@ -67,11 +67,11 @@ public class OfficeService {
 
         // Step 2: Repository try to retrieve an Office entity by its unique name from the database.
         Office office = officeRepository.findByNameIgnoreCase(normalizedName).orElseThrow(() -> {
-            log.error("Office not found. Name:{}", normalizedName);
+            log.error("Office not found. Name: {}", normalizedName);
             return new EntityNotFoundException("Office not found"); // Throw 404 HTTP Status code
         });
 
-        // Step 3: Mapper converts the entity into a DTO for response.{
+        // Step 3: Mapper converts the entity into a DTO for response.
         return officeMapper.toDTO(office);
     }
 
@@ -103,7 +103,7 @@ public class OfficeService {
         // Step 4. Save the entity into the database
         Office savedOfficeEntity = officeRepository.save(newOfficeEntity);
 
-        log.info("Office created. name={}", savedOfficeEntity.getName());
+        log.info("Office created. Name: {}", savedOfficeEntity.getName());
 
         // Step 5. Convert Entity -> DTO
         return officeMapper.toDTO(savedOfficeEntity);
@@ -132,7 +132,7 @@ public class OfficeService {
 
         // Step 3: Retrieve the existing office or throw if not found.
         Office existingOffice = officeRepository.findByNameIgnoreCase(normalizedCurrentName).orElseThrow(() -> {
-            log.error("Update failed. Office not found. Name:{}", normalizedCurrentName);
+            log.error("Update failed. Office not found. Name: {}", normalizedCurrentName);
              return new EntityNotFoundException("Office not found");
         });
 
@@ -150,7 +150,7 @@ public class OfficeService {
         // Step 7: Save the new updated Office into the database
         Office updatedOffice = officeRepository.save(existingOffice);
 
-        log.info("Office updated. OldName:{}, NewName:{}", normalizedCurrentName, newOfficeName);
+        log.info("Office updated. OldName: {}, NewName: {}", normalizedCurrentName, newOfficeName);
 
         // Step 8: Convert Entity -> DTO
         return officeMapper.toDTO(updatedOffice);
@@ -174,14 +174,14 @@ public class OfficeService {
 
         // Step 2: Validate entity existence before deletion.
         if (!officeRepository.existsByNameIgnoreCase(normalizedName)) {
-            log.error("Delete failed. Office not found. Name:{}", normalizedName);
+            log.error("Delete failed. Office not found. Name: {}", normalizedName);
             throw new EntityNotFoundException("Office not found");
         }
 
         // Step 3: Proceed with deletion.
         officeRepository.deleteByNameIgnoreCase(normalizedName);
 
-        log.info("Deleting office. Named:{}", normalizedName);
+        log.info("Deleting office. Named: {}", normalizedName);
 
     }
 }
