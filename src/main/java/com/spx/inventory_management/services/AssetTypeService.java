@@ -1,16 +1,18 @@
 package com.spx.inventory_management.services;
 
+import com.spx.inventory_management.dto.AssetTypeRequestDTO;
+import com.spx.inventory_management.dto.AssetTypeResponseDTO;
+import com.spx.inventory_management.mappers.AssetTypeMapper;
 import com.spx.inventory_management.models.AssetType;
 import com.spx.inventory_management.repositories.AssetTypeRepository;
+import com.spx.inventory_management.utils.AssetTypeRequestNormalizer;
+import com.spx.inventory_management.utils.TextNormalizer;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import com.spx.inventory_management.utils.TextNormalizer;
-
 import java.util.List;
 
 @Service
@@ -20,122 +22,131 @@ public class AssetTypeService {
     @Autowired
     private AssetTypeRepository assetTypeRepository;
 
+    @Autowired
+    private AssetTypeMapper assetTypeMapper;
+
+    // ==========================================================
+    // CRUD METHODS - From Repository Layer
+    // ==========================================================
+
     // ==========================================================
     // READ OPERATIONS
     // ==========================================================
 
-    /**
-     * Gets all asset types.
-     *
-     * @return the all asset types
-     */
     @Cacheable("asset_types")
-    public List<AssetType> getAllAssetTypes() {
-        return assetTypeRepository.findAll();
+    public List<AssetTypeResponseDTO> getAllAssetTypes() {
+
+        return assetTypeRepository.findAll()
+                .stream()
+                .map(assetTypeMapper::toDTO)
+                .toList();
     }
 
-    /**
-     * Gets asset type by id.
-     *
-     * @param id the id
-     * @return the asset type by id
-     */
-    @Cacheable(value = "asset_types", key = "#id")
-    public AssetType getAssetTypeById(long id) {
-        return assetTypeRepository.findById(id).orElseThrow(() -> {
-            log.error("AssetType not found. id={}", id);
-            return new EntityNotFoundException("AssetType not found");
-        });
-    }
+    @Cacheable(value = "asset_types", key = "#name")
+    public AssetTypeResponseDTO getAssetTypeByName(String assetTypeName) {
 
+        // Step 1: Normalized the incoming asset type name
+        String normalizedName = TextNormalizer.normalizeKey(assetTypeName);
+
+        // Step 2: Repository try to retrieve an Asset Type entity by its unique name from the database.
+        AssetType assetType = assetTypeRepository
+                .findByAssetTypeNameIgnoreCase(normalizedName)
+                .orElseThrow(() -> {
+                    log.error("AssetType not found. name: {}", normalizedName);
+                    return new EntityNotFoundException("Asset type not found");
+                });
+
+        // Step 3: Mapper converts the entity into a DTO for response.
+        return assetTypeMapper.toDTO(assetType);
+    }
 
     // ==========================================================
     // CREATE OPERATION
     // ==========================================================
 
-    /**
-     * Create asset type.
-     *
-     * @param newAssetType the new asset type
-     * @return the asset type
-     */
     @Transactional
-    @CacheEvict(value = "asset_types", allEntries = true)
-    public AssetType createAssetType(AssetType newAssetType) {
+    public AssetTypeResponseDTO createAssetType(AssetTypeRequestDTO newAssetTypeRequestDTO) {
 
-        // Cleaning incoming assetType name data using utility function
-        String newAssetTypeName = TextNormalizer.normalizeKey(newAssetType.getAssetTypeName());
-        newAssetType.setAssetTypeName(newAssetTypeName);
+        // Step 1: Normalize all the input field incoming from assetTypeRequestDTO
+        AssetTypeRequestDTO normalizedDTO = AssetTypeRequestNormalizer.normalize(newAssetTypeRequestDTO);
 
-        // Check if the office name already exists
-        if (assetTypeRepository.existsByAssetTypeName(newAssetTypeName)) {
-            throw new IllegalArgumentException("Asset type already exists: " + newAssetTypeName);
+        // Step 2: Check if the asset type name already exists
+        if (assetTypeRepository.existsByAssetTypeNameIgnoreCase(normalizedDTO.getAssetTypeName())) {
+            throw new IllegalArgumentException("Asset type already exists: " + normalizedDTO.getAssetTypeName());
         }
 
-        log.info("Creating a new Asset Type. name:'{}' and description:'{}'", newAssetType.getAssetTypeName(), newAssetType.getAssetTypeDescription());
-        return assetTypeRepository.save(newAssetType);
+        // Step 3. Convert DTO -> Entity (Database added an id automatically)
+        AssetType newAssetType = assetTypeMapper.toEntity(normalizedDTO);
+
+        // Step 4. Save the entity into the database
+        AssetType saved = assetTypeRepository.save(newAssetType);
+
+        log.info("AssetType created. name: {}", saved.getAssetTypeName());
+
+        // Step 5: Entity -> DTO
+        return assetTypeMapper.toDTO(saved);
     }
 
     // ==========================================================
     // UPDATE OPERATION
     // ==========================================================
 
-    /**
-     * Update existing asset type.
-     *
-     * @param id               the id
-     * @param updatedAssetType the updated asset type
-     * @return the asset type
-     */
     @Transactional
-    @CacheEvict(value = "asset_types", allEntries = true)
-    public AssetType updateExistingAssetType(long id, AssetType updatedAssetType) {
+    public AssetTypeResponseDTO updateAssetTypeByName(String currentName, AssetTypeRequestDTO newAssetTypeDTO) {
 
-        // Cleaning incoming assetType name data
-        String newAssetTypeName = TextNormalizer.normalizeKey(updatedAssetType.getAssetTypeName());
+        // Step 1: Normalize the current name
+        String normalizedCurrentName = TextNormalizer.normalizeKey(currentName);
 
-        // Retrieve the existing office or throw if not found.
-        AssetType existingAssetType = assetTypeRepository.findById(id).orElseThrow(() -> {
-            log.error("Update failed. Asset Type not found. id={}", id);
-            return new EntityNotFoundException("Asset Type not found");
+        // Step 2: Normalize incoming new asset type data
+        AssetTypeRequestDTO normalizedDTO = AssetTypeRequestNormalizer.normalize(newAssetTypeDTO);
+
+        // Step 3: Retrieve the existing asset type or throw if not found.
+        AssetType existingAssetType = assetTypeRepository.findByAssetTypeNameIgnoreCase(normalizedCurrentName).orElseThrow(() -> {
+            log.error("Update failed. AssetType not found. name: {}", normalizedCurrentName);
+            return new EntityNotFoundException("Asset type not found");
         });
 
-        // Get the current AssetType name
-        String currentOfficeName = existingAssetType.getAssetTypeName();
+        // Step 4: Extract the new asset type name
+        String newName = normalizedDTO.getAssetTypeName();
 
-        // Update only mutable fields (in this case: name and description).
-        existingAssetType.setAssetTypeName(updatedAssetType.getAssetTypeName());
-        existingAssetType.setAssetTypeDescription(updatedAssetType.getAssetTypeDescription());
+        // Step 5: If the newName IS NOT EQUAL to the currentName AND if the newName already exists into the database...
+        if (!normalizedCurrentName.equalsIgnoreCase(newName) && assetTypeRepository.existsByAssetTypeNameIgnoreCase(newName)) {
+            throw new IllegalArgumentException("Asset type already exists: " + newName);
+        }
 
-        // Save and return the updated entity.
-        log.info("Updating Asset Type. id:{}, name:'{}', description:'{}'",
-                id, updatedAssetType.getAssetTypeName(), updatedAssetType.getAssetTypeDescription());
+        // Step 6: Update only mutable fields (in this case: asset type name and asset type description).
+        existingAssetType.setAssetTypeName(newName);
+        existingAssetType.setAssetTypeDescription(normalizedDTO.getAssetTypeDescription());
 
-        return assetTypeRepository.save(existingAssetType);
+        // Step 7: Save the new updated Asset Type into the database
+        AssetType updated = assetTypeRepository.save(existingAssetType);
+
+        log.info("AssetType updated. oldName: {}, newName: {}", normalizedCurrentName, newName);
+
+
+        // Step 8: Convert Entity -> DTO
+        return assetTypeMapper.toDTO(updated);
     }
-
 
     // ==========================================================
     // DELETE OPERATION
     // ==========================================================
 
-    /**
-     * Delete asset type by id.
-     *
-     * @param id the id
-     */
     @Transactional
-    @CacheEvict(value = "asset_types", allEntries = true)
-    public void deleteAssetTypeById(long id) {
+    public void deleteAssetTypeByName(String assetTypeName) {
 
-        // Validate entity existence before deletion.
-        if (!assetTypeRepository.existsById(id)) {
-            log.error("Delete failed. Asset Type not found. id={}", id);
-            throw new EntityNotFoundException("Asset Type not found");
+        // Step 1: Normalize the asset type name
+        String normalizedName = TextNormalizer.normalizeKey(assetTypeName);
+
+        // Step 2: Validate entity existence before deletion.
+        if (!assetTypeRepository.existsByAssetTypeNameIgnoreCase(normalizedName)) {
+            log.error("Delete failed. AssetType not found. Name: {}", normalizedName);
+            throw new EntityNotFoundException("Asset type not found");
         }
 
-        // Proceed with deletion.
-        log.info("Deleting Asset Type. id={}", id);
-        assetTypeRepository.deleteById(id);
+        // Step 3: Proceed with deletion.
+        assetTypeRepository.deleteByAssetTypeNameIgnoreCase(normalizedName);
+
+        log.info("AssetType deleted. name={}", normalizedName);
     }
 }
