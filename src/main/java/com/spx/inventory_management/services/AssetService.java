@@ -220,7 +220,8 @@ public class AssetService {
 
         // Step 8: Set the foreign keys and update the mutable field (in this case: asset serial number, asset type and asset purchase date)
         existingAsset.setSerialNumber(newSerialNumber);
-        existingAsset.setOffice(office); existingAsset.setAssetType(assetType);
+        existingAsset.setOffice(office);
+        existingAsset.setAssetType(assetType);
         existingAsset.setPurchaseDate(normalizedDTO.getPurchaseDate());
 
         // Step 9: Save the new updated Asset into the database
