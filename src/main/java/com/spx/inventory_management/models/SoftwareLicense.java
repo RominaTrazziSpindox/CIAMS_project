@@ -18,10 +18,10 @@ public class SoftwareLicense {
     // Properties
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id_software_license", nullable = false)
+    @Column(name="id_software_license")
     private long id;
 
-    @Column(name="software_name", nullable = false, unique = true)
+    @Column(name="software_name", nullable = false, unique = true, length = 200)
     private String softwareName;
 
     @Column(name = "max_installations")
