@@ -23,7 +23,7 @@ public class Asset {
     private long id;
 
 
-    @Column(name="serial_number", nullable = false, unique = true)
+    @Column(name="serial_number", nullable = false, unique = true, length = 50)
     private String serialNumber;
 
 
