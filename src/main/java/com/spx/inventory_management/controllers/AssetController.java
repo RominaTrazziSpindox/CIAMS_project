@@ -54,8 +54,10 @@ public class AssetController {
      *
      * @param officeName the office name
      * @return the response entity
+     *
+     * URL: GET /assets/offices/Milan HQ
      */
-    @GetMapping("/{officeName}")
+    @GetMapping("/offices/{officeName}")
     public ResponseEntity<List<AssetResponseDTO>> getAssetsByOffice(@PathVariable String officeName){
 
         // Step 1: Service try to retrieve an Asset list based on an office name.
@@ -76,8 +78,11 @@ public class AssetController {
      *
      * @param assetTypeName the asset type name
      * @return the assets by asset type
+     *
+     * URL: GET /assets/asset-types/Laptop
+     *
      */
-    @GetMapping("/{assetTypeName}")
+    @GetMapping("/asset-types/{assetTypeName}")
     public ResponseEntity<List<AssetResponseDTO>> getAssetsByAssetType(@PathVariable String assetTypeName) {
 
         List<AssetResponseDTO> assets = assetService.getAssetsByAssetType(assetTypeName);
@@ -94,6 +99,8 @@ public class AssetController {
      *
      * @param serialNumber the serial number
      * @return the asset by serial number
+     *
+     * URL: GET /assets/MONXXX
      */
     @GetMapping("/{serialNumber}")
     public ResponseEntity<AssetResponseDTO> getAssetBySerialNumber(@PathVariable String serialNumber) {
@@ -112,7 +119,7 @@ public class AssetController {
      * @param serialNumber the serial number
      * @return the asset details
      *
-     * URL: GET /assets/SN-001/details
+     * URL: GET /assets/MONXXX/details
      */
     @GetMapping("/{serialNumber}/details")
     public ResponseEntity<AssetDetailedResponseDTO> getAssetDetails(@PathVariable String serialNumber) {
@@ -180,7 +187,7 @@ public class AssetController {
      * @param newOfficeName the new office name
      * @return the response entity
      *
-     * URL: PUT /assets/SN-001/move?officeName=Rome HQ
+     * URL: PUT /assets/SN-001/move?newOfficeName=Rome HQ
      */
     @PutMapping("/{serialNumber}/move")
     public ResponseEntity<AssetResponseDTO> moveAssetToOffice(@PathVariable String serialNumber, @RequestParam String newOfficeName) {
