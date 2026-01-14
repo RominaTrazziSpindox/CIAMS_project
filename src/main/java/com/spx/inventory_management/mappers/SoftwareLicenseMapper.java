@@ -5,7 +5,7 @@ import com.spx.inventory_management.models.SoftwareLicense;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = { AssetMapper.class })
 public interface SoftwareLicenseMapper {
 
     // Request → Entity

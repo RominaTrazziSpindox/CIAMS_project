@@ -7,7 +7,7 @@ import com.spx.inventory_management.models.Asset;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = SoftwareLicenseMapper.class)
+@Mapper(componentModel = "spring")
 public interface AssetMapper {
 
     // ==========================================================
