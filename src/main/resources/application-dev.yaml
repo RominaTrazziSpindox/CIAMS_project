@@ -57,8 +57,9 @@ spring:
   # --------------------------------------------
   sql:
     init:
-      # Forces execution of data.sql at every startup in order to load mock data into database
-      mode: never
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
 
 
 # ============================================
