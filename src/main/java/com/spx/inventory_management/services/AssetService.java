@@ -197,7 +197,7 @@ public class AssetService {
 
         // Step 3: Retrieve the existing asset or throw if not found.
         Asset existingAsset = assetRepository.findBySerialNumberIgnoreCase(normalizedCurrentSerialNumber).orElseThrow(() -> {
-                log.error("Update failed. Asset not found. Serial number: {}", normalizedCurrentSerialNumber);
+                log.error("Update failed. Asset not updated, serial number not found. Serial number: {}", normalizedCurrentSerialNumber);
                 return new EntityNotFoundException("Asset not found");
         });
 
