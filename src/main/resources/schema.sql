@@ -46,3 +46,4 @@ CREATE TABLE IF NOT EXISTS assets_licenses (
 
 -- DROP SCHEMA public CASCADE;
 -- CREATE SCHEMA public;
+
