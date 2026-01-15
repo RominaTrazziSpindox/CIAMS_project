@@ -1,0 +1,2633 @@
+{
+	"info": {
+		"_postman_id": "8911be03-be64-4357-8eaa-568e2b52579e",
+		"name": "REST API basics: CRUD, test & variable",
+		"description": "# 🚀 Get started here\n\nThis template guides you through CRUD operations (GET, POST, PUT, DELETE), variables, and tests.\n\n## 🔖 **How to use this template**\n\n#### **Step 1: Send requests**\n\nRESTful APIs allow you to perform CRUD operations using the POST, GET, PUT, and DELETE HTTP methods.\n\nThis collection contains each of these [request](https://learning.postman.com/docs/sending-requests/requests/) types. Open each request and click \"Send\" to see what happens.\n\n#### **Step 2: View responses**\n\nObserve the response tab for status code (200 OK), response time, and size.\n\n#### **Step 3: Send new Body data**\n\nUpdate or add new data in \"Body\" in the POST request. Typically, Body data is also used in PUT request.\n\n```\n{\n    \"name\": \"Add your name in the body\"\n}\n\n ```\n\n#### **Step 4: Update the variable**\n\nVariables enable you to store and reuse values in Postman. We have created a [variable](https://learning.postman.com/docs/sending-requests/variables/) called `base_url` with the sample request [https://postman-api-learner.glitch.me](https://postman-api-learner.glitch.me). Replace it with your API endpoint to customize this collection.\n\n#### **Step 5: Add tests in the \"Scripts\" tab**\n\nAdding tests to your requests can help you confirm that your API is working as expected. You can write test scripts in JavaScript and view the output in the \"Test Results\" tab.\n\n<img src=\"https://content.pstmn.io/fa30ea0a-373d-4545-a668-e7b283cca343/aW1hZ2UucG5n\" width=\"2162\" height=\"1530\">\n\n## 💪 Pro tips\n\n- Use folders to group related requests and organize the collection.\n    \n- Add more [scripts](https://learning.postman.com/docs/writing-scripts/intro-to-scripts/) to verify if the API works as expected and execute workflows.\n    \n\n## 💡Related templates\n\n[API testing basics](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9a37a28-055b-49cd-8c7e-97494a21eb54&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[API documentation](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9c28f47-1253-44af-a2f3-20dce4da1f18&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[Authorization methods](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=31a9a6ed-4cdf-4ced-984c-d12c9aec1c27&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "50719399",
+		"_collection_link": "https://rominatrazzispindox-5145114.postman.co/workspace/John-Doe's-Workspace~05488122-e8ca-4794-80c6-25147e6c3392/collection/50719399-8911be03-be64-4357-8eaa-568e2b52579e?action=share&source=collection_link&creator=50719399"
+	},
+	"item": [
+		{
+			"name": "offices",
+			"item": [
+				{
+					"name": "Get data",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": [
+						{
+							"name": "GetAllOffices",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/offices/all",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"offices",
+										"all"
+									]
+								}
+							},
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": ""
+						},
+						{
+							"name": "GetOfficeByName",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/offices/Rome-HQ",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"offices",
+										"Rome-HQ"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "GetOfficeByName (error 404 not found)",
+							"originalRequest": {
+								"method": "GET",
+								"header": []
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "CreateOffice (201 create)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"officeName\": \"Milan-hq\"\r\n}"
+						},
+						"url": {
+							"raw": "localhost:8080/offices/insert",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"offices",
+								"insert"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateOffice (error 400 bad request - already exists)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"officeName\": \"rome-hq\"\r\n}"
+						},
+						"url": {
+							"raw": "localhost:8080/offices/insert",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"offices",
+								"insert"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateOffice (error 401 unauthorized)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"officeName\": \"Milan N11 Branch\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/offices/insert",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"offices",
+								"insert"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateOfficeByName (200 ok)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"officeName\": \"genoa hq\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/offices/update/turin-HQ",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"offices",
+								"update",
+								"turin-HQ"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateOfficeByName (200 ok with same name)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n \"officeName\": \"milan-hq\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/offices/update/milan-HQ",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"offices",
+								"update",
+								"milan-HQ"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateOfficeByName (error 400 bad request - already exists",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n \"officeName\": \"milan-hq\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/offices/update/rome-hq",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"offices",
+								"update",
+								"rome-hq"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateOfficeByName (error 400 bad request - office name cannot be blank",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n \"officeTitle\": \"genoa branch\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/offices/update/milan-hq",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"offices",
+								"update",
+								"milan-hq"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateOffice (error 404 not found)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"officeName\": \"genoa hq Branch\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/offices/update/naples hq branch",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"offices",
+								"update",
+								"naples hq branch"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateOffice (error 405 method not allowed)",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"officeName\": \"genoa-hq\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/offices/update/milan-hq",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"offices",
+								"update",
+								"milan-hq"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteOfficeByName (error 401 unauthorized)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/offices/rome-hq",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"offices",
+								"rome-hq"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteOfficeByName (error 403 forbbiden - access denied)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/offices/rome-hq",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"offices",
+								"rome-hq"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteOfficeByName (error 404 resource not found)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/offices/milan hr",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"offices",
+								"milan hr"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "asset_types",
+			"item": [
+				{
+					"name": "Get data",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": [
+						{
+							"name": "GetAllAssetTypes",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/asset-types/all",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"asset-types",
+										"all"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "GetAssetTypeByName",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/asset-types/Laptop",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"asset-types",
+										"Laptop"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "GetAssetTypeByName (error 404 not found)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/asset-types/Bla",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"asset-types",
+										"Bla"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "CreateAssetType (201 create)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"assetTypeName\": \"Inkjet Printer\",\r\n    \"assetTypeDescription\": \"Printer with expensive ink\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/asset-types/insert",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"asset-types",
+								"insert"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateAssetType (error 400 bad request - already exists)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"assetTypeName\": \"laptop\",\r\n    \"assetTypeDescription\": \"portable-computer\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/asset-types/insert",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"asset-types",
+								"insert"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateAssetType (error 401 unauthorized)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \r\n    \"assetTypeName\": \"Keyboard\",\r\n    \"assetTypeDescription\": \"Keyboard with lights\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/asset-types/insert",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"asset-types",
+								"insert"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateAssetTypeByName (200 ok - name only)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"assetTypeName\": \"Laptop Powered\",\r\n    \"assetTypeDescription\": \"portable-computer\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/asset-types/update/Laptop",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"asset-types",
+								"update",
+								"Laptop"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateAssetTypeByName (200 ok - description only)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"assetTypeName\": \"Laptop\",\r\n    \"assetTypeDescription\": \"Portable computers assigned to project managers for daily work\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/asset-types/update/Laptop",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"asset-types",
+								"update",
+								"Laptop"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateAssetTypeByName (200 ok with same name)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"assetTypeName\": \"Laptop\",\r\n    \"assetTypeDescription\": \"portable-computer\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/asset-types/update/Laptop",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"asset-types",
+								"update",
+								"Laptop"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateAssetTypeByName (error 400 bad request - already exists)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"assetTypeName\": \"Laptop\",\r\n    \"assetTypeDescription\": \"portable-computer\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/asset-types/update/monitor",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"asset-types",
+								"update",
+								"monitor"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateAssetTypeByName (error 400 bad request - asset type name cannot be blank))",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"assetTypeName\": \"\",\r\n    \"assetTypeDescription\": \"Portable computers assigned to project managers for daily work\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/asset-types/update/Laptop powered",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"asset-types",
+								"update",
+								"Laptop powered"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateAssetType (error 404 not found)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"assetTypeName\": \"Laptop\",\r\n    \"assetTypeDescription\": \"Portable computers assigned to project managers for daily work\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/asset-types/update/Bla",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"asset-types",
+								"update",
+								"Bla"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteAssetTypeByName (error 401 unauthorized)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:8080/asset-types/Mouse",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"asset-types",
+								"Mouse"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteAssetTypeByName (error 403 access denied)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/asset-types/monitor",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"asset-types",
+								"monitor"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteOfficeByName (error 404 resource not found)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:8080/asset-types/Bla",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"asset-types",
+								"Bla"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "assets",
+			"item": [
+				{
+					"name": "Get data",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": [
+						{
+							"name": "GetAllAssets",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/assets/all",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"assets",
+										"all"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "GetAssetsByOffice",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/assets/offices/rome-hq",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"assets",
+										"offices",
+										"rome-hq"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "GetAssetsByAssetType",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/assets/asset-types/laptop",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"assets",
+										"asset-types",
+										"laptop"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "GetAssetBySerialNumber",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/assets/LAP-DEV-001",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"assets",
+										"LAP-DEV-001"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "GetAssetBySerialNumber with details",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/assets/LAP-DEV-001/details",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"assets",
+										"LAP-DEV-001",
+										"details"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "CreateAsset (201 create)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"serialNumber\": \"SN-TEST-002\",\n  \"purchaseDate\": \"2024-01-10\",\n  \"officeName\": \"rome-hq\",\n  \"assetTypeName\": \"laptop\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/assets/insert",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"assets",
+								"insert"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateAsset (error 400 bad request - already exists)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"serialNumber\": \"SN-TEST-001\",\n  \"purchaseDate\": \"2024-01-10\",\n  \"officeName\": \"rome-hq\",\n  \"assetTypeName\": \"laptop\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/assets/insert",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"assets",
+								"insert"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateAsset (error 401 unauthorized)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"serialNumber\": \"SN-TEST-002\",\n  \"purchaseDate\": \"2024-02-10\",\n  \"officeName\": \"milan-hq\",\n  \"assetTypeName\": \"laptop\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/assets/insert",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"assets",
+								"insert"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateAsset (error 404 - Office not found)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"serialNumber\": \"SN-TEST-003\",\n  \"purchaseDate\": \"2024-01-10\",\n  \"officeName\": \"palermo hq\",\n  \"assetTypeName\": \"laptop\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/assets/insert",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"assets",
+								"insert"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateAsset (error 404 - Asset Type not found)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"serialNumber\": \"SN-TEST-001\",\n  \"purchaseDate\": \"2024-01-10\",\n  \"officeName\": \"GENOA BRANCH\",\n  \"assetTypeName\": \"laptop powered\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/assets/insert",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"assets",
+								"insert"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateAsset (200 ok)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"serialNumber\": \"phn-dir-019\",\r\n    \"purchaseDate\": \"2023-03-18\",\r\n    \"officeName\": \"rome-hq\",\r\n    \"assetTypeName\": \"phone\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/assets/update/phn-mkt-001",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"assets",
+								"update",
+								"phn-mkt-001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateAsset (error 400 bad request - already exists)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"serialNumber\": \"LAP-DEV-002\",\r\n    \"purchaseDate\": \"2025-02-10\",\r\n    \"officeName\": \"milan\",\r\n    \"assetTypeName\": \"laptop\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/assets/update/LAP-DEV-001",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"assets",
+								"update",
+								"LAP-DEV-001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateAsset (error 404 - Asset Type not found)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"serialNumber\": \"PHN-DIR-019\",\r\n    \"purchaseDate\": \"2023-03-18\",\r\n    \"officeName\": \"rome-hq\",\r\n    \"assetTypeName\": \"manager phone\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/assets/update/PHN-MKT-001",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"assets",
+								"update",
+								"PHN-MKT-001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateAsset (error 404 - serialnumber that doesn't esists)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"serialNumber\": \"PHN-DIR-019\",\r\n    \"purchaseDate\": \"2023-03-18\",\r\n    \"officeName\": \"rome hq\",\r\n    \"assetTypeName\": \"monitor\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/assets/update/MON-DEV-005",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"assets",
+								"update",
+								"MON-DEV-005"
+							]
+						},
+						"description": "Puoi modificare il serialNumber solo con uno che non esiste ancora  \nPuoi modificare office o asset-type solo se esistono già"
+					},
+					"response": []
+				},
+				{
+					"name": "MoveAssetToOfficeByName (200 ok)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/assets/DOC-IT-001/move?newOfficeName=rome-hq",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"assets",
+								"DOC-IT-001",
+								"move"
+							],
+							"query": [
+								{
+									"key": "newOfficeName",
+									"value": "rome-hq"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "MoveAssetToOfficeByName (error 400 bad request - same office)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/assets/LAP-DEV-002/move?newOfficeName=rome-hq",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"assets",
+								"LAP-DEV-002",
+								"move"
+							],
+							"query": [
+								{
+									"key": "newOfficeName",
+									"value": "rome-hq"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "MoveAssetToOfficeByName (error 404 Resource not found)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/assets/MON-MAG-012/move?newOfficeName=Rome-hq",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"assets",
+								"MON-MAG-012",
+								"move"
+							],
+							"query": [
+								{
+									"key": "newOfficeName",
+									"value": "Rome-hq"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteAssetBySerialNumber",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/assets/KBD-OPS-001",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"assets",
+								"KBD-OPS-001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteAssetBySerialNumber (error 401 unauthorized)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/assets/KBD-OPS-001",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"assets",
+								"KBD-OPS-001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteAssetBySerialNumber (error 403 access denied)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/assets/KBD-OPS-001",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"assets",
+								"KBD-OPS-001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteOfficeBySerialNumber (error 404 resource not found)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "localhost:8080/assets/KBD-OPS-004",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"assets",
+								"KBD-OPS-004"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "software_licenses",
+			"item": [
+				{
+					"name": "Get data",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": [
+						{
+							"name": "GetAllSofwareLicenses",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/software-licenses/all",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"software-licenses",
+										"all"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "GetSoftwareLicenceByName",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/software-licenses/adobe-acrobat-pro",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"software-licenses",
+										"adobe-acrobat-pro"
+									]
+								}
+							},
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": ""
+						},
+						{
+							"name": "GetSoftwareLicensesByAsset (Audit)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/software-licenses/assets/LAP-DEV-002",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"software-licenses",
+										"assets",
+										"LAP-DEV-002"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "GetSoonExpiredLicenses",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/software-licenses/expiring-soon",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"software-licenses",
+										"expiring-soon"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "CreateSoftwareLicense (201 create)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"softwareName\": \"mongo-client\",\r\n  \"maxInstallations\": 50,\r\n  \"expirationDate\": \"2026-12-31\",\r\n  \"installedAssets\": []\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/software-licenses/insert",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"software-licenses",
+								"insert"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateSoftwareLicense (200 ok)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"softwareName\": \"mysql-client\",\r\n  \"maxInstallations\": 70,\r\n  \"expirationDate\": \"2026-12-31\",\r\n  \"installedAssets\": []\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/software-licenses/update/mysql-client",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"software-licenses",
+								"update",
+								"mysql-client"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteSoftwareLicense",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/software-licenses/mysql-client",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"software-licenses",
+								"mysql-client"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteSoftwareLicense (error 401 unauthorized)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/software-licenses/mysql-client",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"software-licenses",
+								"mysql-client"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteSoftwareLicense (error 403 access denied)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/software-licenses/mysql-client",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"software-licenses",
+								"mysql-client"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteSoftwareLicence (error 404 resource not found)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/software-licenses/post-client",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"software-licenses",
+								"post-client"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "compliance",
+			"item": [
+				{
+					"name": "InstallSoftwareLicence (200 ok)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/software-licenses/mysql-client/install/LAP-DEV-002",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"software-licenses",
+								"mysql-client",
+								"install",
+								"LAP-DEV-002"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "InstallSoftwareLicence (error 401: unauthorized)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/software-licenses/mysql-client/install/LAP-DEV-001",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"software-licenses",
+								"mysql-client",
+								"install",
+								"LAP-DEV-001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "InstallSoftwareLicence (error 409: sl already installed on this asset)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/software-licenses/docker-desktop/install/DOC-IT-001",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"software-licenses",
+								"docker-desktop",
+								"install",
+								"DOC-IT-001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UninstallSoftwareLicence (204 no content - ok)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/software-licenses/mysql-client/uninstall/LAP-DEV-002",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"software-licenses",
+								"mysql-client",
+								"uninstall",
+								"LAP-DEV-002"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UninstallSoftwareLicence (error 401: unauthorized)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/software-licenses/mysql-client/uninstall/LAP-DEV-002",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"software-licenses",
+								"mysql-client",
+								"uninstall",
+								"LAP-DEV-002"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UninstallSoftwareLicence (error 403: forbidden)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/software-licenses/mysql-client/uninstall/LAP-DEV-002",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"software-licenses",
+								"mysql-client",
+								"uninstall",
+								"LAP-DEV-002"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UninstallSoftwareLicence (error 409: sl not installed on this asset)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/software-licenses/microsoft-office-365/uninstall/TAB-MKT-001",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"software-licenses",
+								"microsoft-office-365",
+								"uninstall",
+								"TAB-MKT-001"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "id",
+			"value": "1"
+		},
+		{
+			"key": "base_url",
+			"value": "https://template.postman-echo.com"
+		}
+	]
+}
