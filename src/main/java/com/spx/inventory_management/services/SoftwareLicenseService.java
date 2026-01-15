@@ -1,6 +1,4 @@
 package com.spx.inventory_management.services;
-
-import com.spx.inventory_management.dto.OfficeRequestDTO;
 import com.spx.inventory_management.dto.SoftwareLicenseRequestDTO;
 import com.spx.inventory_management.dto.SoftwareLicenseResponseDTO;
 import com.spx.inventory_management.mappers.SoftwareLicenseMapper;
@@ -8,7 +6,6 @@ import com.spx.inventory_management.models.Asset;
 import com.spx.inventory_management.models.SoftwareLicense;
 import com.spx.inventory_management.repositories.AssetRepository;
 import com.spx.inventory_management.repositories.SoftwareLicenseRepository;
-import com.spx.inventory_management.utils.OfficeRequestNormalizer;
 import com.spx.inventory_management.utils.SoftwareLicenseRequestNormalizer;
 import com.spx.inventory_management.utils.TextNormalizer;
 import jakarta.persistence.EntityNotFoundException;
@@ -19,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
+
 
 @Service
 @Slf4j
@@ -69,7 +66,7 @@ public class SoftwareLicenseService {
         // Step 2: Repository try to retrieve a SoftwareLicence entity by its unique name from the database.
         SoftwareLicense license = softwareLicenseRepository.findBySoftwareNameIgnoreCase(normalizedSoftwareName).orElseThrow(() -> {
             log.error("Asset not found. This software name doesn't exists: {}", normalizedSoftwareName);
-            return new EntityNotFoundException("Software Licence not found" + normalizedSoftwareName);
+            return new EntityNotFoundException("Software Licence not found " + normalizedSoftwareName);
         });
 
         // Step 3: Mapper converts the entity into a DTO for response.
@@ -80,35 +77,38 @@ public class SoftwareLicenseService {
     /**
      * Create software license response dto.
      *
-     * @param requestDTO the request dto
+     * @param newSoftwareLicenseRequestDTO dto
      * @return the software license response dto
      */
     // ==========================================================
     // CREATE OPERATION
     // ==========================================================
     @Transactional
-    public SoftwareLicenseResponseDTO createSoftwareLicense(SoftwareLicenseRequestDTO requestDTO) {
+    public SoftwareLicenseResponseDTO createSoftwareLicense(SoftwareLicenseRequestDTO newSoftwareLicenseRequestDTO) {
 
         // Step 1: Normalize all the input field incoming from SoftwareLicenceRequestDTO
-        SoftwareLicenseRequestDTO normalized = SoftwareLicenseRequestNormalizer.normalize(requestDTO);
+        SoftwareLicenseRequestDTO normalizedDTO = SoftwareLicenseRequestNormalizer.normalize(newSoftwareLicenseRequestDTO);
+
+        log.debug("Creating a new software license: {}", normalizedDTO.getSoftwareName());
+
 
         // Step 2: Check if the software license name already exists
-        if (softwareLicenseRepository.existsBySoftwareNameIgnoreCase(normalized.getSoftwareName())) {
-            throw new IllegalArgumentException("Software license already exists: " + normalized.getSoftwareName());
+        if (softwareLicenseRepository.existsBySoftwareNameIgnoreCase(normalizedDTO.getSoftwareName())) {
+            throw new IllegalArgumentException("Software license already exists: " + normalizedDTO.getSoftwareName());
         }
 
         // Step 3. Convert DTO -> Entity (Database added an id automatically)
-        SoftwareLicense newSoftwareLicenceEntity = softwareLicenseMapper.toEntity(normalized);
+        SoftwareLicense newSoftwareLicenceEntity = softwareLicenseMapper.toEntity(normalizedDTO);
 
         // Step 4. Save the entity into the database
         SoftwareLicense savedSoftwareLicense = softwareLicenseRepository.save(newSoftwareLicenceEntity);
 
-
         log.info("Software license created: {}", savedSoftwareLicense.getSoftwareName());
 
-        // Step 5. Convert Entity -> DTO
+        // Step 6. Convert Entity -> DTO
         return softwareLicenseMapper.toDTO(savedSoftwareLicense);
     }
+
     // ==========================================================
     // UPDATE OPERATION
     // ==========================================================
@@ -204,7 +204,7 @@ public class SoftwareLicenseService {
 
         // Step 2:  Check if the asset exists
         Asset asset = assetRepository.findBySerialNumberIgnoreCase(normalizedSerialNumber).orElseThrow(() -> {
-            log.error("Installation failed. Asset not found. serial={}", normalizedSerialNumber);
+            log.error("Installation failed. Asset not found. serial= {}", normalizedSerialNumber);
             return new EntityNotFoundException("Asset not found");
         });
 
@@ -260,7 +260,7 @@ public class SoftwareLicenseService {
 
         // Step 2:  Check if the asset exists
         Asset asset = assetRepository.findBySerialNumberIgnoreCase(normalizedSerialNumber).orElseThrow(() -> {
-            log.error("Installation failed. Asset not found. serial={}", normalizedSerialNumber);
+            log.error("Installation failed. Asset not found. serial= {}", normalizedSerialNumber);
             return new EntityNotFoundException("Asset not found");
         });
 
@@ -297,7 +297,7 @@ public class SoftwareLicenseService {
      * @return the installed software by asset
      */
     // Retrieve all the licenses owned by an asset
-    public List<SoftwareLicenseResponseDTO> getInstalledSoftwareLicenseByAsset(String serialNumber) {
+    public List<SoftwareLicenseResponseDTO> getInstalledSoftwareLicenseBySerialNumber(String serialNumber) {
 
         // Step 1: Normalize the incoming asset serial number
         String normalizedSerialNumber = TextNormalizer.normalizeKey(serialNumber);
@@ -324,10 +324,7 @@ public class SoftwareLicenseService {
         LocalDate today = LocalDate.now();
         LocalDate limit = today.plusDays(30);
 
-        log.info("Fetching software licenses expiring between {} and {}", today, limit);
-
-        return softwareLicenseRepository
-                .findByExpirationDateBefore(limit)
+        return softwareLicenseRepository.findByExpirationDateBetween(today, limit)
                 .stream()
                 .map(softwareLicenseMapper::toDTO)
                 .toList();

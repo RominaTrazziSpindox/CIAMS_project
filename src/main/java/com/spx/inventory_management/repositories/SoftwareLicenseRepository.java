@@ -1,7 +1,9 @@
 package com.spx.inventory_management.repositories;
 
 import com.spx.inventory_management.models.SoftwareLicense;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -31,5 +33,6 @@ public interface SoftwareLicenseRepository extends JpaRepository<SoftwareLicense
     );
 
     // Licenses expiring before a given date
-    List<SoftwareLicense> findByExpirationDateBefore(LocalDate date);
+    @EntityGraph(attributePaths = "installedAssets")
+    List<SoftwareLicense> findByExpirationDateBetween(LocalDate start, LocalDate end);
 }
