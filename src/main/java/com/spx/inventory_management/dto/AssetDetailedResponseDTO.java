@@ -1,5 +1,6 @@
 package com.spx.inventory_management.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -14,5 +15,6 @@ public class AssetDetailedResponseDTO implements Serializable {
     private OfficeResponseDTO office;
     private AssetTypeResponseDTO assetType;
 
+    @JsonIgnoreProperties({"installedAssets"})
     private Set<SoftwareLicenseResponseDTO> softwareLicenses;
 }
