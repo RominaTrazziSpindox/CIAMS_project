@@ -21,7 +21,6 @@ public class SoftwareLicenseController {
     SoftwareLicenseService softwareLicenseService;
 
 
-
     // ==========================================================
     // CRUD METHODS - From Service Layer
     // ==========================================================
@@ -57,9 +56,8 @@ public class SoftwareLicenseController {
      * @param softwareLicenseName the software license name
      * @return the software license by name
      */
-    @GetMapping("/{softwareName}")
-    public ResponseEntity<SoftwareLicenseResponseDTO>
-    getSoftwareLicenseByName(@PathVariable String softwareLicenseName) {
+    @GetMapping("/{softwareLicenseName}")
+    public ResponseEntity<SoftwareLicenseResponseDTO> getSoftwareLicenseByName(@PathVariable String softwareLicenseName) {
 
         // Step 1: Service try to retrieve a Software license entity by its unique name.
         SoftwareLicenseResponseDTO license = softwareLicenseService.getSoftwareLicenseByName(softwareLicenseName);
@@ -184,11 +182,11 @@ public class SoftwareLicenseController {
     // ==========================================================
     // AUDIT & QUERY
     // ==========================================================
-    @GetMapping("/asset/{serialNumber}")
-    public ResponseEntity<List<SoftwareLicenseResponseDTO>> getInstalledSoftwareLicenseByAsset(@PathVariable String serialNumber) {
+    @GetMapping("/assets/{serialNumber}")
+    public ResponseEntity<List<SoftwareLicenseResponseDTO>> getInstalledSoftwareLicenseBySerialNumber(@PathVariable String serialNumber) {
 
         // Step 1: Service try to retrieve all the software licence owned by a specific asset (through its serial number)
-        List<SoftwareLicenseResponseDTO>  installedLicensesOnAsset = softwareLicenseService.getInstalledSoftwareLicenseByAsset(serialNumber);
+        List<SoftwareLicenseResponseDTO>  installedLicensesOnAsset = softwareLicenseService.getInstalledSoftwareLicenseBySerialNumber(serialNumber);
 
         // If the list is empty add a header with message
         if (installedLicensesOnAsset.isEmpty()) {
