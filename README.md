@@ -224,19 +224,6 @@ Retrieve licenses expiring soon
 
 ---
 
-## 🗄️ Database
-
-1. Database schema is initialized via ```schema.sql```. 
-2. Sample data is loaded via ```data.sql```.
-
-Entity relationships:
-
-1. Asset → Office (many-to-one)
-2. Asset → AssetType (many-to-one)
-3. Asset ↔ SoftwareLicense (many-to-many)
-
----
-
 
 ## 🚀 Getting Started
 
@@ -269,7 +256,7 @@ Create a database for the application (example with PostgreSQL):
 CREATE DATABASE inventory_db;
 ```
 
-Configure database connection using environment variables loaded from a `.env` file:
+Database credentials and connection details are externalized using environment variables and loaded at runtime via a `.env` file.
 
 ```properties
 DB_HOST=localhost
@@ -279,9 +266,7 @@ DB_USER=your_db_username
 DB_PASSWORD=your_db_password
 ```
 
-The `.env` file is automatically loaded at startup and must not be committed to version control.
-
-In application.yaml (or application.properties) use placeholders:
+In `application.yaml` (or `application.properties`) use placeholders:
 
 ```yaml
 spring:
@@ -299,14 +284,29 @@ spring:
         format_sql: true
 ```
 
-Security credentials (Basic Authentication) are also configured via environment variables.
+*Schema & Initial Data*
+
+Database schema is initialized via `schema.sql`.
+Sample data is loaded via `data.sql`.
+
+These scripts allow the application to start with a consistent and usable dataset for testing and demonstration purposes.
+
+*Entity relationships*
+
+The database schema reflects the core domain model:
+
+1. Asset → Office (many-to-one)
+2. Asset → AssetType (many-to-one)
+3. Asset ↔ SoftwareLicense (many-to-many)
+
+All relationships are enforced at the JPA level and validated at the service layer.
 
 *Build the Project*
 
 From the project root directory, run:
 
 ```bash
-mvn clean install
+./gradlew build
 ```
 
 This will:
@@ -319,10 +319,8 @@ This will:
 *Run the Application using Gradle*
 
 ```bash
-mvn spring-boot:run
+./gradlew bootRun
 ```
-
-
 
 *Application Startup*
 
@@ -343,7 +341,7 @@ While CIAMS already provides a complete and consistent backend for IT asset and 
 
 3. Frontend & Visualization Layer
 
-Although CIAMS is currently backend-focused, a future extension could include A web-based frontend
+Although CIAMS is currently backend-focused, a future extension could include a web-based frontend.
 This would improve usability for non-technical users.
 
 ## 📄 License
