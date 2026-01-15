@@ -1,16 +1,45 @@
-# CIAMS_project
-CIAMS is a RESTful backend application designed to manage corporate IT assets, physical offices, and software licenses, with a strong focus on traceability, consistency, and compliance.
+# 📦 CIAMS_project
 
-The system supports the full lifecycle of hardware devices and software licenses, enabling organizations to maintain a clear and auditable inventory of their IT resources.
+--- 
 
-CIAMS aims to provide a robust and scalable backend that allows:
+CIAMS is a Spring Boot RESTful application designed for managing an IT inventory, including physical assets, offices, asset types, and software licenses.
 
-* Cataloging physical company locations (Offices)
-* Standardizing hardware categories (Asset Types)
-* Tracking individual devices (Assets) and their physical location
-* Managing software licenses installed on devices
-* Enforcing software compliance rules server-side
-* Offering both lightweight list views and detailed asset inspections
+It simulates a real-world enterprise backend, focusing on:
+
+* clean architecture
+* explicit business logic
+* security
+* maintainability
+
+
+The application allows tracking where assets are located, which licenses are installed on them, and monitoring license expiration.
+
+---
+
+## 🖥️ Main Features
+
+### Asset Management
+* Create, update, list and delete IT assets
+* Assign assets to offices
+* Move assets between offices
+* Decommission assets
+
+### Office & Asset Type Management
+* CRUD operations for Offices
+* CRUD operations for Asset Types
+* Cached read operations for improved performance
+
+### Software License Management
+* CRUD operations for software licenses
+* Install / uninstall licenses on assets (many-to-many)
+* Retrieve asset details including installed licenses
+* Retrieve licenses expiring within the next 30 days
+
+### Security
+* Basic Authentication
+* Read operations publicly accessible
+* Write operations restricted to authenticated users
+* Custom authentication entry point and access denied handler
 
 ---
 
@@ -18,7 +47,7 @@ CIAMS aims to provide a robust and scalable backend that allows:
 
 The application follows a **layered architecture**, with strict separation of concerns:
 
-
+```
 Controller → Service → Repository → Database
 
                 ↓
@@ -26,37 +55,32 @@ Controller → Service → Repository → Database
                 
                 ↓
                 DTO
+                
+```
 
 ### Layer Responsibilities
 
 - **Controller**
-    - Exposes REST endpoints
-    - Performs input validation (@Valid)
+  - Exposes REST endpoints and handles HTTP concerns
 
 - **Service**
-    - Implements business rules and domain logic
-    - Coordinates repositories and domain entities
-    - Performs validations and consistency checks
-    - Handles HTTP routing and request/response mapping
-    - Orchestrates complex operations (e.g. moving assets, installing licenses)
+  - Contains business logic and transactional boundaries
 
 - **Repository**
-    - Handles data access using Spring Data JPA
-    - Provides query methods based on domain concepts
+  - Handles persistence via Spring Data JPA
+  - Provides query methods based on domain concepts
 
 - **Entity**
-    - Represents the persistent domain model
-    - Defines JPA mappings and relationships
-    - Mirrors the logical database schema
+  - Represents the persistent domain model
+  - Defines JPA mappings and relationships
+  - Mirrors the logical database schema
 
 - **DTO (Request / Response)**
-    - Defines the API contract
-    - Prevents exposing JPA entities directly
-    - Uses human-friendly keys (names, serial numbers) instead of internal IDs
+  - Prevents exposing JPA entities directly
+  - Uses human-friendly keys (names, serial numbers) instead of internal IDs
 
-- **Mapper**
-    - Converts between Entities and DTOs
-    - Implemented using MapStruct
+- **Mapper (with MapStruct library)**
+  - Converts between Entities and DTOs automatically
 
 - **Exception**
   - Centralized via `@RestControllerAdvice`
@@ -66,32 +90,28 @@ Controller → Service → Repository → Database
 - **Security**
   - Implemented with Spring Security
   - Manages security-related error responses (401 Unauthorized, 403 Forbidden)
- 
+
 - **Utils**
-  - Provides shared utility logic used across the application
-  - Centralizes text normalization and input sanitization
-  - Ensures consistent and human-friendly data persistence (e.g. lowercase keys, trimmed values)
+  - Input normalization utilities for clean and consistent data (e.g. lowercase keys, trimmed values)
 
 ---
 
-## 🧱 Domain Model
+## 🧱 Domain Model 
 
-### Core Entities
-
-#### Office
+### Office
 Represents a physical company location.
 
 - `id`
 - `name` (unique, domain key)
 
-#### AssetType
+### AssetType
 Defines a standardized hardware category.
 
 - `id`
 - `assetTypeName` (unique, domain key)
 - `assetTypeDescription` (optional)
 
-#### Asset
+### Asset
 Represents a physical device owned by the company.
 
 - `id`
@@ -101,7 +121,7 @@ Represents a physical device owned by the company.
 - `assetType` (Many-to-One)
 - `softwareLicenses` (Many-to-Many)
 
-#### SoftwareLicense
+### SoftwareLicense
 Represents a purchased software license.
 
 - `id`
@@ -112,33 +132,14 @@ Represents a purchased software license.
 
 ---
 
-## 📌 Design Principles
-
-- No business logic in controllers
-- No domain logic in repositories
-- Clear separation between API and persistence models
-- Domain rules enforced centrally
-- Controlled caching applied only to stable, read-heavy operations
-- Human-friendly data handling through centralized normalization and validation
-- Explicit separation between list views and detailed views
-
----
-
-## 🔐 Software License Compliance Rules
-
-Software license management is a core feature of CIAMS.
-
-The system enforces the following rules at the **service layer**:
-
-- A license cannot be installed on the same asset more than once
-- A license cannot be installed if it is expired
-- A license cannot exceed its maximum number of allowed installations
-- Installation and uninstallation operations update both sides of the relationship
-- All compliance rules are enforced server-side
-
----
-
 ## 🔌 REST API Overview
+
+A Postman collection is provided to test:
+
+* CRUD operations
+* License installation/uninstallation
+* Authentication-protected endpoints
+* Error scenarios
 
 ### Office Management
 
@@ -180,7 +181,7 @@ The system enforces the following rules at the **service layer**:
 - `DELETE /assets/{serialNumber}`
 
 
-### Software Licence Management
+### Software License Management
 
 #### CRUD Operations
 
@@ -204,65 +205,38 @@ Audit licenses installed on an asset
 Retrieve licenses expiring soon
 - `GET /software-licenses/expiring-soon`
 
----
-
-## 🧪 Validation & Error Handling
-
-- Request validation is handled using Jakarta Bean Validation (`@Valid`)
-- Input data is validated and normalized before business rule enforcement
-- Business rule violations are enforced in the service layer
-- Errors are centralized using `@RestControllerAdvice`
-- Meaningful HTTP status codes and error messages
-- Error responses follow a unified JSON structure
-- Each error response includes a human-readable action hint to guide API consumers
 
 ---
-
-## 🔐 Security & Access Control
-
-The application is secured using **Spring Security** with **HTTP Basic Authentication**.
-
-### Authentication
-
-- Basic Authentication is enabled
-- Credentials are required for all write operations
-- Authentication is handled at the security filter level (before controllers)
-- Authentication credentials are externalized using environment variables and loaded at runtime, avoiding hard-coded secrets in the codebase.
-
-### Authorization Rules
-
-- **DELETE operations** require the `ADMIN` role
-- **POST / PUT operations** require authentication
-- **GET operations** are publicly accessible
-
-Authorization is enforced using method and path-based rules, ensuring clear and predictable access control.
-
-### Security Error Handling
-
-Security-related errors are handled separately from application errors:
-
-- **401 Unauthorized**
-  - Triggered when authentication credentials are missing or invalid
-  - Returned before reaching controllers
-- **403 Forbidden**
-  - Triggered when an authenticated user lacks sufficient permissions
-
-Both errors return a structured JSON response using the same error DTO format as the rest of the application, ensuring consistency across all API responses.
 
 ## 🛠️ Tech Stack
 
 - **Java 17**
 - **Spring Boot 3.5**
 - **Spring Data JPA / Hibernate**
+- **Spring Security**
+- **Spring Cache**
 - **MapStruct**
 - **Lombok**
 - **Jakarta Validation**
-- **PostgreSQL** 
-- **Maven**
-- **Spring Security**
-- **Spring Cache**
+- **PostgreSQL**
+- **Gradle**
+- **SLF4J Logging**
 
 ---
+
+## 🗄️ Database
+
+1. Database schema is initialized via ```schema.sql```. 
+2. Sample data is loaded via ```data.sql```.
+
+Entity relationships:
+
+1. Asset → Office (many-to-one)
+2. Asset → AssetType (many-to-one)
+3. Asset ↔ SoftwareLicense (many-to-many)
+
+---
+
 
 ## 🚀 Getting Started
 
@@ -279,7 +253,7 @@ Both errors return a structured JSON response using the same error DTO format as
 
 Make sure the following tools are installed on your system:
 
-- **Java 17 (or compatible LTS version)**
+- **Java 17**
 - **Maven 3.8+**
 
 - A relational database:
@@ -342,19 +316,13 @@ This will:
 - generate MapStruct mappers
 - package the application
 
-*Run the Application*
-
-Option 1: Using Maven: 
+*Run the Application using Gradle*
 
 ```bash
 mvn spring-boot:run
 ```
 
-Option 2: Using the JAR: 
 
-```bash
-java -jar target/ciams-*.jar
-```
 
 *Application Startup*
 
@@ -364,55 +332,18 @@ Example endpoint: http://localhost:8080/offices/all
 
 ---
 
-### 🔮 Future Improvements
+## 🔮 Future Improvements
 
 While CIAMS already provides a complete and consistent backend for IT asset and software license management, several enhancements could further improve scalability, usability, and maintainability.
 
-1. Pagination & Sorting for List Endpoints: 
-Currently, list endpoints return full collections.
-A future improvement would introduce:
 
-- Pagination (Pageable)
+1. Podman & Podman Compose support
 
-Sorting by key fields (e.g. asset type, purchase date, expiration date).
-This would improve performance and usability when dealing with large datasets.
+2. Swagger / OpenAPI documentation
 
-2. Advanced Search & Filtering
+3. Frontend & Visualization Layer
 
-Read operations could be extended with more advanced filtering capabilities, such as:
-
-- Assets filtered by purchase date range
-- Assets grouped by office or asset type 
-- Licenses nearing expiration within a configurable time window
-
-These features would enable more powerful reporting and auditing use cases.
-
-3. Advanced Search & Filtering
-
-Read operations could be extended with more advanced filtering capabilities, such as:
-
-- Assets filtered by purchase date range
-- Assets grouped by office or asset type
-- Licenses nearing expiration within a configurable time window
-
-These features would enable more powerful reporting and auditing use cases.
-
-4. API Documentation (OpenAPI / Swagger)
-
-The API could be documented using OpenAPI specifications and Swagger UI to:
-
-- Provide interactive API documentation
-- Improve discoverability for API consumers
-- Simplify integration with external systems
-
-5. Frontend & Visualization Layer
-
-Although CIAMS is currently backend-focused, a future extension could include:
-
-- A web-based frontend
-- Dashboards for asset distribution and license compliance
-- Visual tools for auditing and reporting
-
+Although CIAMS is currently backend-focused, a future extension could include A web-based frontend
 This would improve usability for non-technical users.
 
 ## 📄 License
@@ -423,3 +354,5 @@ This project is intended for educational and professional demonstration purposes
 ---
 
 ## 👤 Author - Romina Trazzi
+
+
