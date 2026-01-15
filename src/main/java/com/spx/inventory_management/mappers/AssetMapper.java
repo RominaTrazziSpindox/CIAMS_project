@@ -32,5 +32,6 @@ public interface AssetMapper {
     // Entity -> DTO (DETAILED)
     // ==========================================================
 
+    @Mapping(source = "office.name", target = "office.officeName")
     AssetDetailedResponseDTO toDetailedDTO(Asset asset);
 }
