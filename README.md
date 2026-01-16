@@ -216,7 +216,7 @@ Retrieve licenses expiring soon
 ### Application
 - Java 17
 - Spring Boot 3.5
-- Spring Data JPA / Hibernate**
+- Spring Data JPA / Hibernate
 - Spring Security
 - MapStruct
 - Lombok
@@ -227,137 +227,95 @@ Retrieve licenses expiring soon
 
 ### Containerization & Runtime
 - Docker
-- Docker Compose
 - Podman
-- Podman Compose
 
 ---
 
+## 🚀 Running the Application
 
-## 🚀 Getting Started
+The application can be run:
 
-1. Clone the repository
-2. Configure environment variables for database and security credentials 
-3. Run the application
-4. Test endpoints using Postman or similar tools
+- locally (Gradle / IDE)
+- in a containerized environment (Docker / Podman)
 
-The application can be run either locally or using containerized environments (Docker / Podman).
+Environment-specific configuration is handled via Spring Profiles (dev, prod).
 
----
 
-## ⚙️ Setup & Run
+🧩 Prerequisites
 
-*Prerequisites* 
-
-Make sure the following tools are installed on your system:
-
-- **Java 17**
-
-- A relational database:
-
-  - **PostgreSQL (recommended) or MySQL**
-  - **An API testing tool (Postman, Insomnia, etc.)**
-
-*Database Configuration*
-
-Create a database for the application (example with PostgreSQL):
-
-```sql
-CREATE DATABASE inventory_db;
-```
-
-Database credentials and connection details are externalized using environment variables and loaded at runtime via a `.env` file.
-
-```properties
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=inventory_db
-DB_USER=your_db_username
-DB_PASSWORD=your_db_password
-```
-
-In `application.yaml` (or `application.properties`) use placeholders:
-
-```yaml
-spring:
-  datasource:
-    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-```
-
-*Schema & Initial Data*
-
-Database schema is initialized via `schema.sql`.
-Sample data is loaded via `data.sql`.
-
-These scripts allow the application to start with a consistent and usable dataset for testing and demonstration purposes.
-
-*Entity relationships*
-
-The database schema reflects the core domain model:
-
-1. Asset → Office (many-to-one)
-2. Asset → AssetType (many-to-one)
-3. Asset ↔ SoftwareLicense (many-to-many)
-
-All relationships are enforced at the JPA level and validated at the service layer.
-
-*Build the Project*
-
-From the project root directory, run:
-
-```bash
-./gradlew build
-```
-
-This will:
-
-- compile the project
-- run validations
-- generate MapStruct mappers
-- package the application
-
-*Run the Application using Gradle*
+- Java 17
+- A relational database (PostgreSQL recommended)
+- An API testing tool (Postman, Insomnia, etc.)
 
 ```bash
 ./gradlew bootRun
 ```
 
-*Application Startup*
+The application will be available at:
 
-Once started, the application will be available at: http://localhost:8080
+```bash
+http://localhost:8080
+```
 
-Example endpoint: http://localhost:8080/offices/all
+
+▶️ Local Execution
+
+1. Clone the repository
+2. Configure environment variables for database and security credentials
+3. Build and run the application:
+
+
+🐳 Containerized Execution
+
+The application can also be run in a containerized environment. Both Docker and Podman are supported.
+
+1. Build image
+
+```bash
+podman build -t ciams-app .
+```
+
+2. Run (dev profile)
+
+```bash
+podman run -p 8080:8080 \
+  --name ciams_app_container_dev \
+  --env-file .env.dev \
+  -e SPRING_PROFILES_ACTIVE=dev \
+  ciams-app
+ ```
+
+2. Run (prod profile)
+
+```bash
+podman run -p 8080:8080 \
+  --name ciams_app_container_prod \
+  --env-file .env.prod \
+  -e SPRING_PROFILES_ACTIVE=prod \
+  ciams-app
+```
+
+🔀 Environment Profiles
+
+*dev*
+
+- Intended for local development 
+- Automatic schema updates
+- Sample data loading enabled
+- In-memory users
+- SQL logging enabled
+
+*prod*
+
+- Production-like behavior
+- Schema validation only
+- No sample data
+- No in-memory users
+- Reduced logging
+
+In production scenarios, credentials are expected to be provided by the runtime environment.
 
 ---
-
-## 🐳 Docker & Docker Compose
-
-The application is also designed to run in containerized environments.
-Both Docker and Podman are supported.
-Docker Compose and Podman Compose are used for local orchestration.
-
-### Run with Docker
-
-```bash
-docker-compose up --build
-```
-
-### Run with Podman
-```bash
-podman-compose up --build
-```
-
-
 
 ## 🔮 Future Improvements
 
