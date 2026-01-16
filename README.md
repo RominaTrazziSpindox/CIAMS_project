@@ -141,6 +141,9 @@ A Postman collection is provided to test:
 * Authentication-protected endpoints
 * Error scenarios
 
+
+### **MAIN ENDPOINTS**
+
 ### Office Management
 
 - `GET /offices/all`
@@ -210,17 +213,23 @@ Retrieve licenses expiring soon
 
 ## 🛠️ Tech Stack
 
-- **Java 17**
-- **Spring Boot 3.5**
-- **Spring Data JPA / Hibernate**
-- **Spring Security**
-- **Spring Cache**
-- **MapStruct**
-- **Lombok**
-- **Jakarta Validation**
-- **PostgreSQL**
-- **Gradle**
-- **SLF4J Logging**
+### Application
+- Java 17
+- Spring Boot 3.5
+- Spring Data JPA / Hibernate**
+- Spring Security
+- MapStruct
+- Lombok
+- Jakarta Validation
+- PostgreSQL
+- Gradle
+- SLF4J Logging
+
+### Containerization & Runtime
+- Docker
+- Docker Compose
+- Podman
+- Podman Compose
 
 ---
 
@@ -232,6 +241,8 @@ Retrieve licenses expiring soon
 3. Run the application
 4. Test endpoints using Postman or similar tools
 
+The application can be run either locally or using containerized environments (Docker / Podman).
+
 ---
 
 ## ⚙️ Setup & Run
@@ -241,7 +252,6 @@ Retrieve licenses expiring soon
 Make sure the following tools are installed on your system:
 
 - **Java 17**
-- **Maven 3.8+**
 
 - A relational database:
 
@@ -330,16 +340,32 @@ Example endpoint: http://localhost:8080/offices/all
 
 ---
 
+## 🐳 Docker & Docker Compose
+
+The application is also designed to run in containerized environments.
+Both Docker and Podman are supported.
+Docker Compose and Podman Compose are used for local orchestration.
+
+### Run with Docker
+
+```bash
+docker-compose up --build
+```
+
+### Run with Podman
+```bash
+podman-compose up --build
+```
+
+
+
 ## 🔮 Future Improvements
 
 While CIAMS already provides a complete and consistent backend for IT asset and software license management, several enhancements could further improve scalability, usability, and maintainability.
 
+1. Swagger / OpenAPI documentation
 
-1. Podman & Podman Compose support
-
-2. Swagger / OpenAPI documentation
-
-3. Frontend & Visualization Layer
+2. Frontend & Visualization Layer
 
 Although CIAMS is currently backend-focused, a future extension could include a web-based frontend.
 This would improve usability for non-technical users.
