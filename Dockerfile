@@ -17,8 +17,9 @@ COPY . .
 
 # Build the project using Gradle
 # -x test skips tests to speed up the Docker build
+# -q quiet mode
 # (tests should be run separately in CI or locally)
-RUN gradle build -x test
+RUN gradle build -q -x test
 
 
 # ==========================
