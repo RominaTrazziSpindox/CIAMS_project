@@ -10,7 +10,7 @@
 spring:
 
   config:
-    import: optional:file:.env[.properties]
+    import: optional:file:.env-dev[.properties]
 
   # --------------------------------------------
   # JDBC connection details for PostgreSQL
