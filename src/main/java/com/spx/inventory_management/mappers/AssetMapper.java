@@ -11,9 +11,8 @@ import org.mapstruct.Mapping;
 public interface AssetMapper {
 
     // ==========================================================
-    // DTO -> Entity (solo campi semplici)
+    // DTO -> Entity
     // ==========================================================
-
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "office", ignore = true)
     @Mapping(target = "assetType", ignore = true)

@@ -45,8 +45,7 @@ public class GlobalExceptionHandler {
     // 400 - BAD REQUEST (Client error types)
     // ==========================================================
 
-
-    /*
+    .     /*
      * If the exception comes from Bean Validation (@Valid),
      * extract a user-friendly validation message from the BindingResult.
      * Otherwise, use the message provided by the exception itself.

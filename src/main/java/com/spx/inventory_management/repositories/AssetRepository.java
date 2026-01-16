@@ -8,19 +8,11 @@ import java.util.Optional;
 
 public interface AssetRepository extends JpaRepository <Asset, Long> {
 
-    // ==========================================================
-    // Lookup by domain key
-    // ==========================================================
-
     boolean existsBySerialNumberIgnoreCase(String serialNumber);
 
     Optional<Asset> findBySerialNumberIgnoreCase(String serialNumber);
 
     void deleteBySerialNumberIgnoreCase(String serialNumber);
-
-    // ==========================================================
-    // Relations-based queries
-    // ==========================================================
 
     List<Asset> findByOffice_NameIgnoreCase(String officeName);
 
