@@ -42,7 +42,7 @@ services:
         condition: service_healthy
     ports:
       - "8080:8080"
-    # Application environment variables
+    # Application environment variables for Spring
     environment:
       SPRING_PROFILES_ACTIVE: prod
       DB_HOST: db
@@ -51,7 +51,10 @@ services:
       DB_USER: ${DB_USER_USERNAME}
       DB_PASSWORD: ${DB_USER_PASSWORD}
 
-# -----------------------------------------
+    volumes:
+      - ./logs/${SPRING_PROFILES_ACTIVE}:/app/logs:Z
+
+# --------------- --------------------------
 # Named volumes (where data are saved)
 # -----------------------------------------
 volumes:
