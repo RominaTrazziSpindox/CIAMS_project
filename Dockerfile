@@ -18,17 +18,11 @@ WORKDIR /app
 # . (work directory inside container named app)
 COPY . .
 
-# Create the app/logs folder
-RUN mkdir -p /app/logs
-
 # Build the image using Gradle
 # -x test skips tests to speed up the Docker build
 # -q quiet mode
 # (tests should be run separately in CI or locally)
 RUN gradle build -q -x test
-
-
-
 
 # ==========================
 # RUNTIME STAGE
