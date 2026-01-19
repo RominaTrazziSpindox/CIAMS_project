@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- Name value of the log file based on the profile role -->
+    <property name="LOG_FILE"
+              value="logs/ciams-${spring.profiles.active}.log"/>
+
+    <!-- Appender with rotation -->
+    <appender name="ROLLING"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+        <file>${LOG_FILE}</file>
+
+        <rollingPolicy
+                class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+
+            <!-- Create one file a day -->
+            <fileNamePattern>
+                logs/ciams-${spring.profiles.active}.%d{yyyy-MM-dd}.log
+            </fileNamePattern>
+
+            <!-- Keep it for 14 days maximum -->
+            <maxHistory>14</maxHistory>
+
+            <!-- Delete log file that exceed 30MB size -->
+            <totalSizeCap>30MB</totalSizeCap>
+
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>
+                %d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n
+            </pattern>
+        </encoder>
+
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="ROLLING"/>
+    </root>
+
+</configuration>
