@@ -5,7 +5,7 @@
 Write-Host "Loading PROD environment variables from .env.prod"
 
 # Copy .env.prod → .env (file for docker-compose)
-Copy-Item .env.dev .env -Force
+Copy-Item .env.prod .env -Force
 
 Write-Host 'Using .env.prod'
 
