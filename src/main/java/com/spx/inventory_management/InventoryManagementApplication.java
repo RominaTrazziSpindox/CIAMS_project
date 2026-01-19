@@ -1,17 +1,19 @@
 package com.spx.inventory_management;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 
 @SpringBootApplication
 @EnableCaching
+@Slf4j
 public class InventoryManagementApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(InventoryManagementApplication.class, args);
 
-		System.out.println("Inventory software is running...");
+		log.info("Inventory software is running...");
 
 	}
 }
