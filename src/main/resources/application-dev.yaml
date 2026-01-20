@@ -58,8 +58,8 @@ spring:
   sql:
     init:
       mode: always
-      schema-locations: classpath:schema.sql
-      data-locations: classpath:data.sql
+      schema-locations: classpath:db/schema.sql
+      data-locations: classpath:db/data.sql
 
 
 # ============================================
@@ -77,3 +77,4 @@ logging:
     org.hibernate: error                  # General Hibernate logs (entity lifecycle, etc.)
     org.hibernate.SQL: debug              # Logs the actual SQL statements executed
     org.hibernate.orm.jdbc.bind: trace    # Logs parameter bindings (shows query values)
+    org.springframework.cache: debug      # Cache logs

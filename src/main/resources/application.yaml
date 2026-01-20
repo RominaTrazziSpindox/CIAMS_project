@@ -25,3 +25,8 @@ spring:
   # - JVM arguments (-Dspring.profiles.active=prod)
   profiles:
     active: dev
+
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=10s,expireAfterAccess=1m
