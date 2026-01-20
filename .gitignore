@@ -1,7 +1,8 @@
 HELP.md
 .gradle
-.env.dev
-.env.prod
+.env
+.env.*
+
 build/
 logs/
 !gradle/wrapper/gradle-wrapper.jar
