@@ -25,4 +25,7 @@ BEGIN
 
     END LOOP;
 
+    -- Log message
+    RAISE NOTICE 'All the ID tables have been re-aligned';
+
 END $$;
