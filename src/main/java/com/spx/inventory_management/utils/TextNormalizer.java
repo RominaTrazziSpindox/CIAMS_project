@@ -1,7 +1,9 @@
 package com.spx.inventory_management.utils;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Locale;
 
-
+@Slf4j
 public final class TextNormalizer {
 
     /* Clean and normalize an incoming key value */
@@ -9,7 +11,7 @@ public final class TextNormalizer {
 
         if (incomingText == null) {
 
-            System.out.println("There is no text to normalize");
+            log.info("There is no text to normalize");
             return null;
 
         }
@@ -24,7 +26,7 @@ public final class TextNormalizer {
 
         if (incomingDescription == null) {
 
-            System.out.println("There is no description to normalize");
+           log.info("There is no description to normalize");
             return null;
 
         }
