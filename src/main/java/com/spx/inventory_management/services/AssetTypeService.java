@@ -39,7 +39,7 @@ public class AssetTypeService {
      *
      * @return the all asset types
      */
-    @Cacheable("asset-types")
+    @Cacheable("assets-types")
     public List<AssetTypeResponseDTO> getAllAssetTypes() {
 
         log.info("Service getAllAssetTypes");
@@ -56,7 +56,7 @@ public class AssetTypeService {
      * @param assetTypeName the asset type name
      * @return the asset type by name
      */
-    @Cacheable(value = "asset_types", key = "T(com.spx.inventory_management.utils.TextNormalizer).normalizeKey(#assetTypeName)")
+    @Cacheable(value = "assets-types", key = "T(com.spx.inventory_management.utils.TextNormalizer).normalizeKey(#assetTypeName)")
     public AssetTypeResponseDTO getAssetTypeByName(String assetTypeName) {
 
         // Step 1: Normalized the incoming asset type name
