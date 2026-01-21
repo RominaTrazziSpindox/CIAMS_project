@@ -4,6 +4,7 @@ import com.spx.inventory_management.dto.OfficeRequestDTO;
 import com.spx.inventory_management.dto.OfficeResponseDTO;
 import com.spx.inventory_management.services.OfficeService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/offices")
+@Slf4j
 public class OfficeController {
 
 
@@ -44,6 +46,8 @@ public class OfficeController {
             return ResponseEntity.ok().header("X-Info-Message", "No offices found in the database").body(officesRetrieved);
         }
 
+        log.info("Controller getAllOffices");
+
         // Step 2: return a 200 HTTP Status code
         return ResponseEntity.ok(officesRetrieved);
     }
@@ -60,6 +64,8 @@ public class OfficeController {
 
         // Step 1: Service try to retrieve an Office entity by its unique name.
         OfficeResponseDTO retrievedOffice = officeService.getOfficeByName(name);
+
+        log.info("Controller getOfficeByName");
 
         // Step 2: return a 200 HTTP Status code
         return ResponseEntity.ok(retrievedOffice);

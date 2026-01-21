@@ -29,4 +29,7 @@ spring:
   cache:
     type: caffeine
     caffeine:
-      spec: maximumSize=1000,expireAfterAccess=1m
+      cache-names:
+        - offices-all
+        - offices-by-name
+      spec: maximumSize=1000,expireAfterAccess=30s

@@ -13,11 +13,9 @@ import java.util.concurrent.TimeUnit;
 @EnableCaching
 public class CaffeineCacheConfig {
 
-    public static final String CACHE_NAME = "test";
-
     @Bean
     public CacheManager cacheManager(){
-        CaffeineCacheManager cacheManager = new CaffeineCacheManager(CACHE_NAME);
+        CaffeineCacheManager cacheManager = new CaffeineCacheManager();
         cacheManager.setCaffeine(caffeineCacheBuilder());
         cacheManager.setAllowNullValues(false);
         return cacheManager;
