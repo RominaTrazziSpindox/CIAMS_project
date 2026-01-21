@@ -236,16 +236,23 @@ Retrieve licenses expiring soon
 The application can be run:
 
 - locally (Gradle / IDE)
-- in a containerized environment (Docker / Podman)
+- in a containerized environment using Podman Compose (recommended)
 
-Environment-specific configuration is handled via Spring Profiles (dev, prod).
+Environment-specific behavior is controlled via Spring Profiles (dev, prod) and environment variables.
 
 
 🧩 Prerequisites
 
 - Java 17
-- A relational database (PostgreSQL recommended)
+- Podman (and Podman Compose or alternatively Docker and Docker Compose)
+- A relational database (PostgreSQL recommended via compose)
 - An API testing tool (Postman, Insomnia, etc.)
+
+▶️ Local Execution
+
+  1. Clone the repository 
+  2. Configure environment variables for database and security credentials3. Run the application:
+  3. Run the application 
 
 ```bash
 ./gradlew bootRun
@@ -257,43 +264,36 @@ The application will be available at:
 http://localhost:8080
 ```
 
-
-▶️ Local Execution
-
-1. Clone the repository
-2. Configure environment variables for database and security credentials
-3. Build and run the application:
+By default, it is used the dev profile unless overridden via SPRING_PROFILES_ACTIVE.
 
 
-🐳 Containerized Execution
+🐳 Containerized Execution (with Docker or Podman)
 
-The application can also be run in a containerized environment. Both Docker and Podman are supported.
+The application can be run in a containerized environment using environment-specific ```.env``` files.
 
-1. Build image
+Environment Files
+
+* .env.dev → development environment
+* .env.prod → production environment
+
+The active profile is selected via SPRING_PROFILES_ACTIVE.
+
+Commands for the shell:
 
 ```bash
-podman build -t ciams-app .
+.\run.ps1 
 ```
 
-2. Run (dev profile)
+For dev profile.
+
+Or:
 
 ```bash
-podman run -p 8080:8080 \
-  --name ciams_app_container_dev \
-  --env-file .env.dev \
-  -e SPRING_PROFILES_ACTIVE=dev \
-  ciams-app
- ```
-
-2. Run (prod profile)
-
-```bash
-podman run -p 8080:8080 \
-  --name ciams_app_container_prod \
-  --env-file .env.prod \
-  -e SPRING_PROFILES_ACTIVE=prod \
-  ciams-app
+.\run.ps1 -Env "prod"
 ```
+
+For prod profile.
+
 
 🔀 Environment Profiles
 
