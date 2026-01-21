@@ -1,22 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
+    <!-- Define the Spring profile value -->
+    <springProperty name="SPRING_PROFILE" source="spring.profiles.active" defaultValue="dev"/>
+
+
     <!-- Name value of the log file based on the profile role -->
-    <property name="LOG_FILE"
-              value="logs/ciams-${spring.profiles.active}.log"/>
+    <property name="LOG_FILE" value="logs/ciams-${SPRING_PROFILE}.log"/>
+
 
     <!-- Appender with rotation -->
-    <appender name="ROLLING"
-              class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
 
         <file>${LOG_FILE}</file>
 
-        <rollingPolicy
-                class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 
             <!-- Create one file a day -->
             <fileNamePattern>
-                logs/ciams-${spring.profiles.active}.%d{yyyy-MM-dd}.log
+                logs/%d{yyyy-MM-dd}-ciams-${SPRING_PROFILE}.log
             </fileNamePattern>
 
             <!-- Keep it for 14 days maximum -->
@@ -29,19 +31,20 @@
 
         <encoder>
             <pattern>
-                %d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n
+                %d{HH:mm:ss.SSS} [%thread] %highlight(%-5level) %cyan(%logger{36}) - %msg%n
             </pattern>
         </encoder>
 
     </appender>
 
-    <appender name="CONSOLE"
-              class="ch.qos.logback.core.ConsoleAppender">
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+
         <encoder>
             <pattern>
-                %d{HH:mm:ss} %-5level %logger{36} - %msg%n
+                %d{HH:mm:ss.SSS} [%thread] %highlight(%-5level) %cyan(%logger{36}) - %msg%n
             </pattern>
         </encoder>
+
     </appender>
 
     <root level="INFO">
