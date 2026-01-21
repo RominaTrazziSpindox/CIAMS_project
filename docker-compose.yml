@@ -42,7 +42,7 @@ services:
       - "8080:8080"
     # Application environment variables for Spring
     environment:
-      SPRING_PROFILES_ACTIVE: dev
+git ad      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
       DB_HOST: db
       DB_PORT: 5432
       DB_NAME: ${DB_NAME}
