@@ -48,11 +48,3 @@ CREATE TABLE IF NOT EXISTS assets_licenses (
 -- CREATE SCHEMA public;
 
 
--- ============================================================
--- TO ALIGN THE PRIMARY KEY
--- ============================================================
-
---SELECT setval(
---  pg_get_serial_sequence('assets', 'id_asset'),
---  (SELECT MAX(id_asset) FROM assets)
---);
