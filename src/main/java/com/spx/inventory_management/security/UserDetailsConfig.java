@@ -10,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.util.Assert;
 
 
 @Configuration
@@ -42,16 +41,13 @@ public class UserDetailsConfig {
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder encoder) {
 
-        // --- ADMIN ---
-        Assert.hasText(adminUsername, "DB_ADMIN_USERNAME must be set");
-        Assert.hasText(adminPassword, "DB_ADMIN_PASSWORD must be set");
-
+        // --- ADMIN ROLE --
         UserDetails admin = User.withUsername(adminUsername)
                 .password(encoder.encode(adminPassword))
                 .roles("ADMIN")
                 .build();
 
-        // --- USER (optional - only with dev profile) ---
+        // --- USER ROLE (optional - only with dev profile) ---
         if (userUsername != null && !userUsername.isBlank() && userPassword != null && !userPassword.isBlank()) {
 
             UserDetails user = User.withUsername(userUsername)
