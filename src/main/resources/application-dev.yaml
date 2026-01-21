@@ -57,7 +57,7 @@ spring:
   # --------------------------------------------
   sql:
     init:
-      mode: always
+git       mode: never
       schema-locations: classpath:db_files/schema.sql
       data-locations: classpath:db_files/data.sql
 
