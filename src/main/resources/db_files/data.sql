@@ -29,7 +29,7 @@ INSERT INTO public.offices ("name") VALUES
     ('warehouse-west'),
     ('training-center')
 
-ON CONFLICT (id_office) DO NOTHING;
+ON CONFLICT (name) DO NOTHING;
 
 
 -- ============================================================
