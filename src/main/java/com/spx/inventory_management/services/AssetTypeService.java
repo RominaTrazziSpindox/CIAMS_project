@@ -39,8 +39,10 @@ public class AssetTypeService {
      *
      * @return the all asset types
      */
-    @Cacheable("asset_types")
+    @Cacheable("asset-types")
     public List<AssetTypeResponseDTO> getAllAssetTypes() {
+
+        log.info("Service getAllAssetTypes");
 
         return assetTypeRepository.findAll()
                 .stream()
@@ -54,7 +56,7 @@ public class AssetTypeService {
      * @param assetTypeName the asset type name
      * @return the asset type by name
      */
-    @Cacheable(value = "asset_types", key = "#assetTypeName")
+    @Cacheable(value = "asset_types", key = "T(com.spx.inventory_management.utils.TextNormalizer).normalizeKey(#assetTypeName)")
     public AssetTypeResponseDTO getAssetTypeByName(String assetTypeName) {
 
         // Step 1: Normalized the incoming asset type name
@@ -67,6 +69,8 @@ public class AssetTypeService {
                     log.error("AssetType not found. Name: {}", normalizedName);
                     return new EntityNotFoundException("Asset type not found");
                 });
+
+        log.info("Service getAssetTypesByName");
 
         // Step 3: Mapper converts the entity into a DTO for response.
         return assetTypeMapper.toDTO(assetType);
