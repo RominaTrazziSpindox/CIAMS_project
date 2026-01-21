@@ -1,17 +1,18 @@
 package com.spx.inventory_management.security;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.util.Assert;
 
-@Profile("dev")
+
 @Configuration
 public class UserDetailsConfig {
 
@@ -39,20 +40,29 @@ public class UserDetailsConfig {
      * Users stored in RAM (DEV / TEST purpose)
      */
     @Bean
-    public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
+    public UserDetailsService userDetailsService(PasswordEncoder encoder) {
 
-        UserDetails admin = User
-                .withUsername(adminUsername)
-                .password(passwordEncoder.encode(adminPassword))
+        // --- ADMIN ---
+        Assert.hasText(adminUsername, "DB_ADMIN_USERNAME must be set");
+        Assert.hasText(adminPassword, "DB_ADMIN_PASSWORD must be set");
+
+        UserDetails admin = User.withUsername(adminUsername)
+                .password(encoder.encode(adminPassword))
                 .roles("ADMIN")
                 .build();
 
-        UserDetails user = User
-                .withUsername(userUsername)
-                .password(passwordEncoder.encode(userPassword))
-                .roles("USER")
-                .build();
+        // --- USER (optional - only with dev profile) ---
+        if (userUsername != null && !userUsername.isBlank() && userPassword != null && !userPassword.isBlank()) {
 
-        return new InMemoryUserDetailsManager(admin, user);
+            UserDetails user = User.withUsername(userUsername)
+                    .password(encoder.encode(userPassword))
+                    .roles("USER")
+                    .build();
+
+            return new InMemoryUserDetailsManager(admin, user);
+        }
+
+        // Only admin profile
+        return new InMemoryUserDetailsManager(admin);
     }
 }
