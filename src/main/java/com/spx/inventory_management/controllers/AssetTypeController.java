@@ -4,6 +4,7 @@ import com.spx.inventory_management.dto.AssetTypeRequestDTO;
 import com.spx.inventory_management.dto.AssetTypeResponseDTO;
 import com.spx.inventory_management.services.AssetTypeService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/asset-types")
+@Slf4j
 public class AssetTypeController {
 
     @Autowired
@@ -45,6 +47,8 @@ public class AssetTypeController {
             return ResponseEntity.ok().header("X-Info-Message", "No asset types found in the database").body(assetTypes);
         }
 
+        log.info("Controller getAllAssetType");
+
         // Step 2: return a 200 HTTP Status code
         return ResponseEntity.ok(assetTypes);
     }
@@ -60,6 +64,8 @@ public class AssetTypeController {
 
         // Step 1: Service try to retrieve an Office entity by its unique name.
         AssetTypeResponseDTO assetType = assetTypeService.getAssetTypeByName(name);
+
+        log.info("Controller getAssetTypeByName");
 
         // Step 2: return a 200 HTTP Status code
         return ResponseEntity.ok(assetType);
