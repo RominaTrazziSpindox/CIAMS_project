@@ -5,8 +5,9 @@ import com.spx.inventory_management.dto.AssetTypeResponseDTO;
 import com.spx.inventory_management.mappers.AssetTypeMapper;
 import com.spx.inventory_management.models.AssetType;
 import com.spx.inventory_management.repositories.AssetTypeRepository;
-import com.spx.inventory_management.utils.AssetTypeRequestNormalizer;
+import com.spx.inventory_management.utils.normalizer.AssetTypeRequestNormalizer;
 import com.spx.inventory_management.utils.TextNormalizer;
+import com.spx.inventory_management.utils.validator.ReadValidator;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,9 @@ public class AssetTypeService {
 
     @Autowired
     private AssetTypeRepository assetTypeRepository;
+
+    @Autowired
+    private ReadValidator readValidator;
 
     @Autowired
     private AssetTypeMapper assetTypeMapper;
@@ -59,16 +63,8 @@ public class AssetTypeService {
     @Cacheable(value = "assets-types", key = "T(com.spx.inventory_management.utils.TextNormalizer).normalizeKey(#assetTypeName)")
     public AssetTypeResponseDTO getAssetTypeByName(String assetTypeName) {
 
-        // Step 1: Normalized the incoming asset type name
-        String normalizedName = TextNormalizer.normalizeKey(assetTypeName);
-
-        // Step 2: Repository try to retrieve an Asset Type entity by its unique name from the database.
-        AssetType assetType = assetTypeRepository
-                .findByAssetTypeNameIgnoreCase(normalizedName)
-                .orElseThrow(() -> {
-                    log.error("AssetType not found. Name: {}", normalizedName);
-                    return new EntityNotFoundException("Asset type not found");
-                });
+        // Step 1: Check if the input Office entity is found and validate its name
+        AssetType assetType = readValidator.checkIfEntityIsFound("AssetType", assetTypeName, assetTypeRepository::findByAssetTypeNameIgnoreCase);
 
         log.info("Service getAssetTypesByName");
 

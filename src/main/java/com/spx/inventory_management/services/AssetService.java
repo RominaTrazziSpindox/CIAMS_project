@@ -8,8 +8,9 @@ import com.spx.inventory_management.models.Office;
 import com.spx.inventory_management.repositories.AssetRepository;
 import com.spx.inventory_management.repositories.AssetTypeRepository;
 import com.spx.inventory_management.repositories.OfficeRepository;
-import com.spx.inventory_management.utils.AssetRequestNormalizer;
+import com.spx.inventory_management.utils.normalizer.AssetRequestNormalizer;
 import com.spx.inventory_management.utils.TextNormalizer;
+import com.spx.inventory_management.utils.validator.ReadValidator;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,9 @@ public class AssetService {
 
     @Autowired
     private OfficeRepository officeRepository;
+
+    @Autowired
+    private ReadValidator readValidator;
 
     @Autowired
     private AssetMapper assetMapper;
@@ -93,16 +97,10 @@ public class AssetService {
      */
     public AssetResponseDTO getAssetBySerialNumber(String assetSerialNumber) {
 
-        // Step 1: Normalized the incoming asset serial number
-        String normalizedSerialNumber = TextNormalizer.normalizeKey(assetSerialNumber);
+        // Step 1: Check if the input Office entity is found and validate its name
+        Asset asset = readValidator.checkIfEntityIsFound("Asset", assetSerialNumber, assetRepository::findBySerialNumberIgnoreCase);
 
-        // Step 2: Repository try to retrieve an Asset entity by its unique serial number from the database.
-        Asset asset = assetRepository.findBySerialNumberIgnoreCase(normalizedSerialNumber).orElseThrow(() -> {
-            log.error("Asset not found. This serial number doesn't exists: {}", normalizedSerialNumber);
-            return new EntityNotFoundException("Asset not found: " + normalizedSerialNumber);
-        });
-
-        // Step 3: Mapper converts the entity into a DTO for response.
+        // Step 2: Mapper converts the entity into a DTO for response.
         return assetMapper.toDTO(asset);
     }
 
