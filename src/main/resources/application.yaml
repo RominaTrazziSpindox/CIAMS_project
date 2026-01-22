@@ -33,4 +33,4 @@ spring:
         - offices-by-name
         - assets-type
         - assets-type-by-name
-      spec: maximumSize=1000,expireAfterAccess=30s
+
