@@ -224,6 +224,7 @@ Retrieve licenses expiring soon
 - PostgreSQL
 - Gradle
 - SLF4J Logging
+- Caffeine
 
 ### Containerization & Runtime
 - Docker
