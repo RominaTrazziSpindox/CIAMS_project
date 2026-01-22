@@ -5,8 +5,9 @@ import com.spx.inventory_management.dto.OfficeResponseDTO;
 import com.spx.inventory_management.mappers.OfficeMapper;
 import com.spx.inventory_management.models.Office;
 import com.spx.inventory_management.repositories.OfficeRepository;
-import com.spx.inventory_management.utils.OfficeRequestNormalizer;
+import com.spx.inventory_management.utils.normalizer.OfficeRequestNormalizer;
 import com.spx.inventory_management.utils.TextNormalizer;
+import com.spx.inventory_management.utils.validator.ReadValidator;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,9 @@ public class OfficeService {
 
     @Autowired
     private OfficeRepository officeRepository;
+
+    @Autowired
+    private ReadValidator readValidator;
 
     @Autowired
     private OfficeMapper officeMapper;
@@ -65,18 +69,12 @@ public class OfficeService {
     @Cacheable(value = "offices-by-name", key = "T(com.spx.inventory_management.utils.TextNormalizer).normalizeKey(#name)")
     public OfficeResponseDTO getOfficeByName(String name) {
 
-        // Step 1: Normalized the incoming name
-        String normalizedName = TextNormalizer.normalizeKey(name);
-
-        // Step 2: Repository try to retrieve an Office entity by its unique name from the database.
-        Office office = officeRepository.findByNameIgnoreCase(normalizedName).orElseThrow(() -> {
-            log.error("Office not found. Name: {}", normalizedName);
-            return new EntityNotFoundException("Office not found"); // Throw 404 HTTP Status code
-        });
+        // Step 1: Check if the input Office entity is found and validate its name
+        Office office = readValidator.checkIfEntityIsFound("Office", name, officeRepository::findByNameIgnoreCase);
 
         log.info("Service getOfficeByName");
 
-        // Step 3: Mapper converts the entity into a DTO for response.
+        // Step 2: Mapper converts the entity into a DTO for response.
         return officeMapper.toDTO(office);
     }
 

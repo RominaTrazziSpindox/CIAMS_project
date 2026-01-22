@@ -3,11 +3,13 @@ import com.spx.inventory_management.dto.SoftwareLicenseRequestDTO;
 import com.spx.inventory_management.dto.SoftwareLicenseResponseDTO;
 import com.spx.inventory_management.mappers.SoftwareLicenseMapper;
 import com.spx.inventory_management.models.Asset;
+import com.spx.inventory_management.models.Office;
 import com.spx.inventory_management.models.SoftwareLicense;
 import com.spx.inventory_management.repositories.AssetRepository;
 import com.spx.inventory_management.repositories.SoftwareLicenseRepository;
-import com.spx.inventory_management.utils.SoftwareLicenseRequestNormalizer;
+import com.spx.inventory_management.utils.normalizer.SoftwareLicenseRequestNormalizer;
 import com.spx.inventory_management.utils.TextNormalizer;
+import com.spx.inventory_management.utils.validator.ReadValidator;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +29,9 @@ public class SoftwareLicenseService {
 
     @Autowired
     private AssetRepository assetRepository;
+
+    @Autowired
+    private ReadValidator readValidator;
 
     @Autowired
     private SoftwareLicenseMapper softwareLicenseMapper;
@@ -60,14 +65,8 @@ public class SoftwareLicenseService {
      */
     public SoftwareLicenseResponseDTO getSoftwareLicenseByName(String softwareName) {
 
-        // Step 1: Normalized the incoming software name license
-        String normalizedSoftwareName = TextNormalizer.normalizeKey(softwareName);
-
-        // Step 2: Repository try to retrieve a SoftwareLicence entity by its unique name from the database.
-        SoftwareLicense license = softwareLicenseRepository.findBySoftwareNameIgnoreCase(normalizedSoftwareName).orElseThrow(() -> {
-            log.error("Asset not found. This software name doesn't exists: {}", normalizedSoftwareName);
-            return new EntityNotFoundException("Software Licence not found " + normalizedSoftwareName);
-        });
+        // Step 1: Check if the input Office entity is found and validate its name
+        SoftwareLicense license = readValidator.checkIfEntityIsFound("SoftwareLicence", softwareName, softwareLicenseRepository::findBySoftwareNameIgnoreCase);
 
         // Step 3: Mapper converts the entity into a DTO for response.
         return softwareLicenseMapper.toDTO(license);
