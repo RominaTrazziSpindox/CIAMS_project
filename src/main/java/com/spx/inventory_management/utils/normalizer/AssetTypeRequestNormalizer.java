@@ -1,6 +1,7 @@
-package com.spx.inventory_management.utils;
+package com.spx.inventory_management.utils.normalizer;
 
 import com.spx.inventory_management.dto.AssetTypeRequestDTO;
+import com.spx.inventory_management.utils.TextNormalizer;
 
 /**
  * Normalizes OfficeRequestDTO fields.
