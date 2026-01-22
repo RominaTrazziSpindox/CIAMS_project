@@ -1,5 +1,7 @@
-package com.spx.inventory_management.security;
+package com.spx.inventory_management.config;
 
+import com.spx.inventory_management.security.CustomAccessDeniedHandler;
+import com.spx.inventory_management.security.CustomAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
