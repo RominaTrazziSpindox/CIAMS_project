@@ -2,11 +2,14 @@ package com.spx.inventory_management.services;
 
 import com.spx.inventory_management.dto.AssetTypeRequestDTO;
 import com.spx.inventory_management.dto.AssetTypeResponseDTO;
+import com.spx.inventory_management.dto.OfficeRequestDTO;
 import com.spx.inventory_management.mappers.AssetTypeMapper;
 import com.spx.inventory_management.models.AssetType;
 import com.spx.inventory_management.repositories.AssetTypeRepository;
 import com.spx.inventory_management.utils.normalizer.AssetTypeRequestNormalizer;
 import com.spx.inventory_management.utils.TextNormalizer;
+import com.spx.inventory_management.utils.normalizer.OfficeRequestNormalizer;
+import com.spx.inventory_management.utils.validator.CreateValidator;
 import com.spx.inventory_management.utils.validator.ReadValidator;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -26,6 +29,9 @@ public class AssetTypeService {
 
     @Autowired
     private ReadValidator readValidator;
+
+    @Autowired
+    private CreateValidator createValidator;
 
     @Autowired
     private AssetTypeMapper assetTypeMapper;
@@ -85,23 +91,19 @@ public class AssetTypeService {
     @Transactional
     public AssetTypeResponseDTO createAssetType(AssetTypeRequestDTO newAssetTypeRequestDTO) {
 
-        // Step 1: Normalize all the input field incoming from assetTypeRequestDTO
-        AssetTypeRequestDTO normalizedDTO = AssetTypeRequestNormalizer.normalize(newAssetTypeRequestDTO);
+        // Step 1. Check if the input Asset Type entity already exists and validate its fields
+        AssetTypeRequestDTO normalizedDTO = createValidator.checkIfEntityAlreadyExists("Asset Type", newAssetTypeRequestDTO,
+                dto -> assetTypeRepository.existsByAssetTypeNameIgnoreCase(dto.getAssetTypeName()), AssetTypeRequestNormalizer::normalize);
 
-        // Step 2: Check if the asset type name already exists
-        if (assetTypeRepository.existsByAssetTypeNameIgnoreCase(normalizedDTO.getAssetTypeName())) {
-            throw new IllegalArgumentException("Asset type already exists: " + normalizedDTO.getAssetTypeName());
-        }
-
-        // Step 3. Convert DTO -> Entity (Database added an id automatically)
+        // Step 2. Convert DTO -> Entity (Database added an id automatically)
         AssetType newAssetType = assetTypeMapper.toEntity(normalizedDTO);
 
-        // Step 4. Save the entity into the database
+        // Step 3. Save the entity into the database
         AssetType saved = assetTypeRepository.save(newAssetType);
 
         log.info("AssetType created. name: {}", saved.getAssetTypeName());
 
-        // Step 5. Convert Entity -> DTO
+        // Step 4. Convert Entity -> DTO
         return assetTypeMapper.toDTO(saved);
     }
 

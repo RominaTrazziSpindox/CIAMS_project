@@ -27,6 +27,8 @@ public class ReadValidator {
 
         This function is the repository function method given by JPA.
         We use lambda expression :: to put a method as a function parameter.
+
+        The return type is an entity T.
      */
 
      /* Implemented example:
@@ -46,7 +48,7 @@ public class ReadValidator {
         if (entityRawValue instanceof String rawString) {
             valueToSearch = (K) TextNormalizer.normalizeKey(rawString);
         } else {
-            // It the valueToSearch is not a String skip controls
+            // If the valueToSearch is not a String skip controls
             valueToSearch = entityRawValue;
         }
 

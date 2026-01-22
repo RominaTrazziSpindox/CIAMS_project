@@ -10,6 +10,8 @@ import com.spx.inventory_management.repositories.AssetTypeRepository;
 import com.spx.inventory_management.repositories.OfficeRepository;
 import com.spx.inventory_management.utils.normalizer.AssetRequestNormalizer;
 import com.spx.inventory_management.utils.TextNormalizer;
+import com.spx.inventory_management.utils.normalizer.AssetTypeRequestNormalizer;
+import com.spx.inventory_management.utils.validator.CreateValidator;
 import com.spx.inventory_management.utils.validator.ReadValidator;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -34,6 +36,9 @@ public class AssetService {
 
     @Autowired
     private ReadValidator readValidator;
+
+    @Autowired
+    private CreateValidator createValidator;
 
     @Autowired
     private AssetMapper assetMapper;
@@ -138,37 +143,32 @@ public class AssetService {
     @Transactional
     public AssetResponseDTO createAsset(AssetRequestDTO newAssetRequestDTO) {
 
-        // Step 1: Normalize all the input field incoming from assetRequestDTO
-        AssetRequestDTO normalizedDTO = AssetRequestNormalizer.normalize(newAssetRequestDTO);
+        // Step 1. Check if the input Asset entity already exists and validate its fields
+        AssetRequestDTO normalizedDTO = createValidator.checkIfEntityAlreadyExists("Asset Type", newAssetRequestDTO,
+                dto -> assetRepository.existsBySerialNumberIgnoreCase(dto.getSerialNumber()), AssetRequestNormalizer::normalize);
 
-        log.debug("Creating asset with serialNumber: {}", normalizedDTO.getSerialNumber());
 
-        // Step 2: Check if the asset serial number already exists
-        if (assetRepository.existsBySerialNumberIgnoreCase(normalizedDTO.getSerialNumber())) {
-            throw new IllegalArgumentException("Asset with serial number already exists: " + normalizedDTO.getSerialNumber());
-        }
-
-        // Step 3: Check if the office exists by its name
+        // Step 2: Check if the office exists by its name [DA AGGIORNARE CON VALIDATOR]
         Office office = officeRepository.findByNameIgnoreCase(normalizedDTO.getOfficeName()).orElseThrow(() ->
                 new EntityNotFoundException("Office not found"));
 
-        // Step 4: Check if the asset type exists by its name
+        // Step 3: Check if the asset type exists by its name [DA AGGIORNARE CON VALIDATOR]
         AssetType assetType = assetTypeRepository.findByAssetTypeNameIgnoreCase(normalizedDTO.getAssetTypeName()).orElseThrow(()
                 -> new EntityNotFoundException("Asset type not found"));
 
-        // Step 5. Convert DTO -> Entity (Database added an id automatically)
+        // Step 4. Convert DTO -> Entity (Database added an id automatically)
         Asset newAsset = assetMapper.toEntity(normalizedDTO);
 
-        // Step 6: Set the new Asset foreign keys
+        // Step 5: Set the new Asset foreign keys
         newAsset.setOffice(office);
         newAsset.setAssetType(assetType);
 
-        // Step 7. Save the entity into the database
+        // Step 6. Save the entity into the database
         Asset savedAsset = assetRepository.save(newAsset);
 
         log.info("Asset created succeffully. Serial number: {}", savedAsset.getSerialNumber());
 
-        // Step 8. Convert Entity -> DTO
+        // Step 7. Convert Entity -> DTO
         return assetMapper.toDTO(savedAsset);
     }
 
