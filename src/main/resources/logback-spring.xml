@@ -1,24 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
+    <!-- ============================= -->
+    <!-- SPRING PROFILE -->
+    <!-- ============================= -->
+
     <!-- Define the Spring profile value -->
     <springProperty name="SPRING_PROFILE" source="spring.profiles.active" defaultValue="dev"/>
 
+    <!-- ============================= -->
+    <!-- PATHS -->
+    <!-- ============================= -->
 
-    <!-- Name value of the log file based on the profile role -->
-    <property name="LOG_FILE" value="logs/ciams-${SPRING_PROFILE}.log"/>
+    <!-- Define the Spring log folders path -->
+    <property name="LOG_BASE_PATH" value="/logs"/>
+    <property name="APP_LOG_PATH" value="${LOG_BASE_PATH}/${SPRING_PROFILE}"/>
+    <property name="CACHE_LOG_PATH" value="${LOG_BASE_PATH}/cache-log"/>
 
+
+    <!-- ============================= -->
+    <!-- GENERAL LOG FILES             -->
+    <!-- ============================= -->
 
     <!-- Appender with rotation -->
     <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
 
-        <file>${LOG_FILE}</file>
+        <!-- Active file -->
+        <file>${APP_LOG_PATH}/current.log</file>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 
             <!-- Create one file a day -->
             <fileNamePattern>
-                logs/%d{yyyy-MM-dd}-ciams-${SPRING_PROFILE}.log
+                ${APP_LOG_PATH}/%d{yyyy-MM-dd}-ciams-${SPRING_PROFILE}.log
             </fileNamePattern>
 
             <!-- Keep it for 14 days maximum -->
@@ -37,6 +51,9 @@
 
     </appender>
 
+    <!-- ============================= -->
+    <!-- CONSOLE LOGS -->
+    <!-- ============================= -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
 
         <encoder>
@@ -46,6 +63,47 @@
         </encoder>
 
     </appender>
+
+    <!-- ============================= -->
+    <!-- CACHE SIFTING APPENDER -->
+    <!-- ============================= -->
+    <appender name="CACHE_SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
+
+        <discriminator>
+            <key>cacheName</key>
+            <defaultValue>unknown-cache</defaultValue>
+        </discriminator>
+
+        <sift>
+            <appender name="CACHE_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+                <!-- Active cache file -->
+                <file>${CACHE_LOG_PATH}/${cacheName}.log</file>
+
+                <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                    <fileNamePattern>
+                       ${CACHE_LOG_PATH}/%d{yyyy-MM-dd}-${cacheName}.log
+                    </fileNamePattern>
+                    <maxHistory>14</maxHistory>
+                </rollingPolicy>
+
+                <encoder>
+                    <pattern>
+                        %d{HH:mm:ss.SSS} %-5level %msg%n
+                    </pattern>
+                </encoder>
+            </appender>
+        </sift>
+    </appender>
+
+    <!-- ============================= -->
+    <!-- CACHE MONITOR LOGGER -->
+    <!-- ============================= -->
+    <logger name="com.spx.inventory_management.cache"
+            level="INFO"
+            additivity="true">
+        <appender-ref ref="CACHE_SIFT"/>
+    </logger>
 
     <root level="INFO">
         <appender-ref ref="ROLLING"/>
