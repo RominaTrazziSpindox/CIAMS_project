@@ -7,6 +7,7 @@ import com.spx.inventory_management.models.Office;
 import com.spx.inventory_management.repositories.OfficeRepository;
 import com.spx.inventory_management.utils.normalizer.OfficeRequestNormalizer;
 import com.spx.inventory_management.utils.TextNormalizer;
+import com.spx.inventory_management.utils.validator.CreateValidator;
 import com.spx.inventory_management.utils.validator.ReadValidator;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -26,6 +27,9 @@ public class OfficeService {
 
     @Autowired
     private ReadValidator readValidator;
+
+    @Autowired
+    private CreateValidator createValidator;
 
     @Autowired
     private OfficeMapper officeMapper;
@@ -63,8 +67,6 @@ public class OfficeService {
      *
      * @param name the name
      * @return the office by name
-     *
-     * ATTENTION: Cache use a not normalized value
      */
     @Cacheable(value = "offices-by-name", key = "T(com.spx.inventory_management.utils.TextNormalizer).normalizeKey(#name)")
     public OfficeResponseDTO getOfficeByName(String name) {
@@ -93,23 +95,19 @@ public class OfficeService {
     @CacheEvict(value = { "offices-all", "offices-by-name" }, allEntries = true)
     public OfficeResponseDTO createOffice(OfficeRequestDTO newOfficeDTO) {
 
-        // Step 1: Normalize all the input field incoming from OfficeRequestDTO
-        OfficeRequestDTO normalizedDTO = OfficeRequestNormalizer.normalize(newOfficeDTO);
+        // Step 1. Check if the input Office entity already exists and validate its fields
+        OfficeRequestDTO normalizedDTO = createValidator.checkIfEntityAlreadyExists("Office", newOfficeDTO,
+               dto -> officeRepository.existsByNameIgnoreCase(dto.getOfficeName()), OfficeRequestNormalizer::normalize);
 
-        // Step 2: Check if the office name already exists
-        if (officeRepository.existsByNameIgnoreCase(normalizedDTO.getOfficeName())) {
-            throw new IllegalArgumentException("Office name already exists: " + normalizedDTO.getOfficeName());
-        }
-
-        // Step 3. Convert DTO -> Entity (Database added an id automatically)
+        // Step 2. Convert DTO -> Entity (Database added an id automatically)
         Office newOfficeEntity = officeMapper.toEntity(normalizedDTO);
 
-        // Step 4. Save the entity into the database
+        // Step 3. Save the entity into the database
         Office savedOfficeEntity = officeRepository.save(newOfficeEntity);
 
         log.info("Office created. Name: {}", savedOfficeEntity.getName());
 
-        // Step 5. Convert Entity -> DTO
+        // Step 4. Convert Entity -> DTO
         return officeMapper.toDTO(savedOfficeEntity);
     }
 
@@ -138,7 +136,7 @@ public class OfficeService {
         // Step 3: Retrieve the existing office or throw if not found.
         Office existingOffice = officeRepository.findByNameIgnoreCase(normalizedCurrentName).orElseThrow(() -> {
             log.error("Update failed. Office not found. Name: {}", normalizedCurrentName);
-             return new EntityNotFoundException("Office not found");
+            return new EntityNotFoundException("Office not found");
         });
 
         // Step 4: Extract the new office name

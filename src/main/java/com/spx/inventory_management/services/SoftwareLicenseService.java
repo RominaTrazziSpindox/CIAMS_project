@@ -3,12 +3,12 @@ import com.spx.inventory_management.dto.SoftwareLicenseRequestDTO;
 import com.spx.inventory_management.dto.SoftwareLicenseResponseDTO;
 import com.spx.inventory_management.mappers.SoftwareLicenseMapper;
 import com.spx.inventory_management.models.Asset;
-import com.spx.inventory_management.models.Office;
 import com.spx.inventory_management.models.SoftwareLicense;
 import com.spx.inventory_management.repositories.AssetRepository;
 import com.spx.inventory_management.repositories.SoftwareLicenseRepository;
 import com.spx.inventory_management.utils.normalizer.SoftwareLicenseRequestNormalizer;
 import com.spx.inventory_management.utils.TextNormalizer;
+import com.spx.inventory_management.utils.validator.CreateValidator;
 import com.spx.inventory_management.utils.validator.ReadValidator;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -32,6 +32,9 @@ public class SoftwareLicenseService {
 
     @Autowired
     private ReadValidator readValidator;
+
+    @Autowired
+    private CreateValidator createValidator;
 
     @Autowired
     private SoftwareLicenseMapper softwareLicenseMapper;
@@ -85,26 +88,19 @@ public class SoftwareLicenseService {
     @Transactional
     public SoftwareLicenseResponseDTO createSoftwareLicense(SoftwareLicenseRequestDTO newSoftwareLicenseRequestDTO) {
 
-        // Step 1: Normalize all the input field incoming from SoftwareLicenceRequestDTO
-        SoftwareLicenseRequestDTO normalizedDTO = SoftwareLicenseRequestNormalizer.normalize(newSoftwareLicenseRequestDTO);
+        // Step 1. Check if the input Software License entity already exists and validate its fields
+       SoftwareLicenseRequestDTO normalizedDTO = createValidator.checkIfEntityAlreadyExists("Software License", newSoftwareLicenseRequestDTO,
+                dto -> softwareLicenseRepository.existsBySoftwareNameIgnoreCase(dto.getSoftwareName()), SoftwareLicenseRequestNormalizer::normalize);
 
-        log.debug("Creating a new software license: {}", normalizedDTO.getSoftwareName());
-
-
-        // Step 2: Check if the software license name already exists
-        if (softwareLicenseRepository.existsBySoftwareNameIgnoreCase(normalizedDTO.getSoftwareName())) {
-            throw new IllegalArgumentException("Software license already exists: " + normalizedDTO.getSoftwareName());
-        }
-
-        // Step 3. Convert DTO -> Entity (Database added an id automatically)
+        // Step 2. Convert DTO -> Entity (Database added an id automatically)
         SoftwareLicense newSoftwareLicenceEntity = softwareLicenseMapper.toEntity(normalizedDTO);
 
-        // Step 4. Save the entity into the database
+        // Step 3. Save the entity into the database
         SoftwareLicense savedSoftwareLicense = softwareLicenseRepository.save(newSoftwareLicenceEntity);
 
         log.info("Software license created: {}", savedSoftwareLicense.getSoftwareName());
 
-        // Step 6. Convert Entity -> DTO
+        // Step 4. Convert Entity -> DTO
         return softwareLicenseMapper.toDTO(savedSoftwareLicense);
     }
 
