@@ -10,11 +10,7 @@ import java.util.Set;
 @Data
 public class UserResponseDTO {
 
-    @NotBlank(message = "Username cannot be blank")
-    @Size(min = 3, max = 50)
     private String username;
-
-
     private Set<Role> roles;
 
 }
