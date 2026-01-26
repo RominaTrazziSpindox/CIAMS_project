@@ -9,6 +9,7 @@ import com.spx.inventory_management.utils.normalizer.OfficeRequestNormalizer;
 import com.spx.inventory_management.utils.TextNormalizer;
 import com.spx.inventory_management.utils.validator.CreateValidator;
 import com.spx.inventory_management.utils.validator.ReadValidator;
+import com.spx.inventory_management.utils.validator.UpdateValidator;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,9 @@ public class OfficeService {
 
     @Autowired
     private CreateValidator createValidator;
+
+    @Autowired
+    private UpdateValidator updateValidator;
 
     @Autowired
     private OfficeMapper officeMapper;
@@ -127,35 +131,25 @@ public class OfficeService {
     @CacheEvict(value = { "offices-all", "offices-by-name" }, allEntries = true)
     public OfficeResponseDTO updateExistingOfficeByName(String currentName, OfficeRequestDTO newOfficeDTO) {
 
-        // Step 1: Normalize the current name
-        String normalizedCurrentName = TextNormalizer.normalizeKey(currentName);
+        // Step 1: Check if the input Office (old office) entity is found and validate its name
+        Office existingOffice = readValidator.checkIfEntityIsFound("Office", currentName, officeRepository::findByNameIgnoreCase);
 
-        // Step 2: Normalize incoming new office data
+        // Step 2: Normalize incoming new office DTO
         OfficeRequestDTO normalizedNewOffice = OfficeRequestNormalizer.normalize(newOfficeDTO);
 
-        // Step 3: Retrieve the existing office or throw if not found.
-        Office existingOffice = officeRepository.findByNameIgnoreCase(normalizedCurrentName).orElseThrow(() -> {
-            log.error("Update failed. Office not found. Name: {}", normalizedCurrentName);
-            return new EntityNotFoundException("Office not found");
-        });
-
-        // Step 4: Extract the new office name
+        // Step 3: Extract the new office name
         String newOfficeName = normalizedNewOffice.getOfficeName();
 
-        // Step 5: If the newName IS NOT EQUAL to the currentName AND if the newName already exists into the database...
-        if (!normalizedCurrentName.equalsIgnoreCase(newOfficeName) && officeRepository.existsByNameIgnoreCase(newOfficeName)) {
-            throw new IllegalArgumentException("Office name already exists: " + newOfficeName);
-        }
+        // Step 4: UpdateValidator
+        updateValidator.checkIfUpdateIsAllowed("Office", existingOffice.getName(), newOfficeName, officeRepository::existsByNameIgnoreCase);
 
-        // Step 6: Update only mutable fields (in this case: office name).
+        // Step 5: Update only mutable fields (in this case: office name).
         existingOffice.setName(newOfficeName);
 
-        // Step 7: Save the new updated Office into the database
+        // Step 6: Save the new updated Office into the database
         Office updatedOffice = officeRepository.save(existingOffice);
 
-        log.info("Office updated. OldName: {}, NewName: {}", normalizedCurrentName, newOfficeName);
-
-        // Step 8: Convert Entity -> DTO
+        // Step 7: Convert Entity -> DTO
         return officeMapper.toDTO(updatedOffice);
     }
 
@@ -173,19 +167,16 @@ public class OfficeService {
     @CacheEvict(value = { "offices-all", "offices-by-name" }, allEntries = true)
     public void deleteOfficeByName(String officeName) {
 
-        // Step 1: Normalize the office name
-        String normalizedName = TextNormalizer.normalizeKey(officeName);
+        // Step 1: Check if the input Office entity is found and validate its name
+        Office office = readValidator.checkIfEntityIsFound("Office", officeName, officeRepository::findByNameIgnoreCase);
 
-        // Step 2: Validate entity existence before deletion.
-        if (!officeRepository.existsByNameIgnoreCase(normalizedName)) {
-            log.error("Delete failed. Office not found. Name: {}", normalizedName);
-            throw new EntityNotFoundException("Office not found");
-        }
+        // Step 2: Extract the normalized office name
+        String normalizedOfficeName = office.getName();
 
         // Step 3: Proceed with deletion.
-        officeRepository.deleteByNameIgnoreCase(normalizedName);
+        officeRepository.deleteByNameIgnoreCase(normalizedOfficeName);
 
-        log.info("Deleting office. Named: {}", normalizedName);
+        log.info("Deleting office. Named: {}", normalizedOfficeName);
 
     }
 }

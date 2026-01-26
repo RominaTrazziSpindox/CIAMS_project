@@ -1,6 +1,7 @@
 .git
-.gradle
+../.gradle
 build/
 node_modules
-.env
-.env.*
+inventory-service/.env
+inventory-service/.env.prod
+inventory-service/src/test
