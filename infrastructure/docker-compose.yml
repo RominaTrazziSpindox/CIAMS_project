@@ -32,7 +32,7 @@ services:
 
   # Application service
   app:
-    build: .
+    build: ..
     container_name: ciams-application
     # Start app only when DB is healthy
     depends_on:
