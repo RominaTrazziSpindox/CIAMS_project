@@ -1,12 +1,15 @@
 package com.spx.auth_service.dto;
 
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-@Data
+@AllArgsConstructor
+@Getter
 public class AuthResponseDTO {
 
     private String token;
+    private String tokenType = "Bearer";
 
     // Constructor
     public AuthResponseDTO(String token) {
