@@ -1,3 +1,8 @@
 spring:
   application:
     name: auth-service
+
+    security:
+      jwt:
+        secret: ${JWT_SECRET_BASE64}
+        access-token-ttl-minutes: 60
