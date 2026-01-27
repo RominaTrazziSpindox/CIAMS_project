@@ -10,7 +10,7 @@
 
 spring:
   application:
-    name: inventory-management
+    name: inventory-service
 
   # --------------------------------------------
   # Default Spring profile
@@ -33,4 +33,9 @@ spring:
         - offices-by-name
         - assets-type
         - assets-type-by-name
+
+    security:
+      jwt:
+        secret: ${JWT_SECRET_BASE64}
+        access-token-ttl-minutes: 60
 
