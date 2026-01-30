@@ -1,8 +1,7 @@
-package com.spx.inventory_management.security;
+package com.spx.auth_service.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.spx.inventory_management.dto.ApiErrorResponseDTO;
-import jakarta.servlet.ServletException;
+import com.spx.auth_service.dto.ApiErrorResponseDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
@@ -14,12 +13,12 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Component
-public class CustomAccessDeniedHandler implements AccessDeniedHandler {
+public class JWTAccessDeniedHandler implements AccessDeniedHandler {
 
     private final ObjectMapper objectMapper;
 
     // Constructor SpringBoot
-    public CustomAccessDeniedHandler(ObjectMapper objectMapper) {
+    public JWTAccessDeniedHandler(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
