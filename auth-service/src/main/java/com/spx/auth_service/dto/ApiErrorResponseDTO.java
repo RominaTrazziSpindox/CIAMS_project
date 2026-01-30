@@ -1,4 +1,4 @@
-package com.spx.inventory_management.dto;
+package com.spx.auth_service.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;

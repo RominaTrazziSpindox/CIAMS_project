@@ -1,4 +1,4 @@
-package com.spx.inventory_management.exceptions;
+package com.spx.auth_service.exceptions;
 
 import com.spx.inventory_management.dto.ApiErrorResponseDTO;
 import jakarta.persistence.EntityNotFoundException;
