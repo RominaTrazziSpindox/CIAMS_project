@@ -36,7 +36,7 @@ public class JWTAuthTokenFilter extends OncePerRequestFilter {
             // STEP 1: Try to parse the HTTP Authorization header (expects format: "Bearer <token>")
             String jwt = parseJwt(request);
 
-            // If there is a JWT and it is valid...
+            // If there is a JWT, and it is valid...
             if (jwt != null && jwtUtil.validateJWTtoken(jwt)) {
 
                 // STEP 2: Extract username from the JWT and load full user details from the database (roles, password hash, account status)
@@ -44,8 +44,7 @@ public class JWTAuthTokenFilter extends OncePerRequestFilter {
                 final UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username);
 
                 // STEP 3: Create an Authentication object for Spring Security. This marks the user as authenticated for the current request
-                UsernamePasswordAuthenticationToken authenticationToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                UsernamePasswordAuthenticationToken authenticationToken =  new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
                 // STEP 4: Attach additional request-related details (IP, session ID). Useful for auditing, logging and debugging purposes
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -73,6 +72,6 @@ public class JWTAuthTokenFilter extends OncePerRequestFilter {
         }
         return null;
     }
-
-
 }
+
+
