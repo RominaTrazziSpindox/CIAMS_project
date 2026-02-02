@@ -1,5 +1,7 @@
 package com.spx.auth_service.models;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -30,9 +32,7 @@ public class User {
     @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
 
-    @Builder.Default
+    @Enumerated(EnumType.STRING)
     private Set<Role> roles = Set.of(Role.USER);
-
-
 
 }
