@@ -41,7 +41,7 @@ public class JWTAuthTokenFilter extends OncePerRequestFilter {
             String jwt = parseJwt(request);
 
             // If there is a JWT, and it is valid...
-            if (jwt != null && jwtUtils.validateJWTtoken(jwt)) {
+            if (jwt != null && jwtUtils.validateToken(jwt)) {
 
                 // STEP 2: Extract username from the JWT and load full user details from the database (roles, password hash, account status)
                 final String username = jwtUtils.getUserFromToken(jwt);
