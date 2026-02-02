@@ -20,7 +20,6 @@ public class JWTUserDetailsService implements UserDetailsService {
     // Constructor injection
     private final UserRepository userRepository;
 
-
     public JWTUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
@@ -36,9 +35,11 @@ public class JWTUserDetailsService implements UserDetailsService {
         });
 
         // Step 2: Retrieve its role converting Set<Role> in a Granted Authority collection
-        Collection<GrantedAuthority> authorities = user.getRoles().stream()
-                        .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
-                        .collect(Collectors.toList());
+        Collection<GrantedAuthority> authorities = user
+                .getRoles()
+                .stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
+                .collect(Collectors.toList());
 
         // Step 3: Return a UserDetails object with details
         return new org.springframework.security.core.userdetails.User(
