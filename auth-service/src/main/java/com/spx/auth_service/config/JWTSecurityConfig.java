@@ -32,14 +32,17 @@ public class JWTSecurityConfig {
     public JWTAuthTokenFilter authenticationJwtTokenFilter() {
         return new JWTAuthTokenFilter();
     }
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -47,11 +50,11 @@ public class JWTSecurityConfig {
                 .csrf(csrf -> csrf.disable())
 
                 // CORS OFF -> (Cross Origin Request Sharing) off
-                .cors( cors -> cors.disable())
+                .cors(cors -> cors.disable())
 
                 // No HTTP session (stateless)
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS) )
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 // AuthenticationEntryPoint (errors: 401 - Unauthorized & 403 - Forbidden permission )
                 .exceptionHandling(ex -> ex
@@ -73,11 +76,11 @@ public class JWTSecurityConfig {
 
                 // JWT Authentication filter
                 .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-                return http.build();
 
-        }
-
+        return http.build();
 
     }
-
 }
+
+
+
