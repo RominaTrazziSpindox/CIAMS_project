@@ -1,6 +1,7 @@
 package com.spx.auth_service.exceptions;
 
-import com.spx.inventory_management.dto.ApiErrorResponseDTO;
+
+import com.spx.auth_service.dto.ApiErrorResponseDTO;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

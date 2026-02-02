@@ -21,13 +21,13 @@ public interface UserRepository extends MongoRepository<User, Long> {
     // User Delete
     void deleteByUsername(String username);
 
-
-    /* Further methods */
-
     // Find users by role and paginate
     Page<User> findByRoles(Role role, Pageable pageable);
 
-    boolean existsByRoles(Role role);
+
+
+
+
 
 
 }
