@@ -1,8 +1,7 @@
-package com.spx.auth_service.exceptions;
+package com.spx.inventory_service.exceptions;
 
-
-import org.springframework.dao.DuplicateKeyException;
 import com.spx.auth_service.dto.ApiErrorResponseDTO;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -74,10 +73,11 @@ public class GlobalExceptionHandler {
     // 404 - NOT FOUND
     // ==========================================================
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiErrorResponseDTO> handleNotFound(ResourceNotFoundException ex, WebRequest request) {
-        return buildError(HttpStatus.NOT_FOUND,"Resource not found", ex.getMessage(), request);
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ApiErrorResponseDTO> handleNotFound(EntityNotFoundException ex, WebRequest request) {
+        return buildError(HttpStatus.NOT_FOUND,"Resource not found", ex.getMessage(),request);
     }
+
 
     // ==========================================================
     // 405 - METHOD NOT ALLOWED
@@ -90,12 +90,12 @@ public class GlobalExceptionHandler {
 
 
     // ==========================================================
-    // 409 - DUPLICATE KEY
+    // 409 - CONFLICT
     // ==========================================================
 
-    @ExceptionHandler(DuplicateKeyException.class)
-    public ResponseEntity<ApiErrorResponseDTO> handleDuplicateKey(DuplicateKeyException ex, WebRequest request) {
-        return buildError( HttpStatus.CONFLICT,"Conflict","Resource already exists", request);
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiErrorResponseDTO> handleConflict(IllegalStateException ex, WebRequest request) {
+        return buildError(HttpStatus.CONFLICT,"Conflict", ex.getMessage(),request);
     }
 
 
