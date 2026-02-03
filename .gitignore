@@ -1,7 +1,13 @@
+# ENV FILES #
+
+infrastructure/.env
+infrastructure/.env.dev
+infrastructure/.env.prod
+
+
+
 HELP.md
 .gradle
-inventory-service/.env
-inventory-service/.env.prod
 
 build/
 logs/
