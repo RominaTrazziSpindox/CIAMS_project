@@ -31,13 +31,13 @@ public class JWTUtils {
      * Base64-encoded secret key used to sign the JWT.
      * Must be at least 256 bits for HS256.
      */
-    @Value("${jwt.secret}")
+    @Value("${spring.security.jwt.secret}")  // Same path of yaml property
     private String jwtSecretKey;
 
     /**
      * Token expiration time in milliseconds.
      */
-    @Value("${jwt.expiration-ms}")
+    @Value("${spring.security.jwt.expiration}")  // Same path of yaml property
     private Long expiration;
 
     private SecretKey key;

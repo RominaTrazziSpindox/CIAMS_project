@@ -1,76 +1,76 @@
 services:
 
-  # -----------------------------------------
-  # PostgreSQL Database Container
-  # -----------------------------------------
+    # -----------------------------------------
+    # PostgreSQL - Inventory Service
+    # -----------------------------------------
+    postgres:
+      image: postgres:16
+      container_name: ciams-postgres
+      environment:
+        POSTGRES_DB: ${DB_NAME}
+        POSTGRES_USER: ${DB_ADMIN_USERNAME}
+        POSTGRES_PASSWORD: ${DB_ADMIN_PASSWORD}
+      ports:
+        - "5432:5432"
+      volumes:
+        - postgres_data:/var/lib/postgresql/data
+      healthcheck:
+        test: [ "CMD-SHELL", "pg_isready -U ${DB_ADMIN_USERNAME} -d ${DB_NAME}" ]
+        interval: 10s
+        timeout: 5s
+        retries: 5
 
-  # Database service
-  db:
-    image: postgres:16
-    container_name: ciams-database
-    # Database initialization credentials
-    environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_ADMIN_USERNAME}
-      POSTGRES_PASSWORD: ${DB_ADMIN_PASSWORD}
-    # Expose database container port to host machine port (useful for DBeaver connection)
-    ports:
-      - "5432:5432"
-    # Specific folder of the persistent volume for database data (see below)
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    # Health check to ensure DB is ready before app starts
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_ADMIN_USERNAME} -d ${DB_NAME}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    # -----------------------------------------
+    # MongoDB - Auth Service
+    # -----------------------------------------
+    mongo:
+      image: mongo:latest
+      container_name: ciams-mongo
+      ports:
+        - "27017:27017"
+      volumes:
+        - mongo_data:/data/db
 
-  # -----------------------------------------
-  # Spring Boot Application Container
-  # -----------------------------------------
+    # -----------------------------------------
+    # Auth Service (Spring Boot)
+    # -----------------------------------------
+    auth-service:
+      build: ../auth-service
+      container_name: auth-service
+      depends_on:
+        - mongo
+      ports:
+        - "8081:8080"
+      environment:
+        SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
 
-  # Application service
-  app:
-    build: ..
-    container_name: ciams-application
-    # Start app only when DB is healthy
-    depends_on:
-      db:
-        condition: service_healthy
-    ports:
-      - "8080:8080"
-    # Application environment variables for Spring
-    environment:
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_NAME: ${DB_NAME}
-      DB_ADMIN_USERNAME: ${DB_ADMIN_USERNAME}
-      DB_ADMIN_PASSWORD: ${DB_ADMIN_PASSWORD}
-      DB_USER_USERNAME: ${DB_USER_USERNAME}
-      DB_USER_PASSWORD: ${DB_USER_PASSWORD}
+        SPRING_DATA_MONGODB_HOST: mongo
+        SPRING_DATA_MONGODB_PORT: 27017
+        SPRING_DATA_MONGODB_DATABASE: auth_db
+        JWT_SECRET: ${JWT_SECRET}
 
-    volumes:
-      - ./logs:/logs:Z
+    # -----------------------------------------
+    # Inventory Service (Spring Boot)
+    # -----------------------------------------
+    inventory-service:
+      build: ../inventory-service
+      container_name: inventory-service
+      depends_on:
+        postgres:
+          condition: service_healthy
+      ports:
+        - "8080:8080"
+      environment:
+        SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+        DB_HOST: postgres
+        DB_PORT: 5432
+        DB_NAME: ${DB_NAME}
+        DB_ADMIN_USERNAME: ${DB_ADMIN_USERNAME}
+        DB_ADMIN_PASSWORD: ${DB_ADMIN_PASSWORD}
 
-
-  # -----------------------------------------
-  # Mongo DB Application Container
-  # -----------------------------------------
-
-  mongodb:
-    image: 'mongo:latest'
-    environment:
-      - 'MONGO_INITDB_DATABASE=mydatabase'
-      - 'MONGO_INITDB_ROOT_PASSWORD=secret'
-      - 'MONGO_INITDB_ROOT_USERNAME=root'
-    ports:
-      - '27017'
-
-
-# --------------- --------------------------
-# Named volumes (where data are saved)
+# -----------------------------------------
+# Volumi persistenti
 # -----------------------------------------
 volumes:
   postgres_data:
+  mongo_data:
