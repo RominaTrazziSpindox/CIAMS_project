@@ -24,10 +24,4 @@ public interface UserRepository extends MongoRepository<User, Long> {
     // Find users by role and paginate
     Page<User> findByRoles(Role role, Pageable pageable);
 
-
-
-
-
-
-
 }
