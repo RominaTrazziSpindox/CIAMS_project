@@ -32,11 +32,6 @@ public class JWTSecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
     public JWTAuthTokenFilter authenticationJwtTokenFilter() {
         return new JWTAuthTokenFilter();
     }
