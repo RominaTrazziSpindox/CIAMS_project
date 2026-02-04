@@ -40,11 +40,3 @@ CREATE TABLE IF NOT EXISTS assets_licenses (
 
 
 
--- ============================================================
--- TO DELETE THE TABLES
--- ============================================================
-
--- DROP SCHEMA public CASCADE;
--- CREATE SCHEMA public;
-
-

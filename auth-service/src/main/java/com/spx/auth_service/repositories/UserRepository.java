@@ -19,7 +19,7 @@ public interface UserRepository extends MongoRepository<User, String> {
     boolean existsByUsername(String username);
 
     // User Delete
-    Long deleteByUsername(String username);
+    long deleteByUsername(String username);
 
     // Find users by role and paginate
     Page<User> findByRoles(Role role, Pageable pageable);
