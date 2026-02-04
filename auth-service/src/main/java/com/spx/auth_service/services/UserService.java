@@ -32,13 +32,15 @@ public class UserService {
     // DELETE
     // ==========================================================
 
-    public void deleteByUsername(String username) {
+    public Long deleteByUsername(String username) {
 
-        if (!userRepository.existsByUsername(username)) {
-            throw new ResourceNotFoundException("User with username '" + username + "' not found");
+        Long deletedUser = userRepository.deleteByUsername(username);
+
+        if (deletedUser == 0) {
+            throw new ResourceNotFoundException(
+                    "User with username '%s' not found".formatted(username)
+            );
         }
-
-        userRepository.deleteByUsername(username);
 
         log.info("User '{}' deleted", username);
     }
