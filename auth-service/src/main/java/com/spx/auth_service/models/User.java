@@ -19,7 +19,7 @@ import java.util.Set;
 public class User {
 
     @Id
-    private Long id;
+    private String id;
 
     @NotBlank (message = "Username cannot be blank")
     @Size(min = 3, max = 50)
