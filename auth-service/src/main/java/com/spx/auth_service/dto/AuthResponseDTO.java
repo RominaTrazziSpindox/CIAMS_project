@@ -5,6 +5,7 @@ import com.spx.auth_service.models.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.time.Instant;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -12,15 +13,10 @@ import java.util.Set;
 public class AuthResponseDTO {
 
     private String token;
-    private String tokenType = "Bearer";
+    private String tokenType;
+    private String username;
     private Set<Role> roles;
-
-    // Constructor
-    public AuthResponseDTO(String token, Set<Role> roles) {
-        this.token = token;
-        this.roles = roles;
-    }
-
+    private Instant expiresAt;
 }
 
 

@@ -1,5 +1,6 @@
 package com.spx.auth_service.services;
 
+import com.spx.auth_service.dto.ApiErrorResponseDTO;
 import com.spx.auth_service.dto.AuthRequestDTO;
 import com.spx.auth_service.dto.AuthResponseDTO;
 import com.spx.auth_service.models.Role;
@@ -12,7 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import java.time.Instant;
 import java.util.Set;
 
 @Service
@@ -54,22 +55,30 @@ public class AuthService {
 
     public AuthResponseDTO login(AuthRequestDTO request) {
 
+        // STEP 1: Perform the user authentication by the authentication manager
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+                String username = authentication.getName();
 
-        String username = authentication.getName();
-
+        // STEP 2: Load User details
         User user = userRepository.findByUsername(username).orElseThrow(() ->
                 new IllegalStateException("User authenticated but not found in database"));
 
-
+        // STEP 3: Generate token
         String token = jwtUtils.generateToken(
                 user.getUsername(),
                 user.getRoles().stream().map(Enum::name).toList()
         );
 
+        // STEP 4: Extract expiration date from token
+        Instant expiresAt = jwtUtils
+                .getExpirationFromToken(token)
+                .toInstant();
+
+
         log.info("User '{}' successfully authenticated", username);
 
-        return new AuthResponseDTO(token, user.getRoles());
+        return new AuthResponseDTO(token,"Bearer", user.getUsername(), user.getRoles(), expiresAt);
+
     }
 }
