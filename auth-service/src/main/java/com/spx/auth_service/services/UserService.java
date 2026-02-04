@@ -28,17 +28,24 @@ public class UserService {
             new ResourceNotFoundException("User with username '" + username + "' not found"));
     }
 
+    public boolean userExists(String username) {
+        if (username == null || username.isBlank()) {
+            throw new IllegalArgumentException(username + "must not be null or blank");
+        }
+        return userRepository.existsByUsername(username);
+    }
+
     // ==========================================================
     // DELETE
     // ==========================================================
 
-    public Long deleteByUsername(String username) {
+    public void deleteByUsername(String username) {
 
-        Long deletedUser = userRepository.deleteByUsername(username);
+        long deleted = userRepository.deleteByUsername(username);
 
-        if (deletedUser == 0) {
+        if (deleted == 0) {
             throw new ResourceNotFoundException(
-                    "User with username '%s' not found".formatted(username)
+                    "User '%s' not found".formatted(username)
             );
         }
 
@@ -53,5 +60,5 @@ public class UserService {
         return userRepository
                 .findByRoles(role, pageable)
                 .map(User::getUsername);
+        }
     }
-}
