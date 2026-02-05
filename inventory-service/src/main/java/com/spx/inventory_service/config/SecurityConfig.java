@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -39,20 +40,17 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
-                        // 🔓 Public endpoints (if any)
+                        // Public endpoints (if any)
                         .requestMatchers("/health", "/error").permitAll()
 
-                        // 🔐 READ operations: authenticated users
+                        // READ operations: authenticated users
                         .requestMatchers(HttpMethod.GET, "/**").authenticated()
 
-                        // 🔐 WRITE operations: ADMIN only
+                        // WRITE operations: ADMIN only
                         .requestMatchers(HttpMethod.POST, "/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/**").hasRole("ADMIN")
-
-                        // Anything else must be authenticated
-                        .anyRequest().authenticated()
                 )
 
                 // =====================================================
@@ -63,8 +61,8 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
                 // Disable default login mechanisms
-                .httpBasic(Customizer.withDefaults())
-                .formLogin(form -> form.disable());
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable);
 
         return http.build();
     }
