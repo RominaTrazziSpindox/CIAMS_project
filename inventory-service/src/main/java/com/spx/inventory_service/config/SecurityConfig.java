@@ -13,12 +13,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 /**
  * Spring Security configuration for inventory-service.
  *
- * RESPONSIBILITY:
- * - define which endpoints are protected
- * - define authorization rules
- * - register JWT authentication filter
- *
- * IMPORTANT:
  * - inventory-service does NOT authenticate users
  * - inventory-service trusts JWT issued by auth-service
  */
@@ -35,10 +29,6 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                // =====================================================
-                // BASIC SECURITY SETUP
-                // =====================================================
-
                 // No CSRF: stateless REST API
                 .csrf(csrf -> csrf.disable())
 
@@ -46,10 +36,6 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-
-                // =====================================================
-                // AUTHORIZATION RULES
-                // =====================================================
 
                 .authorizeHttpRequests(auth -> auth
 
@@ -74,10 +60,7 @@ public class SecurityConfig {
                 // =====================================================
 
                 // Register JWT filter BEFORE Spring's auth filter
-                .addFilterBefore(
-                        jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class
-                )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
                 // Disable default login mechanisms
                 .httpBasic(Customizer.withDefaults())
