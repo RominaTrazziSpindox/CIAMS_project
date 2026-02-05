@@ -8,17 +8,20 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import java.io.IOException;
-import java.util.List;
 
+
+/**
+ * This filter:
+ * - validates incoming JWTs
+ * - loads full user details from the database
+ * - builds a complete Spring Security Authentication
+ */
 @Component
 @Slf4j
 public class JWTAuthTokenFilter extends OncePerRequestFilter {
@@ -37,24 +40,21 @@ public class JWTAuthTokenFilter extends OncePerRequestFilter {
 
         try {
 
-            // STEP 1: Try to parse the HTTP Authorization header (expects format: "Bearer <token>")
-            String jwt = parseJwt(request);
+            // STEP 1: Extract JWT from Authorization header (Bearer <token>)
+            String jwt = extractJwt(request);
 
-            // If there is a JWT, and it is valid...
-            if (jwt != null && jwtUtils.validateToken(jwt)) {
+            // If there is a JWT, it is valid and SecurityContext is null...
+            if (jwt != null && jwtUtils.validateToken(jwt) && SecurityContextHolder.getContext().getAuthentication() == null)  {
 
-                // STEP 2: Extract username from the JWT and load full user details from the database (roles, password hash, account status)
+                // STEP 2: Extract full user details associated with the token
                 final String username = jwtUtils.getUserFromToken(jwt);
                 final UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username);
 
-                // STEP 3: Create an Authentication object. This marks the user as authenticated for the current request
+                // STEP 3: Build Authentication object using UserDetails
                 UsernamePasswordAuthenticationToken authenticationToken =  new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
-                // STEP 4: Attach additional request-related details (IP, session ID). Useful for auditing, logging and debugging purposes
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                /* STEP 5: Store the Authentication in the SecurityContext. From this point on, Spring Security considers the user authenticated
-                and authorization annotations (@PreAuthorize, hasRole, etc.) will work */
+                // STEP 4: Store the Authentication object in the SecurityContext.
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
             }
@@ -62,13 +62,13 @@ public class JWTAuthTokenFilter extends OncePerRequestFilter {
             log.error("Cannot set user authentication: {}", e);
         }
 
-        // STEP 6: Keep on with the next filter
+        // STEP 5: Keep on with the next filter
         filterChain.doFilter(request, response);
 
     }
 
-    // Try to parse an incoming JWT attached to a GET request from client
-    private String parseJwt(HttpServletRequest request) {
+    // Extracts an incoming JWT attached to an HTTP request (it is stored in Authorization header)
+    private String extractJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader("Authorization");
         if (headerAuth != null && headerAuth.startsWith(BEARER)) {
             // Delete "Bearer " label

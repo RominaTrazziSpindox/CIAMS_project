@@ -11,14 +11,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import java.io.IOException;
 import java.util.List;
 
 /**
- * JWT authentication filter for inventory-service.
+ * Inventory-service trusts JWT issued by auth-service. No user lookup is performed here.
+ * This class:
  *
- * RESPONSIBILITY:
  * - intercept incoming HTTP requests
  * - extract JWT from Authorization header
  * - validate JWT
@@ -38,42 +37,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal( HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         try {
-            // STEP 1: Extract JWT from Authorization header
+            // STEP 1: Extract JWT from Authorization header from HTTP request
             String jwt = extractJwt(request);
 
-            // STEP 2: Validate JWT
-            if (jwt != null && jwtUtils.validateToken(jwt)) {
+            // STEP 2: Validate JWT (signature and expiration)
+            if (jwt != null && jwtUtils.validateToken(jwt) && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                // STEP 3: Extract identity data
+                // STEP 3: Extract identity claims from JWT
                 String username = jwtUtils.getUsername(jwt);
                 List<String> roles = jwtUtils.getRoles(jwt);
 
-                // STEP 4: Convert roles to GrantedAuthority
+                // STEP 4: Map roles to Spring Security authorities
                 var authorities = roles.stream()
-                        .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                        .toList();
+                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role)).toList();
 
-                // STEP 5: Build Authentication object
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                username,
-                                null,
-                                authorities
-                        );
+                // STEP 5: Build Authentication for the current request
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
 
-                authentication.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                // STEP 6: Store Authentication in SecurityContext
+                // STEP 6: Store Authentication in the SecurityContext
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
 
         } catch (Exception e) {
-            // Any unexpected error should NOT break the filter chain
             log.error("JWT authentication error", e);
         }
 
