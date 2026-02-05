@@ -15,12 +15,12 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class JWTUserDetailsService implements UserDetailsService {
+public class JwtUserDetailsService implements UserDetailsService {
 
     // Constructor injection
     private final UserRepository userRepository;
 
-    public JWTUserDetailsService(UserRepository userRepository) {
+    public JwtUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 

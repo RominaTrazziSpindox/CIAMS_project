@@ -9,10 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * REST controller responsible for authentication-related endpoints.
- *
- * IMPORTANT:
- * This controller is intentionally thin.
- * All business logic is delegated to AuthService.
  */
 @RestController
 @RequestMapping("/auth")
@@ -25,14 +21,8 @@ public class AuthController {
         this.authService = authService;
     }
 
-    // ==========================================================
-    // REGISTER
-    // ==========================================================
-
     /**
      * Registers a new user.
-     *
-     * HTTP responsibility only:
      * - receives request body
      * - delegates to AuthService
      * - returns appropriate HTTP status
@@ -46,14 +36,10 @@ public class AuthController {
         authService.register(request);
     }
 
-    // ==========================================================
-    // LOGIN
-    // ==========================================================
 
     /**
      * Authenticates a user and returns a JWT.
      *
-     * Notes:
      * - Credential validation is delegated to Spring Security
      * - Authentication and authorization errors are handled globally
      * - Returned roles are informational for the client (UI purposes)

@@ -13,11 +13,11 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * JWT utility class for inventory-service.
+ *  Utility class for handling JWT operations:
+ * - Validate incoming JWT tokens
+ * - Extract identity (username) and authorization data (roles)
  *
- * RESPONSIBILITY:
- * - validate incoming JWT tokens
- * - extract identity (username) and authorization data (roles)
+ * This class trusts JWTs issued by auth-service and does not generate tokens.
  */
 @Component
 @Slf4j
@@ -42,85 +42,46 @@ public class JwtUtils {
         );
     }
 
-    // =========================================================
-    // VALIDATION
-    // =========================================================
+
+    /* ***** MAIN JWT FUNCTIONS ***** */
 
     /**
      * Validates a JWT token.
      *
      * Validation includes:
-     * - signature verification
-     * - token structure validation
-     * - expiration check
+     * - Signature verification
+     * - Token structure validation
+     * - Expiration check
      *
      * @param token raw JWT string
      * @return true if token is valid, false otherwise
      */
     public boolean validateToken(String token) {
         try {
-            Jwts.parser()
-                    .verifyWith(key)
-                    .build()
-                    .parseSignedClaims(token);
-
+            Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
             return true;
-
         } catch (ExpiredJwtException e) {
             log.warn("JWT token expired");
         } catch (MalformedJwtException e) {
-            log.warn("Malformed JWT token");
+            log.error("Invalid JWT token: {}", e.getMessage());
         } catch (UnsupportedJwtException e) {
-            log.warn("Unsupported JWT token");
-        } catch (SecurityException e) {
-            log.warn("Invalid JWT signature");
+            log.error("Unsupported JWT token: {}", e.getMessage());
         } catch (IllegalArgumentException e) {
-            log.warn("JWT token is empty or null");
+            log.error("JWT claims string is empty: {}", e.getMessage());
         } catch (Exception e) {
-            log.error("Unexpected JWT validation error", e);
+            log.error("JWT validation error: {}", e.getMessage());
         }
         return false;
     }
 
-    // =========================================================
-    // EXTRACTION
-    // =========================================================
+    /* ***** OTHER JWT FUNCTIONS ****** */
 
     /**
-     * Extract username (subject) from JWT.
+     * Parses and returns all JWT claims.
+     * Centralized parsing avoids duplicated logic and inconsistencies.
      *
-     * @throws JwtException if token is invalid
-     */
-    public String getUsername(String token) {
-        return extractAllClaims(token).getSubject();
-    }
-
-    /**
-     * Extract roles from JWT.
-     *
-     * @throws JwtException if token is invalid
-     */
-    @SuppressWarnings("unchecked")
-    public List<String> getRoles(String token) {
-        return extractAllClaims(token).get("roles", List.class);
-    }
-
-    /**
-     * Extract expiration date from JWT.
-     *
-     * @throws JwtException if token is invalid
-     */
-    public Date getExpiration(String token) {
-        return extractAllClaims(token).getExpiration();
-    }
-
-    // =========================================================
-    // INTERNAL
-    // =========================================================
-
-    /**
-     * Centralized JWT parsing.
-     * Any parsing-related change must be done here.
+     * @param token JWT token string
+     * @return JWT claims payload
      */
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
@@ -128,5 +89,25 @@ public class JwtUtils {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+    // Get the username from a JWT token
+    public String getUsernameFromToken(String token) {
+        return extractAllClaims(token).getSubject();
+    }
+
+    /* This method:
+        1. Reads the claim "roles" from JWT
+        2. Interprets as a List
+        3. Retrieves as a List<String> thanks to @SuppressWarnings and avoids warning
+     */
+    @SuppressWarnings("unchecked")
+    public List<String> getRolesFromToken(String token) {
+        return extractAllClaims(token).get("roles", List.class);
+    }
+
+    // Get the expiration date from a JWT token
+    public Date getExpiration(String token) {
+        return extractAllClaims(token).getExpiration();
     }
 }

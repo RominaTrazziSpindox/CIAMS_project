@@ -1,12 +1,11 @@
 package com.spx.auth_service.services;
 
-import com.spx.auth_service.dto.ApiErrorResponseDTO;
 import com.spx.auth_service.dto.AuthRequestDTO;
 import com.spx.auth_service.dto.AuthResponseDTO;
 import com.spx.auth_service.models.Role;
 import com.spx.auth_service.models.User;
 import com.spx.auth_service.repositories.UserRepository;
-import com.spx.auth_service.security.JWTUtils;
+import com.spx.auth_service.security.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,18 +22,15 @@ public class AuthService {
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
-    private final JWTUtils jwtUtils;
+    private final JwtUtils jwtUtils;
 
-    public AuthService(UserRepository userRepository, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, JWTUtils jwtUtils) {
+    // Constructor injection
+    public AuthService(UserRepository userRepository, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, JwtUtils jwtUtils) {
         this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
     }
-
-    // ==========================================================
-    // REGISTER
-    // ==========================================================
 
     public void register(AuthRequestDTO request) {
 
@@ -48,10 +44,6 @@ public class AuthService {
 
         log.info("User '{}' successfully registered", user.getUsername());
     }
-
-    // ==========================================================
-    // LOGIN
-    // ==========================================================
 
     public AuthResponseDTO login(AuthRequestDTO request) {
 
@@ -82,3 +74,5 @@ public class AuthService {
 
     }
 }
+
+

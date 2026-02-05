@@ -1,8 +1,8 @@
 package com.spx.auth_service.config;
 
-import com.spx.auth_service.security.JWTAccessDeniedHandler;
-import com.spx.auth_service.security.JWTAuthTokenFilter;
-import com.spx.auth_service.security.JWTAuthenticationEntryPoint;
+import com.spx.auth_service.security.JwtAccessDeniedHandler;
+import com.spx.auth_service.security.JwtAuthTokenFilter;
+import com.spx.auth_service.security.JwtAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -16,12 +16,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class JWTSecurityConfig {
 
-    private final JWTAuthenticationEntryPoint unauthorizedHandler;
-    private final JWTAccessDeniedHandler accessDeniedHandler;
-    private final JWTAuthTokenFilter jwtAuthTokenFilter;
+    private final JwtAuthenticationEntryPoint unauthorizedHandler;
+    private final JwtAccessDeniedHandler accessDeniedHandler;
+    private final JwtAuthTokenFilter jwtAuthTokenFilter;
 
     // Constructor injection
-    public JWTSecurityConfig( JWTAuthenticationEntryPoint unauthorizedHandler, JWTAccessDeniedHandler accessDeniedHandler, JWTAuthTokenFilter jwtAuthTokenFilter) {
+    public JWTSecurityConfig(JwtAuthenticationEntryPoint unauthorizedHandler, JwtAccessDeniedHandler accessDeniedHandler, JwtAuthTokenFilter jwtAuthTokenFilter) {
         this.unauthorizedHandler = unauthorizedHandler;
         this.accessDeniedHandler = accessDeniedHandler;
         this.jwtAuthTokenFilter = jwtAuthTokenFilter;
@@ -52,25 +52,24 @@ public class JWTSecurityConfig {
                         .authenticationEntryPoint(unauthorizedHandler)
                         .accessDeniedHandler(accessDeniedHandler)
                 )
-
                 // Authorization rules
                 .authorizeHttpRequests(auth -> auth
 
-                        // 🔓 Error endpoint
+                        // Error endpoint
                         .requestMatchers("/error").permitAll()
 
-                        // 🔓 PUBLIC endpoints
+                        // PUBLIC endpoints
                         .requestMatchers("/auth/login", "/auth/register").permitAll()
 
-                        // 🔐 ADMIN-only
+                        // ADMIN-only
                         .requestMatchers(HttpMethod.DELETE, "/**").hasRole("ADMIN")
 
-                        // 🔐 AUTHENTICATED write operations
+                        // AUTHENTICATED write operations
                         .requestMatchers(HttpMethod.POST, "/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/**").authenticated()
                         .requestMatchers(HttpMethod.PATCH, "/**").authenticated()
 
-                        // 🔒 everything else
+                        // Everything else
                         .anyRequest().authenticated()
                 )
 
@@ -84,3 +83,5 @@ public class JWTSecurityConfig {
         return http.build();
     }
 }
+
+

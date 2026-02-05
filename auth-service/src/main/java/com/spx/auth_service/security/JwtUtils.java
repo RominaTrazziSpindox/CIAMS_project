@@ -12,18 +12,17 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.List;
 
-
 /**
  * Utility class for handling JWT operations:
  * - Token generation
- * - Token validation
- * - Claims extraction
+ * - Incoming token validation
+ * - Claims extraction for internal use
  *
- * This class is stateless and thread-safe after initialization.
+ * This class represents the token authority
  */
 @Component
 @Slf4j
-public class JWTUtils {
+public class JwtUtils {
 
     // JWT Properties (defined in application.yaml)
 
@@ -71,10 +70,9 @@ public class JWTUtils {
                 .compact();
     }
 
-    // Check if a received token is valid
-
     /**
-     * Validates a JWT token.
+     * Validates a received JWT token.
+     * Check if it is valid
      *
      * Validation includes:
      * - Signature verification
@@ -120,7 +118,7 @@ public class JWTUtils {
     }
 
     // Get the username from a JWT token
-    public String getUserFromToken(String token) {
+    public String getUsernameFromToken(String token) {
         return extractAllClaims(token).getSubject();
     }
 

@@ -1,6 +1,6 @@
 package com.spx.auth_service.security;
 
-import com.spx.auth_service.services.JWTUserDetailsService;
+import com.spx.auth_service.services.JwtUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,15 +24,15 @@ import java.io.IOException;
  */
 @Component
 @Slf4j
-public class JWTAuthTokenFilter extends OncePerRequestFilter {
+public class JwtAuthTokenFilter extends OncePerRequestFilter {
 
     public static final String BEARER = "Bearer ";
 
     @Autowired
-    private JWTUtils jwtUtils;
+    private JwtUtils jwtUtils;
 
     @Autowired
-    private JWTUserDetailsService jwtUserDetailsService;
+    private JwtUserDetailsService jwtUserDetailsService;
 
 
     @Override
@@ -47,7 +47,7 @@ public class JWTAuthTokenFilter extends OncePerRequestFilter {
             if (jwt != null && jwtUtils.validateToken(jwt) && SecurityContextHolder.getContext().getAuthentication() == null)  {
 
                 // STEP 2: Extract full user details associated with the token
-                final String username = jwtUtils.getUserFromToken(jwt);
+                final String username = jwtUtils.getUsernameFromToken(jwt);
                 final UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username);
 
                 // STEP 3: Build Authentication object using UserDetails
@@ -56,7 +56,6 @@ public class JWTAuthTokenFilter extends OncePerRequestFilter {
 
                 // STEP 4: Store the Authentication object in the SecurityContext.
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
             }
         } catch (Exception e) {
             log.error("Cannot set user authentication: {}", e);
@@ -70,6 +69,7 @@ public class JWTAuthTokenFilter extends OncePerRequestFilter {
     // Extracts an incoming JWT attached to an HTTP request (it is stored in Authorization header)
     private String extractJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader("Authorization");
+
         if (headerAuth != null && headerAuth.startsWith(BEARER)) {
             // Delete "Bearer " label
             return headerAuth.substring(BEARER.length());
@@ -77,5 +77,3 @@ public class JWTAuthTokenFilter extends OncePerRequestFilter {
         return null;
     }
 }
-
-
