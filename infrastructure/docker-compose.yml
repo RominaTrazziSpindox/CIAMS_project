@@ -46,6 +46,9 @@ services:
         SPRING_DATA_MONGODB_HOST: mongo
         SPRING_DATA_MONGODB_PORT: 27017
         SPRING_DATA_MONGODB_DATABASE: auth_db
+        ADMIN_USERNAME_MONGODB: ${ADMIN_USERNAME_MONGODB}
+        ADMIN_PASSWORD_MONGODB: ${ADMIN_PASSWORD_MONGODB}
+
         JWT_SECRET: ${JWT_SECRET}
 
     # -----------------------------------------
