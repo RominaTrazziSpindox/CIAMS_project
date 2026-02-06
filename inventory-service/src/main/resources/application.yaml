@@ -34,8 +34,8 @@ spring:
         - assets-type
         - assets-type-by-name
 
-    security:
-      jwt:
-        secret: ${JWT_SECRET_BASE64}
-        expiration: 360000
+  security:
+    jwt:
+      secret: ${JWT_SECRET}
+      expiration: 360000
 
