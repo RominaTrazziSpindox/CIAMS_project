@@ -24,8 +24,7 @@ public class UserService {
     // ==========================================================
 
     public User getByUsername(String username) {
-        return userRepository.findByUsername(username).orElseThrow(() ->
-            new ResourceNotFoundException("User with username '" + username + "' not found"));
+        return userRepository.findByUsername(username);
     }
 
     public boolean userExists(String username) {

@@ -32,6 +32,7 @@ public class AuthService {
         this.jwtUtils = jwtUtils;
     }
 
+    // Register
     public void register(AuthRequestDTO request) {
 
         User user = User.builder()
@@ -45,34 +46,33 @@ public class AuthService {
         log.info("User '{}' successfully registered", user.getUsername());
     }
 
+    // Login
     public AuthResponseDTO login(AuthRequestDTO request) {
 
-        // STEP 1: Perform the user authentication by the authentication manager
-        Authentication authentication = authenticationManager.authenticate(
+        /* STEP 1: Perform the user authentication by using the authentication manager.
+        It calls UserDetailsService.loadByUsername().
+        If authenticate() method fails, it is launched an AuthenticationException  */
+       Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-                String username = authentication.getName();
 
-        // STEP 2: Load User details
-        User user = userRepository.findByUsername(username).orElseThrow(() ->
-                new IllegalStateException("User authenticated but not found in database"));
+        // STEP 2: Extract username from authenticated principal in SecurityContext
+        String username = authentication.getName();
 
-        // STEP 3: Generate token
+        User user = userRepository.findByUsername(username);
+
+        // STEP 4: Generate JWT
         String token = jwtUtils.generateToken(
                 user.getUsername(),
                 user.getRoles().stream().map(Enum::name).toList()
         );
 
-        // STEP 4: Extract expiration date from token
+        // STEP 5: Extract expiration timestamp
         Instant expiresAt = jwtUtils
                 .getExpirationFromToken(token)
                 .toInstant();
 
-
         log.info("User '{}' successfully authenticated", username);
 
-        return new AuthResponseDTO(token,"Bearer", user.getUsername(), user.getRoles(), expiresAt);
-
+        return new AuthResponseDTO(token, "Bearer", user.getUsername(), user.getRoles(), expiresAt);
     }
 }
-
-

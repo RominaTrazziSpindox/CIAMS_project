@@ -26,13 +26,15 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     // Override Spring Security method to extract the user data (User from DB is not equal to UserDetail of Spring Security)
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) {
 
         // Step 1: Retrieve a User from our Mongodb
-        User user = userRepository.findByUsername(username).orElseThrow(() -> {
-            log.error("User not found with username: {}", username);
-            return new UsernameNotFoundException("User not found with username: " + username );
-        });
+        User user = userRepository.findByUsername(username);
+
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found: " + username);
+        }
+
 
         // Step 2: Retrieve its role converting Set<Role> in a Granted Authority collection
         Collection<GrantedAuthority> authorities = user
