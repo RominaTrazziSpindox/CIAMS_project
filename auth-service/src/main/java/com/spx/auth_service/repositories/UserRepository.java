@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface UserRepository extends MongoRepository<User, String> {
 
     // User Login
-    Optional<User> findByUsername(String username);
+    User findByUsername(String username);
 
     // User Register
     boolean existsByUsername(String username);
