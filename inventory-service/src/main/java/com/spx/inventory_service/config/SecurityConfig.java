@@ -42,7 +42,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 
                         // Public endpoints (if any)
-                        .requestMatchers("/health", "/error").permitAll()
+                        .requestMatchers("/error").permitAll()
 
                         // READ operations: authenticated users
                         .requestMatchers(HttpMethod.GET, "/**").authenticated()
