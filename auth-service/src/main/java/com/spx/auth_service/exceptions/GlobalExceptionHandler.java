@@ -1,10 +1,12 @@
 package com.spx.auth_service.exceptions;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import com.spx.auth_service.dto.ApiErrorResponseDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,6 +16,7 @@ import javax.naming.ServiceUnavailableException;
 import java.time.LocalDateTime;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
 
@@ -39,8 +42,6 @@ public class GlobalExceptionHandler {
         // The object ResponseEntity is now built by two blocks: 1. status 2. body(error) 3. headers are omitted.
         return ResponseEntity.status(status).body(error);
     }
-
-
 
     // ==========================================================
     // 400 - BAD REQUEST (Client error types)
@@ -69,6 +70,14 @@ public class GlobalExceptionHandler {
 
     }
 
+    // ==========================================================
+    // 401 - BAD CREDENTIALS
+    // ==========================================================
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiErrorResponseDTO> handleBadCredentials(BadCredentialsException ex, WebRequest request) {
+        return buildError(HttpStatus.UNAUTHORIZED,"Unauthorized", "Invalid username or password", request);
+    }
 
     // ==========================================================
     // 404 - NOT FOUND
@@ -100,14 +109,13 @@ public class GlobalExceptionHandler {
 
 
     // ==========================================================
-    // 500 - INTERNAL SERVER ERROR (FALLBACK)
+    // 500 - INTERNAL SERVER ERROR
     // ==========================================================
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiErrorResponseDTO> handleGeneric(Exception ex, WebRequest request) {
+    public ResponseEntity<ApiErrorResponseDTO> handleServerError(Exception ex, WebRequest request) {
         return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error",ex.getMessage(), request);
     }
-
 
     // ==========================================================
     // 503 - SERVICE UNAVAILABLE
