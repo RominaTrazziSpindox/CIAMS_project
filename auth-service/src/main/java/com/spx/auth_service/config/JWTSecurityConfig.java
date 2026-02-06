@@ -69,8 +69,8 @@ public class JWTSecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/**").authenticated()
                         .requestMatchers(HttpMethod.PATCH, "/**").authenticated()
 
-                        // Everything else
                         .anyRequest().authenticated()
+
                 )
 
 
