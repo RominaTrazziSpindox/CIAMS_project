@@ -17,7 +17,6 @@ import java.util.List;
 /**
  * Inventory-service trusts JWT issued by auth-service. No user lookup is performed here.
  * This class:
- *
  * - intercept incoming HTTP requests
  * - extract JWT from Authorization header
  * - validate JWT
@@ -47,8 +46,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (jwt != null && jwtUtils.validateToken(jwt) && SecurityContextHolder.getContext().getAuthentication() == null) {
 
                 // STEP 3: Extract identity claims from JWT
-                String username = jwtUtils.getUsername(jwt);
-                List<String> roles = jwtUtils.getRoles(jwt);
+                String username = jwtUtils.getUsernameFromToken(jwt);
+                List<String> roles = jwtUtils.getRolesFromToken(jwt);
 
                 // STEP 4: Map roles to Spring Security authorities
                 var authorities = roles.stream()
