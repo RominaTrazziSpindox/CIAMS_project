@@ -49,30 +49,14 @@ public class JWTSecurityConfig {
 
                 // Centralized exception handling
                 .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint(unauthorizedHandler)
+                       .authenticationEntryPoint(unauthorizedHandler)
                         .accessDeniedHandler(accessDeniedHandler)
                 )
                 // Authorization rules
                 .authorizeHttpRequests(auth -> auth
-
-                        // Error endpoint
-                        .requestMatchers("/error").permitAll()
-
-                        // PUBLIC endpoints
-                        .requestMatchers("/auth/login", "/auth/register").permitAll()
-
-                        // ADMIN-only
-                        .requestMatchers(HttpMethod.DELETE, "/**").hasRole("ADMIN")
-
-                        // AUTHENTICATED write operations
-                        .requestMatchers(HttpMethod.POST, "/**").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/**").authenticated()
-                        .requestMatchers(HttpMethod.PATCH, "/**").authenticated()
-
+                        .requestMatchers("/auth/login", "/auth/register", "/error").permitAll()
                         .anyRequest().authenticated()
-
                 )
-
 
                 // JWT filter (must be BEFORE UsernamePasswordAuthenticationFilter)
                 .addFilterBefore(
