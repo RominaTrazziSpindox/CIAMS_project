@@ -15,7 +15,7 @@ spring:
   # JDBC connection details for PostgreSQL
   # --------------------------------------------
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT}/${DB_NAME}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:8080}/${DB_NAME:inventory_db}
     username: ${DB_ADMIN_USERNAME}
     password: ${DB_ADMIN_PASSWORD}
     # HikariCP: default high-performance connection pool used by Spring Boot.
@@ -56,7 +56,7 @@ spring:
   # --------------------------------------------
   sql:
     init:
-      mode: never
+      mode: always
       schema-locations: classpath:db_files/schema.sql
       data-locations: classpath:db_files/data.sql
 
