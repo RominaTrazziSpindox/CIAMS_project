@@ -60,6 +60,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 // STEP 6: Store Authentication in the SecurityContext
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                log.info("Username from token: {}", username);
+                log.info("Roles from token: {}", roles);
+                log.info("Authorities built: {}", authorities);
+
             }
 
         } catch (Exception e) {
@@ -75,6 +80,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      */
     private String extractJwt(HttpServletRequest request) {
         String header = request.getHeader(AUTH_HEADER);
+
+        log.info("Authorization header: {}", request.getHeader("Authorization"));
 
         if (header != null && header.startsWith(BEARER_PREFIX)) {
             return header.substring(BEARER_PREFIX.length());
