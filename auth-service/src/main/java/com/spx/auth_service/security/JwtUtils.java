@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
@@ -34,8 +36,9 @@ public class JwtUtils {
     private String jwtSecretKey;
 
     /**
-     * Token expiration time in milliseconds.
-     */
+     * Token expiration time.
+     *
+     * */
     @Value("${spring.security.jwt.expiration}")  // Same path of yaml property
     private Long expiration;
 
@@ -127,8 +130,14 @@ public class JwtUtils {
         return extractAllClaims(token).getExpiration();
     }
 
+    // Get the expiration date from a JWT token as LocalDateTime
+    public LocalDateTime getExpirationLocalDateTimeFromToken(String token) {
+        return extractAllClaims(token)
+                .getExpiration()
+                .toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+    }
+
 }
-
-
-
 
