@@ -49,7 +49,7 @@ public class JWTSecurityConfig {
 
                 // Centralized exception handling
                 .exceptionHandling(ex -> ex
-                       .authenticationEntryPoint(unauthorizedHandler)
+                        .authenticationEntryPoint(unauthorizedHandler)
                         .accessDeniedHandler(accessDeniedHandler)
                 )
                 // Authorization rules

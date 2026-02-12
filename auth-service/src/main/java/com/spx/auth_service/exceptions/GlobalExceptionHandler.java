@@ -1,6 +1,4 @@
 package com.spx.auth_service.exceptions;
-
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import com.spx.auth_service.dto.ApiErrorResponseDTO;
@@ -19,28 +17,44 @@ import java.time.LocalDateTime;
 @Slf4j
 public class GlobalExceptionHandler {
 
+    private static final String DEFAULT_ACTION = "Check request data and try again";
 
     // ==========================================================
-    // BUILDER METHOD
+    // BUILDER METHOD (With custom action)
     // ==========================================================
 
+    /*
+     * Creates a new ApiErrorResponseDTO object with all its parameters.
+     * Put it as a body of a ResponseEntity Object.
+     * Set the correct HTTP status code (e.g. 400, 409...)
+     */
     private ResponseEntity<ApiErrorResponseDTO> buildError(
-            HttpStatus status, String errorTitle, String message, WebRequest request) {
+            HttpStatus status, String errorTitle, String message, String action, WebRequest request) {
 
-        // Initializing a new ApiErrorResponseDTO object. It contains the body part of a ResponseEntity object.
         ApiErrorResponseDTO error = new ApiErrorResponseDTO(
                 status.value(),
                 errorTitle,
                 message,
-                "Check request data and try again", // Implementation of action property
+                action,
                 // Uri path
-                request.getDescription(true),
+                request.getDescription(false), // NO Client IP exposure
                 LocalDateTime.now()
         );
 
-
         // The object ResponseEntity is now built by two blocks: 1. status 2. body(error) 3. headers are omitted.
         return ResponseEntity.status(status).body(error);
+    }
+
+    // ==========================================================
+    // BUILDER METHOD OVERLOAD (With default action)
+    // ==========================================================
+    private ResponseEntity<ApiErrorResponseDTO> buildError(
+            HttpStatus status,
+            String errorTitle,
+            String message,
+            WebRequest request) {
+
+        return buildError(status, errorTitle, message, DEFAULT_ACTION, request);
     }
 
     // ==========================================================
@@ -48,27 +62,33 @@ public class GlobalExceptionHandler {
     // ==========================================================
 
     /*
-     * If the exception comes from Bean Validation (@Valid),
-     * extract a user-friendly validation message from the BindingResult.
+     * If the exception comes from Validation (@Valid), extract a user-friendly validation message
+     * from the BindingResult.
      * Otherwise, use the message provided by the exception itself.
      */
-    @ExceptionHandler({IllegalArgumentException.class, MethodArgumentNotValidException.class})
+    @ExceptionHandler({IllegalArgumentException.class, MethodArgumentNotValidException.class}) // Error types intercepted
     public ResponseEntity<ApiErrorResponseDTO> handleBadRequest (Exception ex, WebRequest request) {
 
-        // If the type of error is MethodArgumentNotValidException...
-        String message = ex instanceof MethodArgumentNotValidException ?
-                ((MethodArgumentNotValidException) ex)
-                .getBindingResult()
-                .getAllErrors()
-                .get(0) // first validation error (design choice)
-                .getDefaultMessage()
+        String message;
 
-                // Else use this message
-                : ex.getMessage();
+        // If the type of error is MethodArgumentNotValidException...
+        if (ex instanceof MethodArgumentNotValidException validationEx) {
+
+            // Step 1: Collect all errors
+            var errors = validationEx.getBindingResult().getAllErrors();
+
+            // Step 2:
+            message = errors.isEmpty() ? "Validation error" : errors.get(0).getDefaultMessage();
+
+
+        } else {
+            message = ex.getMessage() != null ? ex.getMessage() : "Invalid request";
+        }
 
         return buildError(HttpStatus.BAD_REQUEST,"Bad Request", message, request);
 
     }
+
 
     // ==========================================================
     // 401 - BAD CREDENTIALS
@@ -76,7 +96,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ApiErrorResponseDTO> handleBadCredentials(BadCredentialsException ex, WebRequest request) {
-        return buildError(HttpStatus.UNAUTHORIZED,"Unauthorized", "Invalid username or password", request);
+        return buildError(HttpStatus.UNAUTHORIZED,"Unauthorized", "Invalid username or password", "Provide valid credentials", request);
     }
 
     // ==========================================================
@@ -85,7 +105,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiErrorResponseDTO> handleNotFound(ResourceNotFoundException ex, WebRequest request) {
-        return buildError(HttpStatus.NOT_FOUND,"Resource not found", ex.getMessage(), request);
+        log.warn("Resource not found: {} - {}", ex.getResourceName(), ex.getIdentifier());
+
+        String message = String.format("%s with identifier '%s' not found", ex.getResourceName(), ex.getIdentifier());
+
+        return buildError(HttpStatus.NOT_FOUND,"Resource not found", message, "Verify the resource identifier", request);
     }
 
     // ==========================================================
@@ -94,9 +118,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ApiErrorResponseDTO> handleMethodNotAllowed(HttpRequestMethodNotSupportedException ex, WebRequest request) {
-        return buildError(HttpStatus.METHOD_NOT_ALLOWED,"Method not allowed", ex.getMessage(),request);
+        return buildError(HttpStatus.METHOD_NOT_ALLOWED,"Method not allowed", ex.getMessage(), request);
     }
-
 
     // ==========================================================
     // 409 - DUPLICATE KEY
@@ -107,14 +130,14 @@ public class GlobalExceptionHandler {
         return buildError( HttpStatus.CONFLICT,"Conflict","Resource already exists", request);
     }
 
-
     // ==========================================================
     // 500 - INTERNAL SERVER ERROR
     // ==========================================================
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponseDTO> handleServerError(Exception ex, WebRequest request) {
-        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error",ex.getMessage(), request);
+        log.error("Internal Server Error", ex);
+        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error","Unexpected server error", request);
     }
 
     // ==========================================================
@@ -123,7 +146,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ServiceUnavailableException.class)
     public ResponseEntity<ApiErrorResponseDTO> handleServiceUnavailable(ServiceUnavailableException ex, WebRequest request) {
-        return buildError(HttpStatus.SERVICE_UNAVAILABLE,"Service Unavailable", ex.getMessage(), request);
+        log.error("Service unavailable", ex);
+        return buildError(HttpStatus.SERVICE_UNAVAILABLE,"Service Unavailable", "Service is temporarily unavailable", request);
     }
-
 }

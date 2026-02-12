@@ -29,7 +29,7 @@ public class UserService {
 
     public boolean userExists(String username) {
         if (username == null || username.isBlank()) {
-            throw new IllegalArgumentException(username + "must not be null or blank");
+            throw new IllegalArgumentException(username + " must not be null or blank");
         }
         return userRepository.existsByUsername(username);
     }
@@ -43,9 +43,7 @@ public class UserService {
         long deleted = userRepository.deleteByUsername(username);
 
         if (deleted == 0) {
-            throw new ResourceNotFoundException(
-                    "User '%s' not found".formatted(username)
-            );
+            throw new ResourceNotFoundException("User", username);
         }
 
         log.info("User '{}' deleted", username);
