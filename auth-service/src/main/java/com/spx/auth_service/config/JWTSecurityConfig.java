@@ -39,7 +39,7 @@ public class JWTSecurityConfig {
                 // REST API → no CSRF
                 .csrf(csrf -> csrf.disable())
 
-                // CORS gestito altrove (gateway / reverse proxy)
+                // CORS
                 .cors(cors -> cors.disable())
 
                 // Stateless session (JWT)
