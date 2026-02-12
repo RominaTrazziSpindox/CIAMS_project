@@ -49,10 +49,7 @@ public class GlobalExceptionHandler {
     // BUILDER METHOD OVERLOAD (With default action)
     // ==========================================================
     private ResponseEntity<ApiErrorResponseDTO> buildError(
-            HttpStatus status,
-            String errorTitle,
-            String message,
-            WebRequest request) {
+            HttpStatus status, String errorTitle, String message, WebRequest request) {
 
         return buildError(status, errorTitle, message, DEFAULT_ACTION, request);
     }
@@ -71,17 +68,18 @@ public class GlobalExceptionHandler {
 
         String message;
 
-        // If the type of error is MethodArgumentNotValidException...
+        // If the type of error is MethodArgumentNotValidException (@ Valid)...
         if (ex instanceof MethodArgumentNotValidException validationEx) {
 
-            // Step 1: Collect all errors
+            // Step 1: Collect all the validation errors
             var errors = validationEx.getBindingResult().getAllErrors();
 
-            // Step 2:
+            // Step 2: If the list is Empty use a fallback message, else take the first error and its message
             message = errors.isEmpty() ? "Validation error" : errors.get(0).getDefaultMessage();
 
-
         } else {
+
+            // If it is not a validation error (@Valid) use the default message (if is != null) or use a fallback message
             message = ex.getMessage() != null ? ex.getMessage() : "Invalid request";
         }
 

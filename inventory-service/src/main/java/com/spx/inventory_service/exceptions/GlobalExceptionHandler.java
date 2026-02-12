@@ -2,6 +2,7 @@ package com.spx.inventory_service.exceptions;
 
 import com.spx.inventory_service.dto.ApiErrorResponseDTO;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -13,32 +14,46 @@ import javax.naming.ServiceUnavailableException;
 import java.time.LocalDateTime;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
+    private static final String DEFAULT_ACTION = "Check request data and try again";
 
     // ==========================================================
-    // BUILDER METHOD
+    // BUILDER METHOD (With custom action)
     // ==========================================================
 
+    /*
+     * Creates a new ApiErrorResponseDTO object with all its parameters.
+     * Put it as a body of a ResponseEntity Object.
+     * Set the correct HTTP status code (e.g. 400, 409...)
+     */
     private ResponseEntity<ApiErrorResponseDTO> buildError(
-            HttpStatus status, String errorTitle, String message, WebRequest request) {
+            HttpStatus status, String errorTitle, String message, String action, WebRequest request) {
 
-        // Initializing a new ApiErrorResponseDTO object. It contains the body part of a ResponseEntity object.
         ApiErrorResponseDTO error = new ApiErrorResponseDTO(
                 status.value(),
                 errorTitle,
                 message,
-                "Check request data and try again", // Implementation of action property
+                action,
                 // Uri path
-                request.getDescription(true),
+                request.getDescription(false), // NO Client IP exposure
                 LocalDateTime.now()
         );
-
 
         // The object ResponseEntity is now built by two blocks: 1. status 2. body(error) 3. headers are omitted.
         return ResponseEntity.status(status).body(error);
     }
 
+
+    // ==========================================================
+    // BUILDER METHOD OVERLOAD (With default action)
+    // ==========================================================
+    private ResponseEntity<ApiErrorResponseDTO> buildError(
+            HttpStatus status, String errorTitle, String message, WebRequest request) {
+
+        return buildError(status, errorTitle, message, DEFAULT_ACTION, request);
+    }
 
 
     // ==========================================================
@@ -46,28 +61,33 @@ public class GlobalExceptionHandler {
     // ==========================================================
 
     /*
-     * If the exception comes from Bean Validation (@Valid),
-     * extract a user-friendly validation message from the BindingResult.
+     * If the exception comes from Validation (@Valid), extract a user-friendly validation message
+     * from the BindingResult.
      * Otherwise, use the message provided by the exception itself.
      */
-    @ExceptionHandler({IllegalArgumentException.class, MethodArgumentNotValidException.class})
+    @ExceptionHandler({IllegalArgumentException.class, MethodArgumentNotValidException.class}) // Error types intercepted
     public ResponseEntity<ApiErrorResponseDTO> handleBadRequest (Exception ex, WebRequest request) {
 
-        // If the type of error is MethodArgumentNotValidException...
-        String message = ex instanceof MethodArgumentNotValidException ?
-                ((MethodArgumentNotValidException) ex)
-                .getBindingResult()
-                .getAllErrors()
-                .get(0) // first validation error (design choice)
-                .getDefaultMessage()
+        String message;
 
-                // Else use this message
-                : ex.getMessage();
+        // If the type of error is MethodArgumentNotValidException (@ Valid)...
+        if (ex instanceof MethodArgumentNotValidException validationEx) {
+
+            // Step 1: Collect all the validation errors
+            var errors = validationEx.getBindingResult().getAllErrors();
+
+            // Step 2: If the list is Empty use a fallback message, else take the first error and its message
+            message = errors.isEmpty() ? "Validation error" : errors.get(0).getDefaultMessage();
+
+        } else {
+
+            // If it is not a validation error (@Valid) use the default message (if is != null) or use a fallback message
+            message = ex.getMessage() != null ? ex.getMessage() : "Invalid request";
+        }
 
         return buildError(HttpStatus.BAD_REQUEST,"Bad Request", message, request);
 
     }
-
 
     // ==========================================================
     // 404 - NOT FOUND
@@ -105,7 +125,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponseDTO> handleGeneric(Exception ex, WebRequest request) {
-        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error",ex.getMessage(), request);
+        log.error("Internal server error", ex);
+        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", "Unexpected server error", request);
     }
 
 
@@ -115,6 +136,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ServiceUnavailableException.class)
     public ResponseEntity<ApiErrorResponseDTO> handleServiceUnavailable(ServiceUnavailableException ex, WebRequest request) {
+        log.error("Service unavailable", ex);
         return buildError(HttpStatus.SERVICE_UNAVAILABLE,"Service Unavailable", ex.getMessage(), request);
     }
 
