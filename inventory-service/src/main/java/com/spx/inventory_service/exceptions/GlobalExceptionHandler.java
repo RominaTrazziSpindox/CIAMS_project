@@ -3,6 +3,7 @@ package com.spx.inventory_service.exceptions;
 import com.spx.inventory_service.dto.ApiErrorResponseDTO;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -116,6 +117,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ApiErrorResponseDTO> handleConflict(IllegalStateException ex, WebRequest request) {
         return buildError(HttpStatus.CONFLICT,"Conflict", ex.getMessage(),request);
+    }
+
+    // ==========================================================
+    // 409 - CONFLICT (Data Integrity)
+    // ==========================================================
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiErrorResponseDTO> handleDataIntegrityConflict(DataIntegrityViolationException ex, WebRequest request) {
+        String message = "Operation not allowed: related entities still exist";
+        return buildError(HttpStatus.CONFLICT,"Conflict - Data integrity violation", message, request);
     }
 
 
