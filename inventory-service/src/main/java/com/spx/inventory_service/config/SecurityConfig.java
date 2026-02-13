@@ -64,6 +64,9 @@ public class SecurityConfig {
 
                         // DELETE operations: ADMIN only
                         .requestMatchers(HttpMethod.DELETE, "/**").hasRole("ADMIN")
+
+                        // ANY Other request
+                        .anyRequest().authenticated()
                 )
 
                 // =====================================================
