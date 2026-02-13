@@ -36,6 +36,13 @@ public class AuthService {
     // Register
     public void register(AuthRequestDTO request) {
 
+        // Duplicate usernames are not allowed
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new IllegalArgumentException(
+                    "Username is not available. Please, try again with a new one"
+            );
+        }
+
         User user = User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))

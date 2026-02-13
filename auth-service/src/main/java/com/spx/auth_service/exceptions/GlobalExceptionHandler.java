@@ -125,7 +125,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DuplicateKeyException.class)
     public ResponseEntity<ApiErrorResponseDTO> handleDuplicateKey(DuplicateKeyException ex, WebRequest request) {
-        return buildError( HttpStatus.CONFLICT,"Conflict","Resource already exists", request);
+        return buildError( HttpStatus.CONFLICT,"Conflict","Username is not available. Please, try again with a new one", request);
     }
 
     // ==========================================================
