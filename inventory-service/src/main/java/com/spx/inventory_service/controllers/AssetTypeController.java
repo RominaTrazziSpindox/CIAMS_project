@@ -123,7 +123,7 @@ public class AssetTypeController {
      * @return the response entity
      */
     @DeleteMapping("/{name}")
-    public ResponseEntity<Void> deleteAssetTypeByName(@PathVariable String name) {
+    public ResponseEntity<Void> deleteAssetType(@PathVariable String name) {
 
         // Step 1: Delegate to service layer for deletion logic.
         assetTypeService.deleteAssetTypeByName(name);

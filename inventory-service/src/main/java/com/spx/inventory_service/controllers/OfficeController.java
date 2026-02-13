@@ -119,13 +119,13 @@ public class OfficeController {
     // ==========================================================
 
     /**
-     * Delete office by id response entity.
+     * Delete office by name response entity.
      *
      * @param name the name
      * @return the response entity
      */
     @DeleteMapping("/{name}")
-    public ResponseEntity<Void> deleteOfficeById(@PathVariable String name) {
+    public ResponseEntity<Void> deleteOffice (@PathVariable String name) {
 
         // Step 1: Delegate to service layer for deletion logic.
         officeService.deleteOfficeByName(name);
