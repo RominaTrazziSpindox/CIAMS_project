@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,7 +16,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/software-licenses")
 public class SoftwareLicenseController {
-
 
     @Autowired
     SoftwareLicenseService softwareLicenseService;
@@ -34,6 +34,7 @@ public class SoftwareLicenseController {
      *
      * @return the response entity
      */
+    @Transactional(readOnly = true)
     @GetMapping("/all")
     public ResponseEntity<List<SoftwareLicenseResponseDTO>>getAllSoftwareLicenses() {
 
@@ -56,6 +57,7 @@ public class SoftwareLicenseController {
      * @param softwareLicenseName the software license name
      * @return the software license by name
      */
+    @Transactional(readOnly = true)
     @GetMapping("/{softwareLicenseName}")
     public ResponseEntity<SoftwareLicenseResponseDTO> getSoftwareLicenseByName(@PathVariable String softwareLicenseName) {
 
@@ -65,8 +67,6 @@ public class SoftwareLicenseController {
         // Step 2: return a 200 HTTP Status code
         return ResponseEntity.ok(license);
     }
-
-
 
     // ==========================================================
     // CREATE
@@ -182,6 +182,7 @@ public class SoftwareLicenseController {
     // ==========================================================
     // AUDIT & QUERY
     // ==========================================================
+    @Transactional(readOnly = true)
     @GetMapping("/assets/{serialNumber}")
     public ResponseEntity<List<SoftwareLicenseResponseDTO>> getInstalledSoftwareLicenseBySerialNumber(@PathVariable String serialNumber) {
 
@@ -202,6 +203,7 @@ public class SoftwareLicenseController {
      *
      * @return the software licenses expiring soon
      */
+    @Transactional(readOnly = true)
     @GetMapping("/expiring-soon")
     public ResponseEntity<List<SoftwareLicenseResponseDTO>> getSoftwareLicensesExpiringSoon() {
 
