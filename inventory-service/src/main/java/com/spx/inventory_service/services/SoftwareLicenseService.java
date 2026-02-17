@@ -133,7 +133,7 @@ public class SoftwareLicenseService {
 
         // Step 5: If the newSoftwareLicenseName IS NOT EQUAL to the currentSoftwareLicenseName AND if the newSoftwareLicenseName already exists into the database...
         if (!normalizedCurrentName.equalsIgnoreCase(newSoftwareLicenseName) && softwareLicenseRepository.existsBySoftwareNameIgnoreCase(newSoftwareLicenseName)) {
-            throw new IllegalArgumentException("Software license already exists: " + newSoftwareLicenseName);
+            throw new IllegalStateException("Software license already exists: " + newSoftwareLicenseName);
         }
 
         // Step 6: Update only mutable fields (in this case: office name).

@@ -136,7 +136,7 @@ public class AssetTypeService {
 
         // Step 5: If the newName IS NOT EQUAL to the currentName AND if the newName already exists into the database...
         if (!normalizedCurrentName.equalsIgnoreCase(newName) && assetTypeRepository.existsByAssetTypeNameIgnoreCase(newName)) {
-            throw new IllegalArgumentException("Asset type already exists: " + newName);
+            throw new IllegalStateException("Asset type already exists: " + newName);
         }
 
         // Step 6: Update only mutable fields (in this case: asset type name and asset type description).

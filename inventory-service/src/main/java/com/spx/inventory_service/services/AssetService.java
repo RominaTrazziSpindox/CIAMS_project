@@ -204,7 +204,7 @@ public class AssetService {
 
         // Step 5: If the newSerialNumber IS NOT EQUAL to the currentSerialNumber AND if the newSerialNumber already exists into the database...
         if (!normalizedCurrentSerialNumber.equalsIgnoreCase(newSerialNumber) && assetRepository.existsBySerialNumberIgnoreCase(newSerialNumber)) {
-            throw new IllegalArgumentException( "Asset with serial number already exists: " + newSerialNumber);
+            throw new IllegalStateException( "Asset with serial number already exists: " + newSerialNumber);
         }
 
         // Step 6: Check if there is no office
@@ -239,7 +239,7 @@ public class AssetService {
      * @return the asset response dto
      */
     @Transactional
-    public AssetResponseDTO moveAssetToOfficeByName( String serialNumber,String updatedOfficeName) {
+    public AssetResponseDTO moveAssetToOfficeByName(String serialNumber,String updatedOfficeName) {
 
         // Step 1: Normalize the current serial number
         String normalizedSerial = TextNormalizer.normalizeKey(serialNumber);
