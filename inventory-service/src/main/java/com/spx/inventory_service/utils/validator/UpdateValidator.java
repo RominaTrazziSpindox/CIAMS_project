@@ -14,7 +14,7 @@ public class UpdateValidator {
         if (!currentValue.equalsIgnoreCase(newValue) && repositoryMethod.apply(newValue)) {
 
             log.error("{} already exists. Tried value: {}", entityName, newValue);
-            throw new IllegalArgumentException(entityName + " already exists: " + newValue);
+            throw new IllegalStateException(entityName + " already exists: " + newValue);
 
 
         }
