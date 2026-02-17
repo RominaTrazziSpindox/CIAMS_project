@@ -286,12 +286,11 @@ public class SoftwareLicenseService {
 
 
     /**
-     * Gets installed software by asset.
+     * Retrieve all the licenses owned by an asset.
      *
      * @param serialNumber the serial number
      * @return the installed software by asset
      */
-    // Retrieve all the licenses owned by an asset
     public List<SoftwareLicenseResponseDTO> getInstalledSoftwareLicenseBySerialNumber(String serialNumber) {
 
         // Step 1: Normalize the incoming asset serial number
@@ -309,11 +308,10 @@ public class SoftwareLicenseService {
     }
 
     /**
-     * Gets licenses expiring soon.
+     * Retrieve all the licenses that will expire in 30 days.
      *
      * @return the licenses expiring soon
      */
-    // Retrieve all the licenses that will expire in 30 days
     public List<SoftwareLicenseResponseDTO> getSoftwareLicensesExpiringSoon() {
 
         LocalDate today = LocalDate.now();
