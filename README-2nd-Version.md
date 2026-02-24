@@ -466,6 +466,8 @@ While CIAMS already provides a complete and consistent backend for IT asset and 
 
 2. Frontend & Visualization Layer
 
+3. Refresh and Rotation JWT logic implementation 
+
 Although CIAMS is currently backend-focused, a future extension could include a web-based frontend.
 This would improve usability for non-technical users.
 
